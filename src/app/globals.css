@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+:root {
+  /* Paleta Dromos: carbón, volt (líder y acciones), calle (texto), grafito y tartán (avisos) */
+  --bg: #0c0d10;
+  --card: #16181d;
+  --line: #2a2d34;
+  --fg: #f2f1ec;
+  --muted: #9a9ca3;
+  --accent: #c8f135;
+  --accent-fg: #0c0d10;
+  --alert: #ff5a36;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-card: var(--card);
+  --color-line: var(--line);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-grotesk), var(--font-inter), system-ui, sans-serif;
+  --color-alert: var(--alert);
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+@layer components {
+  .input {
+    @apply w-full rounded-lg border border-line bg-bg px-3 py-2.5 text-fg outline-none placeholder:text-muted/60 focus:border-accent;
+  }
+  .label {
+    @apply mb-1 block text-xs font-semibold uppercase tracking-wider text-muted;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center rounded-lg bg-accent px-4 py-2.5 font-display text-base font-semibold uppercase tracking-wider text-accent-fg transition hover:brightness-110 disabled:opacity-50;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-lg border border-line px-3 py-2 text-sm text-fg transition hover:border-muted;
+  }
+  .card {
+    @apply rounded-xl border border-line bg-card;
+  }
+  .chip {
+    @apply rounded-full border border-line px-3 py-1 text-sm text-muted transition hover:text-fg;
+  }
+  .chip-on {
+    @apply border-accent bg-accent text-accent-fg hover:text-accent-fg;
+  }
+  .h-display {
+    @apply font-display font-semibold uppercase leading-none tracking-tight;
+  }
+  /* Títulos: Space Grotesk, la tipografía de la marca */
+  .h-title {
+    @apply font-display font-semibold leading-[1.02] tracking-tight;
+  }
+  /* Marcador lateral «01 02 03» del manual */
+  .marker {
+    @apply font-display text-xs font-semibold tabular-nums tracking-widest;
+  }
+}
+
+@keyframes tc-pop {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes tc-flame {
+  from { transform: scale(1) rotate(-4deg); }
+  to { transform: scale(1.12) rotate(4deg); }
+}
+
+/* Manual en pantalla */
+.manual { font-size: 15px; line-height: 1.6; }
+.manual > * + * { margin-top: 0.75rem; }
+.manual h3 { font-weight: 700; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-muted); margin-top: 1.25rem; }
+.manual strong { font-weight: 700; color: var(--color-fg); }
+.manual ul { list-style: none; padding-left: 0; }
+.manual ul li { position: relative; padding-left: 1.1rem; margin-top: 0.4rem; }
+.manual ul li::before { content: ""; position: absolute; left: 0.2rem; top: 0.62em; width: 6px; height: 6px; border-radius: 99px; background: var(--color-accent); }
+.manual ol { list-style: decimal; padding-left: 1.3rem; }
+.manual ol li { margin-top: 0.4rem; }
+.manual ol li::marker { color: var(--color-accent); font-weight: 700; }
+.manual table { width: 100%; border-collapse: collapse; font-size: 13px; display: block; overflow-x: auto; }
+.manual th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-muted); border-bottom: 1px solid var(--color-line); padding: 6px 8px; }
+.manual td { border-bottom: 1px solid var(--color-line); padding: 8px; vertical-align: top; }
+.manual td:first-child { font-weight: 600; }
+.manual blockquote { border-left: 3px solid var(--color-accent); padding-left: 0.75rem; color: var(--color-muted); }

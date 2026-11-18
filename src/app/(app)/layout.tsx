@@ -1,0 +1,82 @@
+import Link from "next/link";
+import { isCoachProfile, requireUser } from "@/lib/supabase/server";
+import { BottomNav } from "@/components/bottom-nav";
+import { getI18n } from "@/lib/i18n/server";
+import { getNotices } from "@/lib/notifications";
+import { NoticeBanner } from "@/components/notice-banner";
+import { UnreadBadge } from "@/components/unread-badge";
+import { PushPrompt } from "@/components/push-prompt";
+import { BRAND } from "@/lib/brand";
+
+export default async function AppLayout({ children }: LayoutProps<"/">) {
+  const { supabase, user, profile } = await requireUser();
+  const { unread: fresh } = await getNotices(supabase, user.id, 30, true);
+  const unread = fresh.length;
+  const latest = fresh.reduce<string | null>((m, n) => (m && m > n.at ? m : n.at), null);
+  const names = [...new Set(fresh.map((n) => n.who).filter(Boolean))];
+  const isCoach = isCoachProfile(profile);
+  const { t } = await getI18n();
+  // Mensajes sin leer: para el equipo, los de atletas sin contestar; para el atleta, los del equipo y anuncios nuevos
+  const { data: unreadMsgs } = isCoach
+    ? await supabase.from("messages").select("created_at").is("staff_read_at", null).not("thread_user_id", "is", null).order("created_at", { ascending: false }).limit(50)
+    : await supabase
+        .from("messages")
+        .select("created_at")
+        .or(`thread_user_id.eq.${user.id},thread_user_id.is.null`)
+        .neq("sender_id", user.id)
+        .gt("created_at", profile?.messages_seen_at ?? "1970-01-01")
+        .order("created_at", { ascending: false })
+        .limit(50);
+  const msgCount = unreadMsgs?.length ?? 0;
+  const msgLatest = (unreadMsgs?.[0]?.created_at as string | undefined) ?? null;
+
+  return (
+    <div className="mx-auto flex min-h-full max-w-2xl flex-col">
+      <header className="flex items-center justify-between gap-3 px-4 pt-4">
+        <Link href="/" className="flex min-w-0 items-center gap-3" aria-label={BRAND.name}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={BRAND.logo} alt={BRAND.name} className="h-5 w-auto shrink-0" />
+          {/* En móviles estrechos (o con el botón Admin) no cabe: solo se muestra con sitio de sobra */}
+          <span className={`border-l border-line pl-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-muted ${profile?.is_admin ? "hidden md:inline" : "hidden min-[400px]:inline"}`}>
+            Leaderboard
+          </span>
+        </Link>
+        <div className="flex shrink-0 items-center gap-1">
+          {profile?.is_admin && (
+            <Link href="/admin" className="rounded-md border border-line px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-muted">
+              Admin
+            </Link>
+          )}
+          <Link href="/mensajes" className="relative flex h-11 w-11 items-center justify-center rounded-full text-fg active:bg-line" aria-label={t("Mensajes")}>
+            <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <path d="m3 7 9 6 9-6" />
+            </svg>
+            <UnreadBadge count={msgCount} latest={msgLatest} prefix="/mensajes" />
+          </Link>
+          <Link href="/avisos" className="relative flex h-11 w-11 items-center justify-center rounded-full text-fg active:bg-line" aria-label={t("Avisos")}>
+            <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z" />
+            </svg>
+            <UnreadBadge count={unread} latest={latest} />
+          </Link>
+        </div>
+      </header>
+      {!profile?.gender && (
+        <Link href="/perfil" className="mx-4 mt-3 rounded-lg border border-accent/50 bg-accent/10 px-3 py-2 text-sm">
+          {t("Completa tu perfil (nombre y categoría) para salir bien en el leaderboard →")}
+        </Link>
+      )}
+      <PushPrompt />
+      <NoticeBanner
+        count={unread}
+        latest={latest}
+        names={names}
+        hasComments={fresh.some((n) => n.kind === "comment")}
+        medals={fresh.filter((n) => n.kind === "medal").length}
+      />
+      <main className="flex-1 px-4 pb-28 pt-4">{children}</main>
+      <BottomNav isCoach={isCoach} />
+    </div>
+  );
+}

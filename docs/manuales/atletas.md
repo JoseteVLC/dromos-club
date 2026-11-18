@@ -1,0 +1,220 @@
+## Primeros pasos
+
+Dromos Club es el leaderboard de tu box: donde apuntas tus resultados de cada WOD, guardas tus marcas y te comparas con el resto de la comunidad. Funciona desde el navegador del móvil, sin descargar nada de la tienda.
+
+1. **Entra con tu invitación.** Tu coach te manda un enlace por WhatsApp o email. Ábrelo, elige si eres chico o chica y crea tu contraseña.
+2. **Inicia sesión** las siguientes veces en la dirección de tu box (la del enlace de invitación) con tu email y esa contraseña.
+3. **Instálala en el móvil.** En Perfil → «Instala la app» tienes los pasos. En iPhone: botón Compartir de Safari → «Añadir a pantalla de inicio». En Android: menú de Chrome → «Instalar app».
+4. **Completa tu perfil:** sube tu foto y rellena tus datos (lo explicamos más abajo, en «Tu perfil»).
+5. **Activa los avisos:** con la app instalada, en Perfil → 🔔 Notificaciones (ver «Notificaciones»).
+6. **Elige tu idioma** en Perfil → Idioma: español, inglés o polaco.
+
+Abajo tienes el menú: **WODs** (el entreno del día), **Ranking**, **Historial** y **Perfil**. Arriba a la derecha, el sobre de **Mensajes** ✉️ y el globo de **Avisos**.
+
+## El WOD del día
+
+Al abrir la app ves el entreno de hoy. Si el día tiene varias partes (A, B, C…), salen como pestañas arriba: cada parte tiene su propio resultado y su propio leaderboard.
+
+- **Cambiar de día:** flechas a los lados de la fecha, desliza el dedo a izquierda o derecha, o toca la fecha para abrir el calendario.
+- **Tu semana:** la tira de días de arriba marca con ✓ los días en que ya metiste resultado.
+- **★ Benchmark:** los WODs con estrella son pruebas de referencia (Fran, Grace, 1RM…). Cuentan para tus PRs.
+- **Desde tu alta:** ves y participas en la plani a partir del día en que te diste de alta. Los días anteriores no aparecen.
+
+## Meter tu resultado
+
+Baja hasta «Mete tu resultado», elige tu categoría, escribe tu marca y pulsa **Guardar resultado**. Puedes cambiarlo cuando quieras volviendo al mismo WOD.
+
+### Categorías
+
+| Categoría | Cuándo | Ranking |
+| --- | --- | --- |
+| Elite | Lo haces tal cual, con el peso y las reps de Elite | Sí, por delante de RX |
+| RX | Lo haces tal cual, con el peso y las reps RX | Sí |
+| Escalado | Lo adaptas: menos peso, menos reps, otro movimiento, más descanso | No. Cuentas en notas qué has hecho y el día cuenta para tu racha |
+
+### Cómo se escribe cada tipo de score
+
+| Tipo | Qué escribes | Gana |
+| --- | --- | --- |
+| For Time | Tu tiempo en minutos y segundos. Si no acabas en el time cap: marca CAP y pon las reps hechas | Menos tiempo |
+| AMRAP | Rondas completas + reps sueltas | Más |
+| Carga | Kilos | Más |
+| Repeticiones · Calorías · Distancia · EMOM | El número total | Más |
+
+**WODs con dos scores.** Algunos WODs piden dos marcas, por ejemplo kilos del back squat y reps de sandbag clean. Verás dos casillas: la segunda es opcional y cada una tiene su propio ranking.
+
+**Notas.** Opcional en Elite y RX («con chaleco», «estaba reventado»). En Escalado es obligatoria: es tu resultado.
+
+## El leaderboard del WOD
+
+Debajo de cada WOD está su clasificación, con la foto de cada atleta. Elite va siempre por delante de RX; dentro de cada una, gana la mejor marca.
+
+- **Filtros:** Absoluto, Chicos o Chicas, y Todas, Elite o RX.
+- **Dos scores:** si el WOD tiene dos, arriba eliges cuál ver; la otra marca sale en pequeño bajo cada nombre.
+- **Escalado:** sale aparte, debajo, sin posiciones, con lo que cada uno contó en sus notas.
+- **Reacciones y comentarios:** toca 👊 o 🔥 para animar a alguien, o 💬 para comentar su resultado y contestar en la conversación.
+- **Reaccionar a un comentario:** como en WhatsApp, mantén pulsado un comentario (o toca la carita ☺ que tiene al lado) y elige 👍 ❤️ 😂 😮 🔥 o 💪. Solo puedes poner una por comentario: si eliges otra, cambia; si tocas la tuya, se quita. Toca las reacciones de debajo para ver quién las ha puesto.
+- **Ver a un atleta:** toca su foto o su nombre para abrir su ficha pública.
+- **Tu posición y tu percentil:** encima de la lista ves dónde quedas con el filtro elegido. A partir de 10 atletas sale tu «Top X %» con una campana de Gauss que marca dónde estás; con menos, solo tu posición («3º / 7»). Solo lo ves tú.
+
+## Ranking
+
+En el menú **Ranking** tienes tres pestañas. Puntos y Leaderboards se ven por semana, mes o año, y te mueves entre periodos con las flechas.
+
+| Pestaña | Qué mide |
+| --- | --- |
+| Puntos | En cada WOD sumas 1 punto por participar y 1 más por cada atleta que queda por detrás de ti. Escalado suma 1 punto |
+| Constancia | Días de plani seguidos con resultado metido, tu récord y el total. Los días sin WOD (normalmente el domingo) no rompen la racha |
+| Leaderboards | Todos los WODs del periodo, con quién va primero y tu posición. Toca uno para entrar en su clasificación |
+
+## Mis marcas
+
+En **Historial → 🏋️ Mis marcas** tienes el catálogo de benchmarks de CrossFit para apuntar tus mejores marcas, aunque no salgan en la plani: Girls, Héroes, clásicos, básicos (squat, deadlift, press…), halterofilia, gimnásticos y cardio.
+
+- **Despliega una categoría** o usa el buscador, y entra en el ejercicio.
+- **Apunta tu marca:** fecha, RX o Escalado (en WODs) o el RM (1RM, 3RM, 5RM… en levantamientos) y tu resultado. Antes de guardar un tiempo verás «Se guardará como 5:09» para comprobar que está bien.
+- **Corrige o borra:** en «Tu historial», debajo de cada marca, tienes ✏️ Editar y la papelera.
+- **Tu PR y tu percentil:** ves tu mejor marca, en qué porcentaje de la comunidad estás («Top 15 %», con la campana de Gauss a partir de 10 atletas) y el ranking de la comunidad por chicos y chicas.
+- **Tabla de porcentajes:** en los levantamientos, la app calcula tus kilos del 40 % al 100 % de tu 1RM para preparar los entrenos.
+- **WODs de la plani:** si un WOD se llama igual que un benchmark (por ejemplo «Fran»), tu resultado cuenta también aquí.
+
+## Historial y PRs
+
+En **Historial** está todo lo que has hecho.
+
+- **Mis PRs:** tu mejor marca en cada benchmark, juntando Mis marcas y los WODs benchmark de la plani, con la fecha en que la hiciste. En levantamientos sale cada RM por separado (back squat 1RM, 3RM…). Los escalados no cuentan.
+- **Mis resultados:** tus WODs y tus marcas personales (🏋️) por fecha, agrupados por mes, con tu posición en cada WOD. Por defecto ves los últimos meses; «Ver meses anteriores» carga más.
+- **Buscar:** escribe el nombre de un WOD («Fran», «back squat») o activa «★ Solo benchmarks».
+
+## Tu perfil
+
+En **Perfil → Tus datos** está todo lo tuyo. Tiene una parte pública y otra privada.
+
+### Foto
+
+Toca el círculo de la foto y elige una de tu galería o haz una con la cámara. La app la recorta en cuadrado automáticamente. Sale en pequeño en los leaderboards, en los rankings y en los comentarios. Puedes cambiarla o quitarla cuando quieras.
+
+### Lo que ve todo el mundo
+
+| Dato | Para qué |
+| --- | --- |
+| Nombre y apellidos | Así sales en los leaderboards |
+| Chico / Chica | Para los rankings por sexo |
+| Nivel habitual | Elite, RX o Escalado (se ajusta solo al meter resultados) |
+| Sobre ti | Una frase sobre ti (máximo 200 caracteres) |
+| Instagram | Tu usuario, para que la comunidad te siga |
+
+### 🔒 Datos privados
+
+Solo los ve el equipo de tu box. Ningún atleta puede verlos. Los usamos para enviarte regalos y premios de medallas y, más adelante, para rankings por edad.
+
+| Dato | Para qué |
+| --- | --- |
+| Box donde entrenas | Saber de dónde es cada atleta de la comunidad |
+| Teléfono | Contactarte si hace falta |
+| Fecha de nacimiento | Rankings por edad (nunca se muestra la fecha) |
+| Dirección, código postal, ciudad y país | Enviarte premios y regalos |
+| Talla de camiseta | Acertar con la ropa de regalo |
+
+Si quieres, puedes marcar **«Mostrar mi box»** y **«Mostrar mi edad»** para que salgan en tu ficha pública. La fecha de nacimiento y la dirección no se muestran nunca.
+
+### Tu ficha pública
+
+Cualquier atleta puede abrirla tocando tu foto o tu nombre. Muestra tu foto, nombre, lo que hayas hecho público, tus entrenos totales, tu racha actual y tu mejor racha, tus medallas y tus mejores marcas. Para ver cómo te ven los demás: Perfil → «👀 Ver mi perfil público».
+
+## Medallas
+
+Cada vez que entrenas, bates un PR o completas un benchmark, avanzas hacia una de las **20 medallas** de Dromos. Las ves en **Perfil → 🏅 Medallas**: las conseguidas brillan con la fecha en que las ganaste; las que te faltan salen en gris con una barra de progreso («37/100»).
+
+Se desbloquean solas al guardar tus resultados y tus marcas, y una vez ganadas **son tuyas para siempre**. Cuando consigues una te avisamos en **Avisos** y con un cartel arriba.
+
+| Medalla | Cómo se consigue |
+| --- | --- |
+| **Constancia** | |
+| Primer paso | Mete tu primer entreno |
+| Semana de fuego | 6 días de plani seguidos: una semana completa |
+| Mes perfecto | 25 WODs registrados en un mismo mes |
+| Imparable 🎁 | 30 días de plani seguidos sin fallar |
+| **Entrenos** | |
+| En marcha | 25 entrenos registrados |
+| Centurión 🎁 | 100 entrenos registrados |
+| Leyenda 🎁 | 250 entrenos registrados |
+| Inmortal 🎁 | 500 entrenos registrados |
+| **Récords** | |
+| Rompe-récords | Consigue tu primer PR |
+| Coleccionista | Bate 10 PRs |
+| Cohete | Bate 25 PRs |
+| Club de los 100 | Snatch de 100 kg o más |
+| **Benchmarks** | |
+| Las chicas | Completa 5 Girls distintas |
+| Héroe | Completa 5 Hero WODs distintos |
+| Murph | Completa Murph |
+| Explorador | Completa 10 benchmarks distintos |
+| **Competición** | |
+| Podio | Top 3 en un WOD de tu categoría (mínimo 3 atletas) |
+| Campeón | Gana un WOD de tu categoría (mínimo 3 atletas) |
+| Dinastía | Gana 5 WODs de tu categoría |
+| **Comunidad** | |
+| Alma del box | Anima a la comunidad: 25 comentarios o reacciones |
+
+**🎁 Medallas con premio.** Imparable, Centurión, Leyenda e Inmortal pueden llevar premio de tu box. Si tu box los tiene activados, cuando desbloquees una te lo harán llegar: revisa que tu dirección y tu talla estén al día en tu perfil.
+
+**Retos del mes.** Además de las 20 permanentes, cada mes o en eventos como el Open habrá retos especiales que solo se pueden ganar en ese periodo. Quedarán en tu perfil como recuerdo.
+
+**Cómo cuentan.** Un entreno es un día de plani con resultado metido. Las rachas cuentan días de plani seguidos: los días sin WOD no la rompen. Un PR es cada vez que mejoras tu mejor marca en un benchmark (en RX). El podio y la victoria se calculan dentro de tu categoría (Elite o RX) y tu sexo.
+
+**Cuándo se ganan Podio, Campeón y Dinastía.** Cada WOD tiene **2 días de margen** para meter el resultado: el del lunes se puede meter hasta el miércoles a las 23:59. Hasta entonces la clasificación es provisional (lo verás encima del ranking). Al cerrar, la app reparte las medallas con la clasificación final y te avisa si has ganado alguna. Si alguien mete su resultado después del cierre, sale en el ranking con la etiqueta «fuera de plazo», pero no gana ni quita medallas.
+
+## Avisos
+
+El globo de arriba a la derecha muestra un número cuando tienes algo nuevo:
+
+- alguien comenta tu resultado o contesta en una conversación donde has comentado;
+- alguien reacciona a tu resultado con 👊 o 🔥;
+- alguien reacciona a un comentario tuyo;
+- desbloqueas una medalla.
+
+Al abrir Avisos el contador se pone a cero.
+
+## Notificaciones
+
+Con la app instalada en el móvil te llegan avisos como los de cualquier app, aunque la tengas cerrada.
+
+1. **Instala la app** (ver «Primeros pasos»). En iPhone es imprescindible: las notificaciones solo funcionan si abres Dromos desde el icono de la pantalla de inicio, no desde Safari.
+2. Ve a **Perfil → 🔔 Notificaciones** y pulsa **Activar avisos en este móvil**. Acepta el permiso: te llegará un aviso de prueba.
+3. Elige qué quieres recibir con los interruptores. Puedes cambiarlo cuando quieras.
+
+| Aviso | Cuándo llega |
+| --- | --- |
+| Comentarios y reacciones | Alguien comenta o reacciona a tu resultado o a un comentario tuyo, o contesta donde has comentado |
+| Medallas | Desbloqueas una medalla |
+| Mensajes del equipo | Un coach te escribe o el equipo publica un anuncio |
+| Recordatorios de entreno | A última hora de la tarde, si tu racha está en peligro o llevas varios días sin meter resultado |
+
+Si usas la app en varios móviles, actívalos en cada uno. Para dejar de recibirlos en un móvil: **Desactivar en este móvil**. Si bloqueaste el permiso sin querer, actívalo en los ajustes del móvil para Dromos.
+
+## Mensajes con el equipo
+
+Con el sobre ✉️ de arriba (o Perfil → Mensajes con el equipo) hablas directamente con el equipo de tu box: dudas con la plani, con un resultado o lo que necesites.
+
+- **Te contesta cualquier coach** y ves el nombre de quien te escribe.
+- **Anuncios 📣:** los avisos para toda la comunidad (cambios de horario, eventos…) salen en el mismo chat, destacados en naranja.
+- El sobre muestra un número cuando tienes mensajes nuevos y, si tienes los avisos activados, te llega también una notificación.
+- Ves los últimos 30 mensajes; con **Ver mensajes anteriores** cargas más.
+- Puedes borrar tus propios mensajes con la papelera.
+
+## Preguntas frecuentes
+
+**¿Me equivoqué al meter el resultado?** Vuelve al WOD, corrígelo y guarda. También puedes borrarlo desde el leaderboard. Si es una marca de Mis marcas, usa ✏️ Editar en su historial.
+
+**¿Se me pasa un día?** Puedes meter el resultado de días anteriores navegando hasta esa fecha (desde tu alta). Cuenta para la racha si lo metes.
+
+**¿Puedo apuntar marcas de antes de darme de alta?** Sí: en Mis marcas puedes poner cualquier fecha. Lo que no puedes es participar en WODs de la plani anteriores a tu alta.
+
+**¿Quién ve mis datos?** Tus resultados, tu foto y lo que marques como público, solo los atletas y coaches de tu box con cuenta en la app. Tus datos privados, solo el equipo de tu box.
+
+**¿He olvidado la contraseña?** Escríbele a tu coach y te ayuda a recuperar el acceso. Si sigues dentro, la cambias en Perfil → Contraseña.
+
+**¿Puedo perder una medalla?** No. Una vez ganada es tuya para siempre, aunque luego borres el resultado.
+
+**No me llegan las notificaciones.** Comprueba que abres la app desde el icono (en iPhone es obligatorio), que en Perfil pone «Activadas en este móvil» y que el interruptor de ese tipo de aviso está encendido. Pulsa «Enviar prueba» para comprobarlo.
