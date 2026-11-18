@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { BOX_COOKIE, isValidSlug } from "@/lib/box-shared";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "@/lib/public-config";
 
-const PUBLIC_PATHS = ["/login", "/auth", "/invitacion", "/nuevo-box", "/sw.js", "/api/cron"];
+const PUBLIC_PATHS = ["/login", "/auth", "/invitacion", "/nuevo-box", "/unirse", "/sw.js", "/api/cron"];
 
 export async function proxy(request: NextRequest) {
   // Entrada a un box por su dirección (/cfvalencia): lo recordamos y vamos a su inicio.

@@ -105,4 +105,6 @@ export type Box = {
   accent: string | null;
   rewards_enabled: boolean;
   status: "trial" | "active" | "paused";
+  join_code: string;
+  join_mode: "approval" | "open";
 };

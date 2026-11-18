@@ -7,7 +7,7 @@ import { DIVISIONS, type Division, type Gender, type Profile } from "@/lib/types
 import { FormMessage, Segmented, SubmitButton } from "./ui";
 import { useI18n } from "@/lib/i18n/client";
 
-const GENDER_OPTS = [
+export const GENDER_OPTS = [
   { value: "M" as Gender, label: "Chico" },
   { value: "F" as Gender, label: "Chica" },
 ];

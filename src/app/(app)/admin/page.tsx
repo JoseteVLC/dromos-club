@@ -10,6 +10,10 @@ import { MedalBadge } from "@/components/medal-badge";
 import { InviteForm, ShareInvite } from "@/components/admin-invite";
 import { ConfirmDelete } from "@/components/ui";
 import { getI18n } from "@/lib/i18n/server";
+import { daysAgoISO } from "@/lib/dates";
+import { AdminJoin, type JoinRequest } from "@/components/admin-join";
+import { AdminInactive } from "@/components/admin-inactive";
+import { joinUrl, qrSvg } from "@/lib/qr";
 
 type Person = {
   id: string;
@@ -77,6 +81,25 @@ export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
   for (const r of lastRes ?? []) if (!lastActivity.has(r.user_id)) lastActivity.set(r.user_id, r.updated_at);
   const base = await siteUrl();
 
+  // Alta con QR: solicitudes pendientes y el QR del box
+  const { data: reqRows } = await db
+    .from("box_members")
+    .select("user_id, joined_at, profiles!inner(full_name, avatar_url)")
+    .eq("box_id", box.id)
+    .eq("pending", true)
+    .order("joined_at")
+    .returns<{ user_id: string; joined_at: string; profiles: { full_name: string; avatar_url: string | null } }[]>();
+  const reqEmails = await emailsOf((reqRows ?? []).map((r) => r.user_id));
+  const requests: JoinRequest[] = (reqRows ?? []).map((r) => ({ id: r.user_id, full_name: r.profiles.full_name, avatar_url: r.profiles.avatar_url, email: reqEmails.get(r.user_id) ?? "", at: r.joined_at }));
+  const qrUrl = joinUrl(base, box.join_code);
+  const svg = await qrSvg(qrUrl);
+
+  // Atletas activos que llevan 60 días sin meter nada (y que no acaban de llegar)
+  const cutoff = daysAgoISO(60);
+  const { data: recent } = await db.from("results").select("user_id").eq("box_id", box.id).gte("updated_at", cutoff).limit(20000).returns<{ user_id: string }[]>();
+  const recentIds = new Set((recent ?? []).map((r) => r.user_id));
+  const dormant = people.filter((p) => p.active && p.role === "athlete" && !p.is_admin && p.created_at < cutoff && !recentIds.has(p.id));
+
   const all = people ?? [];
   const list = all
     .filter((p) => (filter === "todos" ? true : filter === "activos" ? p.active : !p.active))
@@ -107,6 +130,8 @@ export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
         <h2 className="h-display text-xl">{t("Tu box")}</h2>
         <BoxSettingsForm name={box.name} rewards={box.rewards_enabled} url={boxUrl(box.slug, base)} />
       </section>
+
+      <AdminJoin svg={svg} url={qrUrl} mode={box.join_mode} requests={requests} t={t} locale={locale} />
 
       <section className="space-y-3">
         <h2 className="h-display text-xl">{t("Invitar a alguien")}</h2>
@@ -183,6 +208,7 @@ export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
 
       <section className="space-y-3">
         <h2 className="h-display text-xl">{t("Personas")}</h2>
+        <AdminInactive people={dormant} t={t} />
         <form className="flex gap-2">
           <input type="hidden" name="f" value={filter} />
           <input name="q" defaultValue={q} placeholder={t("Buscar por nombre o email")} className="input" />

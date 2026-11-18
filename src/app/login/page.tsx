@@ -33,7 +33,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
           {t("El enlace de confirmación no es válido o ha caducado.")}
         </p>
       )}
-      <LoginForm />
+      <LoginForm next={typeof sp.next === "string" ? sp.next : ""} />
       <p className="text-center text-sm text-muted">
         {t("¿Tienes un box y quieres usar {app}?")}{" "}
         <Link href="/nuevo-box" className="font-semibold text-accent underline">

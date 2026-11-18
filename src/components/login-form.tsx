@@ -5,12 +5,13 @@ import { login } from "@/app/actions";
 import { FormMessage, SubmitButton } from "./ui";
 import { useI18n } from "@/lib/i18n/client";
 
-export function LoginForm() {
+export function LoginForm({ next = "" }: { next?: string }) {
   const [state, action] = useActionState(login, undefined);
   const { t } = useI18n();
   return (
     <div className="card space-y-4 p-5">
       <form action={action} className="space-y-4">
+        <input type="hidden" name="next" value={next} />
         <div>
           <label className="label" htmlFor="email">Email</label>
           <input id="email" name="email" type="email" className="input" autoComplete="email" required />

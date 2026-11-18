@@ -9,7 +9,8 @@ import type { Profile } from "@/lib/types";
 import { isCoachProfile, requireUser } from "@/lib/supabase/server";
 import { PasswordForm, PersonalForm } from "@/components/account-forms";
 import { InstallHelp } from "@/components/install-hint";
-import { logout } from "@/app/actions";
+import { leaveBox, logout } from "@/app/actions";
+import { ConfirmDelete } from "@/components/ui";
 import { getI18n } from "@/lib/i18n/server";
 import { LangSwitcher } from "@/components/lang-switcher";
 
@@ -125,6 +126,13 @@ export default async function PerfilPage({ searchParams }: PageProps<"/perfil">)
         </span>
         <span className="text-sm text-accent">{t("Cambiar o crear box")} →</span>
       </Link>
+
+      {sp.salir === "admin" && (
+        <p className="rounded-lg border border-alert/40 bg-alert/10 px-3 py-2 text-sm">{t("Eres el único admin del box: nombra a otro admin antes de salirte.")}</p>
+      )}
+      <form action={leaveBox} className="text-center">
+        <ConfirmDelete label={t("Salir de este box")} confirmLabel={t("¿Salir de {box}? Pulsa otra vez", { box: box.name })} className="text-sm" />
+      </form>
 
       <form action={logout}>
         <button className="btn-ghost w-full py-3 text-muted">{t("Cerrar sesión")}</button>

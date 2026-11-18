@@ -2,14 +2,14 @@
 
 Dromos Club es el leaderboard de tu box: donde apuntas tus resultados de cada WOD, guardas tus marcas y te comparas con el resto de la comunidad. Funciona desde el navegador del móvil, sin descargar nada de la tienda.
 
-1. **Entra con tu invitación.** Tu coach te manda un enlace por WhatsApp o email. Ábrelo, elige si eres chico o chica y crea tu contraseña.
+1. **Date de alta.** Escanea con la cámara del móvil el QR de tu box (suele estar en la pizarra o en recepción), pon tu nombre, email y contraseña y pulsa «Unirme». Si tu box revisa las altas, entrarás en cuanto te acepte. También puede invitarte tu coach con un enlace por WhatsApp o email.
 2. **Inicia sesión** las siguientes veces en la dirección de tu box (la del enlace de invitación) con tu email y esa contraseña.
 3. **Instálala en el móvil.** En Perfil → «Instala la app» tienes los pasos. En iPhone: botón Compartir de Safari → «Añadir a pantalla de inicio». En Android: menú de Chrome → «Instalar app».
 4. **Completa tu perfil:** sube tu foto y rellena tus datos (lo explicamos más abajo, en «Tu perfil»).
 5. **Activa los avisos:** con la app instalada, en Perfil → 🔔 Notificaciones (ver «Notificaciones»).
 6. **Elige tu idioma** en Perfil → Idioma: español, inglés o polaco.
 
-**¿Entrenas en más de un box?** Con la misma cuenta puedes estar en varios. Cada box tiene su dirección (por ejemplo `/tubox`), sus WODs, su ranking, sus medallas y sus mensajes, y lo de uno no se ve en otro. Para pasar de uno a otro: Perfil → «Tu box» → Cambiar o crear box. Arriba a la izquierda siempre ves en qué box estás.
+**¿Entrenas en más de un box?** Con la misma cuenta puedes estar en varios. Cada box tiene su dirección (por ejemplo `/tubox`), sus WODs, su ranking, sus medallas y sus mensajes, y lo de uno no se ve en otro. Para pasar de uno a otro: Perfil → «Tu box» → Cambiar o crear box. Si dejas de ir a un box, en Perfil → «Salir de este box» te sales tú: tu cuenta sigue funcionando en los demás y tus resultados se guardan por si vuelves. Arriba a la izquierda siempre ves en qué box estás.
 
 Abajo tienes el menú: **WODs** (el entreno del día), **Ranking**, **Historial** y **Perfil**. Arriba a la derecha, el sobre de **Mensajes** ✉️ y el globo de **Avisos**.
 

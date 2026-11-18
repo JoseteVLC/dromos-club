@@ -83,9 +83,19 @@ En **Admin → Tu box** puedes cambiar el nombre del box y activar o desactivar 
 
 Cada box es independiente: WODs, resultados, ranking, medallas, mensajes, invitaciones y roles son de ese box. Una misma persona puede ser atleta en un box y coach en otro.
 
+## Altas con QR (admins)
+
+La forma más fácil de que entre todo el box. En **Admin → Unirse con QR** tienes el QR de tu box y su enlace.
+
+1. **Cuélgalo:** pulsa **🖨️ Cartel para imprimir** y saldrá un cartel A4 con el nombre del box, el QR y tres pasos. Imprímelo o guárdalo en PDF y ponlo en la pizarra o en recepción. También puedes copiar el enlace y mandarlo al grupo de WhatsApp.
+2. **El atleta escanea** con la cámara del móvil, pone nombre, email y contraseña y pulsa «Unirme». Si ya tenía cuenta en Dromos Club (de otro box), solo entra.
+3. **Tú lo aceptas:** con **«Con mi aprobación»** (lo normal), la persona queda en **Quieren unirse** y te llega un aviso. Pulsa **Aceptar** o **Rechazar**. Con **«Directo»** entra al momento, sin pasar por ti.
+
+**Cambiar código:** si el QR ha acabado fuera del box, pulsa **Cambiar código**: el anterior deja de valer y tendrás que imprimir el cartel nuevo.
+
 ## Gestionar personas (admins)
 
-Nadie entra sin invitación. Todo se hace en **Admin**.
+Además del QR, puedes invitar a alguien concreto. Todo se hace en **Admin**.
 
 1. **Invitar:** en «Invitar a alguien» pon nombre, apellidos, email y rol (Atleta, Coach o Admin) y pulsa **Crear invitación**. Si esa persona ya tiene cuenta en Dromos Club (por ejemplo, de otro box), entra en tu box directamente, sin enlace.
 2. **Enviar:** copia el enlace o ábrelo por email y mándaselo por WhatsApp o correo. Con ese enlace la persona crea su contraseña y entra.
@@ -93,6 +103,7 @@ Nadie entra sin invitación. Todo se hace en **Admin**.
 
 En **Personas** ves a todo el mundo, con su estado y la fecha de su último resultado, y puedes buscar por nombre o email.
 
+- **💤 Sin entrenar en 60 días:** encima de la lista ves a los atletas activos que llevan dos meses sin meter resultados. Si ya no vienen, **Dar de baja a todos** los desactiva de golpe (pide confirmación).
 - **Desactivar / Activar:** desactivar no borra nada. La persona no puede entrar, pero sus resultados se guardan; si vuelve, la activas y lo tiene todo como lo dejó. Úsalo cuando alguien se da de baja.
 - **Hacer coach / Quitar coach** y **Hacer admin / Quitar admin:** cambian el rol al momento.
 

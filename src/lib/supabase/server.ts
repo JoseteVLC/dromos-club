@@ -54,7 +54,7 @@ export const requireSession = cache(async () => {
   return { supabase, user };
 });
 
-type MemberRow = { role: "athlete" | "coach" | "admin"; active: boolean; joined_at: string; boxes: Box };
+type MemberRow = { role: "athlete" | "coach" | "admin"; active: boolean; pending: boolean; joined_at: string; boxes: Box };
 
 /**
  * Usuario + perfil + box activo. Redirige a /login si no hay sesión y a /boxes si no hay box elegido
@@ -74,12 +74,14 @@ export const requireUser = cache(async () => {
       .single<Profile>(),
     supabase
       .from("box_members")
-      .select("role, active, joined_at, boxes!inner(id, slug, name, logo_url, accent, rewards_enabled, status)")
+      .select("role, active, pending, joined_at, boxes!inner(id, slug, name, logo_url, accent, rewards_enabled, status, join_code, join_mode)")
       .eq("user_id", user.id)
       .eq("boxes.slug", slug)
       .maybeSingle<MemberRow>(),
   ]);
   if (!member) redirect("/boxes?fuera=" + encodeURIComponent(slug));
+  // Se ha apuntado con el QR y el admin aún no le ha aceptado
+  if (member.pending) redirect("/inactivo?pendiente=" + encodeURIComponent(slug));
   // Cuenta desactivada (en la plataforma o en este box)
   if ((profile && profile.active === false) || !member.active) redirect("/inactivo");
 

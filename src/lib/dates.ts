@@ -49,3 +49,8 @@ export function dayHref(iso: string, extra?: Record<string, string | undefined>)
   const s = q.toString();
   return `/d/${iso}${s ? `?${s}` : ""}`;
 }
+
+/** Instante de hace n días (ISO), para filtros como «sin actividad en 60 días». */
+export function daysAgoISO(n: number): string {
+  return new Date(Date.now() - n * 86400000).toISOString();
+}

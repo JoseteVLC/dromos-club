@@ -50,7 +50,12 @@ export async function login(_: ActionState, fd: FormData): Promise<ActionState> 
     const t = authError(error.message);
     return { error: t === error.message ? "Email o contraseña incorrectos." : t };
   }
-  redirect("/");
+  redirect(safeNext(str(fd, "next")));
+}
+
+/** Solo rutas internas (evita redirecciones a otros dominios). */
+function safeNext(next: string): "/" {
+  return (next.startsWith("/") && !next.startsWith("//") && !next.includes("\\") ? next : "/") as "/";
 }
 
 export async function logout() {
@@ -526,7 +531,13 @@ export async function createInvitation(_: InviteState, fd: FormData): Promise<In
   // ¿Ya tiene cuenta en la plataforma (quizá en otro box)? Lo añadimos a este box directamente.
   const { data: existing } = await db.rpc("user_id_by_email", { p_email: email });
   if (existing) {
-    const { data: already } = await db.from("box_members").select("active").eq("box_id", box.id).eq("user_id", existing).maybeSingle();
+    const { data: already } = await db.from("box_members").select("active, pending").eq("box_id", box.id).eq("user_id", existing).maybeSingle<{ active: boolean; pending: boolean }>();
+    if (already?.pending) {
+      // Ya lo había pedido con el QR: invitarle es aceptarle
+      await db.from("box_members").update({ pending: false, active: true, role, joined_at: new Date().toISOString() }).eq("box_id", box.id).eq("user_id", existing);
+      revalidatePath("/admin");
+      return { ok: "Ya tenía cuenta: la hemos añadido a tu box. Que entre con su email y contraseña de siempre.", link: boxUrl(box.slug, await siteUrl()), name: first_name, email };
+    }
     if (already) return { error: "Esa persona ya está en tu box. Búscala en Personas (puedes activarla si estaba desactivada)." };
     const { error } = await db.from("box_members").insert({ box_id: box.id, user_id: existing, role });
     if (error) return { error: "No se ha podido añadir: {msg}", vars: { msg: error.message } } as InviteState;
@@ -605,7 +616,7 @@ export async function acceptInvitation(_: ActionState, fd: FormData): Promise<Ac
     return { error: "No se ha podido crear la cuenta: {msg}", vars: { msg: error?.message ?? "" } };
   }
   await db.from("invitations").update({ accepted_at: new Date().toISOString(), user_id: created.user.id }).eq("id", inv.id);
-  await db.from("box_members").upsert({ box_id: inv.box_id, user_id: created.user.id, role: inv.role }, { onConflict: "box_id,user_id" });
+  await db.from("box_members").upsert({ box_id: inv.box_id, user_id: created.user.id, role: inv.role, active: true, pending: false }, { onConflict: "box_id,user_id" });
 
   const supabase = await createClient(null);
   await supabase.auth.signInWithPassword({ email: inv.email, password });
@@ -616,6 +627,128 @@ export async function acceptInvitation(_: ActionState, fd: FormData): Promise<Ac
 async function setBoxCookie(slug: string) {
   const { cookies } = await import("next/headers");
   (await cookies()).set(BOX_COOKIE, slug, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
+}
+
+// ---------------- ALTA CON QR ----------------
+
+type JoinBox = { id: string; slug: string; name: string; join_mode: "approval" | "open" };
+
+/** El atleta escanea el QR del box: crea su cuenta si no tiene y entra (o queda pendiente de aprobación). */
+export async function joinBox(_: ActionState, fd: FormData): Promise<ActionState> {
+  if (!hasAdminKey()) return { error: "Falta configurar el servidor (SUPABASE_SECRET_KEY)." };
+  const db = adminDb();
+  const code = str(fd, "code");
+  const { data: box } = await db.from("boxes").select("id, slug, name, join_mode").eq("join_code", code).maybeSingle<JoinBox>();
+  if (!box) return { error: "Este código ya no vale. Pide al box el QR nuevo." };
+
+  let supabase = await createClient(null);
+  let userId = (await supabase.auth.getClaims()).data?.claims?.sub as string | undefined;
+  if (!userId) {
+    const email = str(fd, "email").toLowerCase();
+    const password = str(fd, "password");
+    const first_name = str(fd, "first_name");
+    const last_name = str(fd, "last_name");
+    const gender = str(fd, "gender");
+    if (!first_name) return { error: "Pon tu nombre." };
+    if (gender !== "M" && gender !== "F") return { error: "Elige categoría (chico/chica)." };
+    if (!EMAIL_RE.test(email)) return { error: "El email no es válido." };
+    if (password.length < 8) return { error: "La contraseña tiene que tener al menos 8 caracteres." };
+    const { data: created, error } = await db.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { first_name, last_name, gender, full_name: `${first_name} ${last_name}`.trim() },
+    });
+    if (error || !created.user) {
+      if (/already|registered|exists/i.test(error?.message ?? "")) return { error: "Ese email ya tiene cuenta: pulsa «Ya tengo cuenta» y entra con tu contraseña." };
+      return { error: "No se ha podido crear la cuenta: {msg}", vars: { msg: error?.message ?? "" } };
+    }
+    userId = created.user.id;
+    supabase = await createClient(null);
+    await supabase.auth.signInWithPassword({ email, password });
+  }
+
+  const open = box.join_mode === "open";
+  const { data: existing } = await db.from("box_members").select("active, pending").eq("box_id", box.id).eq("user_id", userId).maybeSingle<{ active: boolean; pending: boolean }>();
+  if (!existing) {
+    await db.from("box_members").insert({ box_id: box.id, user_id: userId, role: "athlete", active: open, pending: !open });
+  } else if (!existing.active && !existing.pending) {
+    // Estaba de baja y vuelve: según el box, entra directo o vuelve a pedir paso
+    await db.from("box_members").update(open ? { active: true } : { pending: true }).eq("box_id", box.id).eq("user_id", userId);
+  }
+  await setBoxCookie(box.slug);
+
+  const waiting = !open && !existing?.active;
+  if (waiting) {
+    const { data: who } = await db.from("profiles").select("full_name").eq("id", userId).maybeSingle<{ full_name: string }>();
+    const { data: admins } = await db.from("box_members").select("user_id").eq("box_id", box.id).eq("role", "admin").eq("active", true).returns<{ user_id: string }[]>();
+    after(() =>
+      sendPush((admins ?? []).map((a) => a.user_id), "messages", {
+        title: `${box.name} · ${BRAND.short}`,
+        body: `${who?.full_name || "Alguien"} quiere unirse al box. Acéptalo en Admin.`,
+        url: "/admin",
+        tag: "join",
+        box: box.slug,
+      }),
+    );
+  }
+  redirect("/");
+}
+
+/** Aceptar o rechazar una solicitud del QR. */
+export async function resolveJoinRequest(fd: FormData) {
+  const { box } = await requireAdmin();
+  const id = str(fd, "id");
+  const ok = str(fd, "ok") === "1";
+  const db = adminDb();
+  if (ok) {
+    await db.from("box_members").update({ pending: false, active: true, joined_at: new Date().toISOString() }).eq("box_id", box.id).eq("user_id", id).eq("pending", true);
+    after(() => sendPush([id], "messages", { title: `${box.name} · ${BRAND.short}`, body: "¡Ya estás dentro! Mete tu primer resultado.", url: "/", tag: "join", box: box.slug }));
+  } else {
+    // Si nunca llegó a entrar, se borra la solicitud; si era antiguo socio, queda de baja como estaba
+    const { count } = await db.from("results").select("id", { count: "exact", head: true }).eq("box_id", box.id).eq("user_id", id);
+    if (count) await db.from("box_members").update({ pending: false }).eq("box_id", box.id).eq("user_id", id);
+    else await db.from("box_members").delete().eq("box_id", box.id).eq("user_id", id).eq("pending", true);
+  }
+  revalidatePath("/admin");
+}
+
+/** Con aprobación (por defecto) o entrada directa. */
+export async function setJoinMode(fd: FormData) {
+  const { box } = await requireAdmin();
+  const mode = str(fd, "mode") === "open" ? "open" : "approval";
+  await adminDb().from("boxes").update({ join_mode: mode }).eq("id", box.id);
+  revalidatePath("/admin");
+}
+
+/** Nuevo QR: el anterior deja de valer. */
+export async function rotateJoinCode() {
+  const { box } = await requireAdmin();
+  await adminDb().from("boxes").update({ join_code: randomBytes(6).toString("hex") }).eq("id", box.id);
+  revalidatePath("/admin");
+}
+
+/** Dar de baja de golpe a los atletas sin resultados en los últimos 60 días. */
+export async function deactivateInactive(fd: FormData) {
+  const { user, box } = await requireAdmin();
+  const ids = str(fd, "ids").split(",").filter((x) => /^[0-9a-f-]{36}$/.test(x) && x !== user.id);
+  if (!ids.length) return;
+  await adminDb().from("box_members").update({ active: false }).eq("box_id", box.id).eq("role", "athlete").in("user_id", ids);
+  revalidatePath("/admin");
+}
+
+/** El atleta se sale del box (su cuenta sigue para otros boxes; sus resultados se quedan). */
+export async function leaveBox() {
+  const { user, box, boxRole } = await requireUser();
+  const db = adminDb();
+  if (boxRole === "admin") {
+    const { count } = await db.from("box_members").select("user_id", { count: "exact", head: true }).eq("box_id", box.id).eq("role", "admin").eq("active", true);
+    if ((count ?? 0) <= 1) redirect("/perfil?salir=admin");
+  }
+  await db.from("box_members").update({ active: false }).eq("box_id", box.id).eq("user_id", user.id);
+  const { cookies } = await import("next/headers");
+  (await cookies()).delete(BOX_COOKIE);
+  redirect("/boxes?cambiar=1");
 }
 
 // ---------------- AJUSTES DEL BOX (admin) ----------------

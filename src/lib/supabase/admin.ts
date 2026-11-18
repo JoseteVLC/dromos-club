@@ -46,6 +46,7 @@ export async function boxPeople<P extends { id: string }>(boxId: string, profile
     .from("box_members")
     .select(`user_id, role, active, joined_at, profiles!inner(${profileCols})`)
     .eq("box_id", boxId)
+    .eq("pending", false)
     .returns<MemberJoin<P>[]>();
   const people = (data ?? [])
     .filter((m) => m.profiles)
