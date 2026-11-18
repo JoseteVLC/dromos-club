@@ -24,7 +24,7 @@ export function BottomNav({ isCoach }: { isCoach: boolean }) {
   const { t } = useI18n();
   const items: { href: string; key: keyof typeof ICONS; label: string; active: boolean }[] = [
     { href: "/", key: "hoy", label: t("WODs"), active: path === "/" || path.startsWith("/d/") },
-    { href: "/ranking", key: "ranking", label: t("Ranking"), active: path.startsWith("/ranking") },
+    { href: "/ranking", key: "ranking", label: t("Ranking"), active: path.startsWith("/ranking") || path.startsWith("/medallas") },
     { href: "/historial", key: "historial", label: t("Historial"), active: path.startsWith("/historial") || path.startsWith("/marcas") },
     ...(isCoach ? [{ href: "/coach", key: "coach" as const, label: t("Coach"), active: path.startsWith("/coach") }] : []),
     { href: "/perfil", key: "perfil", label: t("Perfil"), active: path.startsWith("/perfil") },

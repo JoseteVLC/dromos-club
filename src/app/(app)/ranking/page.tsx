@@ -8,7 +8,7 @@ import { computeStandings } from "@/lib/ranking";
 import { streakStandings } from "@/lib/streak-data";
 import type { Gender, Result, Wod } from "@/lib/types";
 import { getI18n } from "@/lib/i18n/server";
-import type { T } from "@/lib/i18n/core";
+import { RankingTabs } from "@/components/ranking-tabs";
 
 type Period = "week" | "month" | "year";
 
@@ -30,17 +30,6 @@ function periodLabel(period: Period, start: string, end: string, locale: string)
   if (period === "year") return start.slice(0, 4);
   if (period === "month") return f(start, { month: "long", year: "numeric" }).replace(/^./, (c) => c.toUpperCase());
   return `${f(start, { day: "numeric", month: "short" })} – ${f(end, { day: "numeric", month: "short" })}`;
-}
-
-type Mode = "points" | "racha" | "lb";
-function ModeTabs({ mode, t }: { mode: Mode; t: T }) {
-  return (
-    <div className="flex flex-wrap gap-2">
-      <Link href="/ranking" replace className={`chip ${mode === "points" ? "chip-on" : ""}`}>🏆 {t("Puntos")}</Link>
-      <Link href="/ranking?p=racha" replace className={`chip ${mode === "racha" ? "chip-on" : ""}`}>🔥 {t("Constancia")}</Link>
-      <Link href="/ranking?p=lb" replace className={`chip ${mode === "lb" ? "chip-on" : ""}`}>📋 {t("Leaderboards")}</Link>
-    </div>
-  );
 }
 
 /** Resultados de los WODs publicados entre dos fechas (paginado: un año puede pasar de 1.000 filas). */
@@ -97,7 +86,7 @@ async function WodBoards({ period, refDate }: { period: Period; refDate: string 
   return (
     <div className="space-y-5">
       <h1 className="h-title text-5xl">Ranking</h1>
-      <ModeTabs mode="lb" t={t} />
+      <RankingTabs mode="lb" t={t} />
       <div className="grid grid-cols-3 gap-1 rounded-lg border border-line p-1">
         {(["week", "month", "year"] as const).map((pp) => (
           <Link
@@ -186,7 +175,7 @@ async function StreakRanking({ gender }: { gender: Gender | "all" }) {
   return (
     <div className="space-y-5">
       <h1 className="h-title text-5xl">Ranking</h1>
-      <ModeTabs mode="racha" t={t} />
+      <RankingTabs mode="racha" t={t} />
       <div className="flex gap-2">
         {[
           { value: "all", label: "Absoluto" },
@@ -282,7 +271,7 @@ export default async function RankingPage({ searchParams }: PageProps<"/ranking"
   return (
     <div className="space-y-5">
       <h1 className="h-title text-5xl">Ranking</h1>
-      <ModeTabs mode="points" t={t} />
+      <RankingTabs mode="points" t={t} />
 
       <div className="grid grid-cols-3 gap-1 rounded-lg border border-line p-1">
         {(["week", "month", "year"] as const).map((p) => (

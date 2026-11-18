@@ -61,13 +61,14 @@ Debajo de cada WOD está su clasificación, con la foto de cada atleta. Elite va
 
 ## Ranking
 
-En el menú **Ranking** tienes tres pestañas. Puntos y Leaderboards se ven por semana, mes o año, y te mueves entre periodos con las flechas.
+En el menú **Ranking** tienes cuatro pestañas. Puntos y Leaderboards se ven por semana, mes o año, y te mueves entre periodos con las flechas.
 
 | Pestaña | Qué mide |
 | --- | --- |
 | Puntos | En cada WOD sumas 1 punto por participar y 1 más por cada atleta que queda por detrás de ti. Escalado suma 1 punto |
 | Constancia | Días de plani seguidos con resultado metido, tu récord y el total. Los días sin WOD (normalmente el domingo) no rompen la racha |
 | Leaderboards | Todos los WODs del periodo, con quién va primero y tu posición. Toca uno para entrar en su clasificación |
+| Medallas | Tus medallas: las conseguidas y lo que te falta para las demás (ver «Medallas») |
 
 ## Mis marcas
 
@@ -126,7 +127,7 @@ Cualquier atleta puede abrirla tocando tu foto o tu nombre. Muestra tu foto, nom
 
 ## Medallas
 
-Cada vez que entrenas, bates un PR o completas un benchmark, avanzas hacia una de las **20 medallas** de Dromos. Las ves en **Perfil → 🏅 Medallas**: las conseguidas brillan con la fecha en que las ganaste; las que te faltan salen en gris con una barra de progreso («37/100»).
+Cada vez que entrenas, bates un PR o completas un benchmark, avanzas hacia una de las **20 medallas** de Dromos. Las ves en **Ranking → 🏅 Medallas** (también en Perfil → 🏅 Medallas): las conseguidas brillan con la fecha en que las ganaste; las que te faltan salen en gris con una barra de progreso («37/100»).
 
 Se desbloquean solas al guardar tus resultados y tus marcas, y una vez ganadas **son tuyas para siempre**. Cuando consigues una te avisamos en **Avisos** y con un cartel arriba.
 

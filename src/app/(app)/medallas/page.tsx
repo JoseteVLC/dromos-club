@@ -4,8 +4,10 @@ import { getI18n } from "@/lib/i18n/server";
 import { syncMedals } from "@/lib/achievements";
 import { MEDALS, MEDAL_GROUPS } from "@/lib/medals";
 import { MedalBadge } from "@/components/medal-badge";
+import { RankingTabs } from "@/components/ranking-tabs";
 
-export default async function MedallasPage() {
+export default async function MedallasPage({ searchParams }: PageProps<"/medallas">) {
+  const fromRanking = (await searchParams).desde === "ranking";
   const { supabase, user, box } = await requireUser();
   const { t, locale } = await getI18n();
   const { progress, owned } = await syncMedals(supabase, user.id, box);
@@ -15,7 +17,11 @@ export default async function MedallasPage() {
 
   return (
     <div className="space-y-6">
-      <Link href="/perfil" className="text-sm text-muted">‹ {t("Perfil")}</Link>
+      {fromRanking ? (
+        <RankingTabs mode="medals" t={t} />
+      ) : (
+        <Link href="/perfil" className="text-sm text-muted">‹ {t("Perfil")}</Link>
+      )}
       <div className="flex items-end justify-between gap-3">
         <h1 className="h-title text-5xl">{t("Medallas")}</h1>
         <div className="text-right">
