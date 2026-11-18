@@ -37,9 +37,9 @@ export function AdminJoin({ svg, url, mode, requests, t, locale }: { svg: string
       )}
 
       <div className="card space-y-4 p-4">
-        <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-start">
-          <div className="w-40 shrink-0 overflow-hidden rounded-lg bg-white p-2" dangerouslySetInnerHTML={{ __html: svg }} />
-          <div className="min-w-0 space-y-2 text-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+          <div className="mx-auto w-40 shrink-0 overflow-hidden rounded-lg bg-white p-2 sm:mx-0" dangerouslySetInnerHTML={{ __html: svg }} />
+          <div className="w-full min-w-0 space-y-2 text-sm">
             <p className="text-muted">{t("Cuélgalo en la pizarra o en recepción: quien lo escanee se crea la cuenta y entra en tu box.")}</p>
             <CopyLink url={url} />
             <div className="flex flex-wrap gap-2 pt-1">
