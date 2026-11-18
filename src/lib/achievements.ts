@@ -12,7 +12,7 @@ import { closeDay, inTime, isClosed } from "./closing";
 import { addDays } from "./dates";
 
 type MyResult = Result & { wods: Pick<Wod, "wod_date" | "title" | "score_type" | "score_label" | "is_benchmark" | "published"> };
-type Row = { id: string; wod_id: string; user_id: string; division: Division; finished: boolean; time_seconds: number | null; rounds: number | null; reps: number | null; value: number | null; created_at: string | null; profiles: { gender: Gender | null } | null };
+type Row = { id: string; wod_id: string; user_id: string; division: Division; finished: boolean; time_seconds: number | null; rounds: number | null; reps: number | null; value: number | null; created_at: string | null; flag?: string | null; flag_reviewed?: boolean; profiles: { gender: Gender | null } | null };
 
 const norm = (x: string) => x.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
 
@@ -173,7 +173,7 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
       for (let from = 0; ; from += 1000) {
         const { data } = await supabase
           .from("results")
-          .select("id, wod_id, user_id, division, finished, time_seconds, rounds, reps, value, created_at, profiles!results_user_id_fkey(gender)")
+          .select("id, wod_id, user_id, division, finished, time_seconds, rounds, reps, value, created_at, flag, flag_reviewed, profiles!results_user_id_fkey(gender)")
           .in("wod_id", chunk)
           .eq("box_id", boxId)
           .order("id")
@@ -192,7 +192,8 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
     if (!gender) break;
     const date = mine.wods.wod_date;
     const rows = (byWod.get(mine.wod_id) ?? [])
-      .filter((r) => r.division === mine.division && r.profiles?.gender === gender && inTime(date, r.created_at))
+      // Los que el detector ve imposibles no cuentan hasta que un coach los da por buenos
+      .filter((r) => r.division === mine.division && r.profiles?.gender === gender && inTime(date, r.created_at) && (!r.flag || r.flag_reviewed))
       .map((r) => ({ ...r, profiles: { full_name: "", gender } }) as unknown as Result);
     if (rows.length < 3) continue;
     const ranked = rankResults({ score_type: mine.wods.score_type, score_label: mine.wods.score_label, score2_type: null, score2_label: null }, rows, { gender, division: mine.division });

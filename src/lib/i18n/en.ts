@@ -635,5 +635,17 @@ const d: Record<string, string> = {
   "Ya tengo cuenta": "I already have an account",
   "Imprimir o guardar PDF": "Print or save as PDF",
   "Ese email ya tiene cuenta: pulsa «Ya tengo cuenta» y entra con tu contraseña.": "That email already has an account: tap «I already have an account» and log in with your password.",
+  "Peso y escalado para ti": "Weight and scaling for you",
+  "Sugerencia de la IA con tus marcas. Si algo no te cuadra, pregunta a tu coach.": "AI suggestion based on your records. If something doesn't add up, ask your coach.",
+  "Pensando…": "Thinking…",
+  "Resultados a revisar": "Results to review",
+  "El detector cree que pueden ser un error al escribirlos. Revísalos antes de que cierre el WOD (2 días) para que las medallas vayan a quien toca.": "The detector thinks these may be typos. Review them before the WOD closes (2 days) so medals go to the right people.",
+  "Es correcto": "It's correct",
+  "revisar": "review",
+  "Resumen semanal": "Weekly summary",
+  "El domingo por la tarde: tus entrenos, tu puesto, tus PRs y la medalla que tienes más cerca": "Sunday evening: your workouts, your ranking, your PRs and your closest medal",
+  "El consejo con IA no está disponible ahora mismo.": "The AI tip isn't available right now.",
+  "Has pedido muchos consejos hoy. Vuelve mañana.": "You've asked for a lot of tips today. Come back tomorrow.",
+  "La IA no ha podido responder. Prueba en un momento.": "The AI couldn't answer. Try again in a moment.",
 };
 export default d;

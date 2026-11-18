@@ -4,12 +4,13 @@ import { adminDb, hasAdminKey } from "./supabase/admin";
 import { BRAND } from "@/lib/brand";
 
 /** Tipos de aviso; cada uno respeta la preferencia del atleta en su perfil. */
-export type PushKind = "social" | "medals" | "messages" | "reminders";
+export type PushKind = "social" | "medals" | "messages" | "reminders" | "weekly";
 const PREF: Record<PushKind, string> = {
   social: "notify_social",
   medals: "notify_medals",
   messages: "notify_messages",
   reminders: "notify_reminders",
+  weekly: "notify_weekly",
 };
 
 /** box: slug del box, para que al tocar el aviso se abra en ese box (aunque estés mirando otro). */

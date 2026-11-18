@@ -5,6 +5,9 @@ import { after } from "next/server";
 import { syncMedals } from "@/lib/achievements";
 import { allActiveIds, sendPush, staffIds } from "@/lib/push";
 import { wodsFromPhotos } from "@/lib/photo-wods";
+import { reviewSavedResult } from "@/lib/plausibility";
+import { makeTip } from "@/lib/ai-tips";
+import { hasAi } from "@/lib/ai";
 import { COMMENT_EMOJIS } from "@/lib/comment-reactions";
 import { BOX_COOKIE, boxUrl, isValidSlug } from "@/lib/box-shared";
 import { redirect } from "next/navigation";
@@ -16,6 +19,7 @@ import { parseTime } from "@/lib/scoring";
 import { dayHref, isISODate } from "@/lib/dates";
 import { SCORE2_TYPES, SCORE_TYPES, type Division, type Score2Type, type ScoreType, type Wod } from "@/lib/types";
 import { BRAND } from "@/lib/brand";
+import { getI18n } from "@/lib/i18n/server";
 
 /** Los textos van en español: el cliente los traduce (FormMessage) con `vars` para las partes variables. */
 export type ActionState = { error?: string; ok?: string; vars?: Record<string, string | number> } | undefined;
@@ -259,6 +263,21 @@ export async function saveResult(_: ActionState, fd: FormData): Promise<ActionSt
   if (error) return { error: error.message };
   revalidatePath("/", "layout");
   checkMedalsLater(supabase, user.id, box);
+  // Detector de resultados imposibles: se revisa después de responder, sin hacer esperar al atleta
+  if (hasAdminKey())
+    after(async () => {
+      const hit = await reviewSavedResult(adminDb(), wodId, user.id).catch(() => null);
+      if (!hit) return;
+      const staff = (await staffIds(box.id)).filter((id) => id !== user.id);
+      const { data: who } = await adminDb().from("profiles").select("full_name").eq("id", user.id).maybeSingle<{ full_name: string }>();
+      await sendPush(staff, "messages", {
+        title: `⚠️ Resultado a revisar · ${hit.wodTitle}`,
+        body: `${who?.full_name ?? "Un atleta"}: ${hit.reason}`.slice(0, 180),
+        url: "/coach",
+        tag: `flag-${wodId}-${user.id}`,
+        box: box.slug,
+      });
+    });
   return { ok: "¡Resultado guardado!" };
 }
 
@@ -268,6 +287,32 @@ export async function deleteResult(fd: FormData) {
   revalidatePath("/", "layout");
   const back = str(fd, "back");
   if (back.startsWith("/")) redirect(back);
+}
+
+/** Consejo de peso y escalado con IA para el WOD (se guarda: la segunda vez no vuelve a gastar). */
+export async function getAiTip(wodId: string): Promise<{ body?: string; error?: string }> {
+  const { supabase, user, box } = await requireUser();
+  if (!hasAdminKey() || !hasAi()) return { error: "El consejo con IA no está disponible ahora mismo." };
+  const db = adminDb();
+  const { data: cached } = await db.from("ai_tips").select("body").eq("wod_id", wodId).eq("user_id", user.id).maybeSingle<{ body: string }>();
+  if (cached) return { body: cached.body };
+  const { count } = await db.from("ai_tips").select("wod_id", { count: "exact", head: true }).eq("user_id", user.id).gte("created_at", new Date(Date.now() - 864e5).toISOString());
+  if ((count ?? 0) >= 15) return { error: "Has pedido muchos consejos hoy. Vuelve mañana." };
+  // Con el cliente del atleta: si no puede ver el WOD (otro box, borrador), no hay consejo
+  const { data: wod } = await supabase.from("wods").select("*").eq("id", wodId).maybeSingle<Wod>();
+  if (!wod) return { error: "WOD no encontrado." };
+  const { locale } = await getI18n();
+  const body = await makeTip(db, wod, user.id, box.id, locale);
+  if (!body) return { error: "La IA no ha podido responder. Prueba en un momento." };
+  await db.from("ai_tips").upsert({ box_id: box.id, wod_id: wodId, user_id: user.id, body });
+  return { body };
+}
+
+/** El coach da por bueno un resultado que el detector había marcado. */
+export async function markResultOk(fd: FormData) {
+  const { box } = await requireCoach();
+  await adminDb().from("results").update({ flag_reviewed: true }).eq("id", str(fd, "id")).eq("box_id", box.id);
+  revalidatePath("/", "layout");
 }
 
 // ---------------- WODS (coach) ----------------
@@ -961,7 +1006,7 @@ export async function sendTestPush() {
 export async function updateNotifyPrefs(fd: FormData) {
   const { supabase, user } = await requireUser();
   const k = str(fd, "key");
-  if (!["notify_social", "notify_medals", "notify_messages", "notify_reminders"].includes(k)) return;
+  if (!["notify_social", "notify_medals", "notify_messages", "notify_reminders", "notify_weekly"].includes(k)) return;
   await supabase.from("profiles").update({ [k]: str(fd, "on") === "1" }).eq("id", user.id);
   revalidatePath("/perfil");
 }

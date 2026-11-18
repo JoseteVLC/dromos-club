@@ -146,6 +146,11 @@ export async function Leaderboard({
                         {t("fuera de plazo")}
                       </span>
                     )}
+                    {isCoach && byId.get(r.id)?.flag && !byId.get(r.id)?.flag_reviewed && (
+                      <Link href="/coach" className="shrink-0 rounded border border-alert/60 px-1 py-0.5 text-alert" title={byId.get(r.id)?.flag ?? ""}>
+                        ⚠️ {t("revisar")}
+                      </Link>
+                    )}
                     {other(r.id) && <span className="shrink-0 font-semibold text-fg/80">{other(r.id)}</span>}
                     {r.notes && <span className="truncate">{r.notes}</span>}
                   </div>

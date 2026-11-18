@@ -21,6 +21,7 @@ Al abrir la app ves el entreno de hoy. Si el día tiene varias partes (A, B, C�
 - **Tu semana:** la tira de días de arriba marca con ✓ los días en que ya metiste resultado.
 - **★ Benchmark:** los WODs con estrella son pruebas de referencia (Fran, Grace, 1RM…). Cuentan para tus PRs.
 - **Desde tu alta:** ves y participas en la plani a partir del día en que te diste de alta. Los días anteriores no aparecen.
+- **💡 Peso y escalado para ti:** pulsa el botón debajo del WOD y la IA mira el WOD y tus marcas (Mis marcas y tus cargas recientes) y te dice qué peso meter en cada movimiento, si te conviene escalar algo y una clave de estrategia. Si la plani pide un %, lo calcula con tu RM. Cuantas más marcas tengas apuntadas, mejor afina. El consejo se queda guardado en ese WOD.
 
 ## Meter tu resultado
 
@@ -193,6 +194,7 @@ Con la app instalada en el móvil te llegan avisos como los de cualquier app, au
 | Medallas | Desbloqueas una medalla |
 | Mensajes del equipo | Un coach te escribe o el equipo publica un anuncio |
 | Recordatorios de entreno | A última hora de la tarde, si tu racha está en peligro o llevas varios días sin meter resultado |
+| Resumen semanal | El domingo por la tarde: tus entrenos de la semana, tu puesto en el ranking (y si has subido), tus PRs, tus medallas nuevas y lo que te falta para la siguiente |
 
 Si usas la app en varios móviles, actívalos en cada uno. Para dejar de recibirlos en un móvil: **Desactivar en este móvil**. Si bloqueaste el permiso sin querer, actívalo en los ajustes del móvil para Dromos.
 

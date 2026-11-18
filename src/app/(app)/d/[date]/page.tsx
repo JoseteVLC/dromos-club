@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AiTip } from "@/components/ai-tip";
 import { notFound, redirect } from "next/navigation";
 import { isCoachProfile, memberSince, requireUser } from "@/lib/supabase/server";
 import { addDays, dayHref, isISODate, todayISO } from "@/lib/dates";
@@ -47,6 +48,10 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
     .returns<Wod[]>();
   const wods = wodsData ?? [];
   const selected = wods.find((w) => w.id === sp.w) ?? wods[0] ?? null;
+  // Consejo de IA ya pedido para este WOD (si lo hay, sale abierto)
+  const { data: tip } = selected
+    ? await supabase.from("ai_tips").select("body").eq("wod_id", selected.id).eq("user_id", user.id).maybeSingle<{ body: string }>()
+    : { data: null };
 
   let results: Result[] = [];
   let doneIds = new Set<string>();
@@ -146,6 +151,8 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
             )}
 
             <WodHeader wod={selected!} isCoach={isCoach} t={t} />
+
+            <AiTip key={`tip-${selected!.id}`} wodId={selected!.id} initial={tip?.body ?? null} />
 
             <ResultForm key={selected!.id} wod={selected!} existing={mine} defaultDivision={profile?.division ?? undefined} />
 

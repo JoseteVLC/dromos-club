@@ -26,7 +26,7 @@ export function pushSupported() {
   return typeof window !== "undefined" && "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
 }
 
-type Prefs = { notify_social: boolean; notify_medals: boolean; notify_messages: boolean; notify_reminders: boolean };
+type Prefs = { notify_social: boolean; notify_medals: boolean; notify_messages: boolean; notify_reminders: boolean; notify_weekly: boolean };
 
 export function PushSettings({ prefs }: { prefs: Prefs }) {
   const { t } = useI18n();
@@ -80,6 +80,7 @@ export function PushSettings({ prefs }: { prefs: Prefs }) {
     { key: "notify_medals", label: t("Medallas"), hint: t("Cuando desbloqueas una medalla") },
     { key: "notify_messages", label: t("Mensajes del equipo"), hint: t("Mensajes de los coaches y anuncios") },
     { key: "notify_reminders", label: t("Recordatorios de entreno"), hint: t("Si tu racha está en peligro o llevas días sin entrenar") },
+    { key: "notify_weekly", label: t("Resumen semanal"), hint: t("El domingo por la tarde: tus entrenos, tu puesto, tus PRs y la medalla que tienes más cerca") },
   ];
 
   return (

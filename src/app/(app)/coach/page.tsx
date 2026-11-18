@@ -3,7 +3,8 @@ import { getI18n } from "@/lib/i18n/server";
 import { requireCoach } from "@/lib/supabase/server";
 import { SCORE_TYPES, type Wod } from "@/lib/types";
 import { WodForm } from "@/components/wod-form";
-import { dayHref, isISODate } from "@/lib/dates";
+import { addDays, dayHref, isISODate, todayISO } from "@/lib/dates";
+import { FlaggedResults, type FlaggedRow } from "@/components/flagged-results";
 
 export default async function CoachPage({ searchParams }: PageProps<"/coach">) {
   const sp = await searchParams;
@@ -18,9 +19,20 @@ export default async function CoachPage({ searchParams }: PageProps<"/coach">) {
     .order("part")
     .limit(30)
     .returns<Wod[]>();
+  // Resultados marcados por el detector en las dos últimas semanas
+  const { data: flagged } = await supabase
+    .from("results")
+    .select("*, wods!inner(id, title, part, wod_date, score_type, score_label), profiles!results_user_id_fkey(full_name, gender, avatar_url)")
+    .not("flag", "is", null)
+    .eq("flag_reviewed", false)
+    .gte("wods.wod_date", addDays(todayISO(), -14))
+    .order("created_at", { ascending: false })
+    .limit(30)
+    .returns<FlaggedRow[]>();
 
   return (
     <div className="space-y-8">
+      <FlaggedResults rows={flagged ?? []} t={t} />
       <Link href="/coach/semana" className="card flex items-center justify-between border-accent/60 p-4">
         <span>
           <span className="h-display block text-2xl">{t("Importar WODs")}</span>

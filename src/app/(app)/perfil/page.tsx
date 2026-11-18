@@ -26,9 +26,9 @@ export default async function PerfilPage({ searchParams }: PageProps<"/perfil">)
   const me = profile ? { ...profile, ...(priv ?? fallback ?? {}) } : profile;
   const { data: prefs } = await supabase
     .from("profiles")
-    .select("notify_social, notify_medals, notify_messages, notify_reminders")
+    .select("notify_social, notify_medals, notify_messages, notify_reminders, notify_weekly")
     .eq("id", user.id)
-    .maybeSingle<{ notify_social: boolean; notify_medals: boolean; notify_messages: boolean; notify_reminders: boolean }>();
+    .maybeSingle<{ notify_social: boolean; notify_medals: boolean; notify_messages: boolean; notify_reminders: boolean; notify_weekly: boolean }>();
   const { data: myMedals } = await supabase.from("user_achievements").select("code").eq("user_id", user.id);
   const ownedMedals = new Set((myMedals ?? []).map((m) => m.code as string));
   // Recalcula medallas en segundo plano (por si hay alguna nueva de antes de existir el sistema)
@@ -46,7 +46,7 @@ export default async function PerfilPage({ searchParams }: PageProps<"/perfil">)
         </div>
       )}
 
-      <PushSettings prefs={prefs ?? { notify_social: true, notify_medals: true, notify_messages: true, notify_reminders: true }} />
+      <PushSettings prefs={prefs ?? { notify_social: true, notify_medals: true, notify_messages: true, notify_reminders: true, notify_weekly: true }} />
 
       <Link href="/mensajes" className="card flex items-center gap-3 p-4">
         <span className="text-2xl">✉️</span>

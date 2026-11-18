@@ -73,6 +73,9 @@ export type Result = {
   value2?: number | null;
   notes: string | null;
   created_at?: string | null;
+  /** Motivo si el detector lo ve imposible (solo lo usan los coaches) */
+  flag?: string | null;
+  flag_reviewed?: boolean;
   profiles?: Pick<Profile, "full_name" | "gender"> & { avatar_url?: string | null } | null;
 };
 

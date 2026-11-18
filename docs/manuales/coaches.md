@@ -127,6 +127,8 @@ Cada mes o en eventos como el Open podemos añadir **retos de temporada** con su
 
 Como coach puedes borrar cualquier resultado (papelera en su fila del leaderboard, pulsando dos veces) y cualquier comentario. Úsalo para marcas imposibles o duplicadas; si dudas, pregunta antes al atleta.
 
+**⚠️ Detector de resultados imposibles.** Cada resultado que se guarda pasa por un detector: si supera un récord mundial (Fran en 1:10, un snatch de 220 kg) o se sale mucho de lo que ha hecho el resto, la IA lo revisa y, si cree que es un error al escribirlo (minutos y segundos cambiados, un cero de más…), lo marca. Te llega un aviso y lo ves arriba del todo en **Coach → Resultados a revisar**, con el motivo, y con la etiqueta «⚠️ revisar» en el leaderboard (solo la veis los coaches). Pulsa **Es correcto** si está bien o **Borrar resultado** si no. Mientras no lo revises, ese resultado **no cuenta para las medallas** de Podio, Campeón y Dinastía. Si el atleta lo corrige, se vuelve a revisar solo.
+
 Para ver quién está activo:
 
 - **Admin → Personas:** fecha del último resultado de cada uno. Quien lleva semanas sin meter nada es alguien a quien escribir.

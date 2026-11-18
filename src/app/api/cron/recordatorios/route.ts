@@ -3,6 +3,7 @@ import { adminDb, hasAdminKey } from "@/lib/supabase/admin";
 import { sendPush } from "@/lib/push";
 import { addDays, todayISO } from "@/lib/dates";
 import { syncMedalsForClosedWods } from "@/lib/achievements";
+import { sendWeeklySummaries } from "@/lib/weekly";
 
 /**
  * Recordatorios diarios (Vercel Cron, a última hora de la tarde). Solo a quien tiene push y los recordatorios activados:
@@ -12,7 +13,7 @@ import { syncMedalsForClosedWods } from "@/lib/achievements";
  * Antes, reparte las medallas de competición (Podio, Campeón, Dinastía) de los WODs que han cerrado.
  */
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET;
@@ -32,6 +33,15 @@ export async function GET(req: Request) {
   const { data: subs } = await db.from("push_subscriptions").select("user_id");
   const ids = [...new Set((subs ?? []).map((s) => s.user_id as string))];
   if (!ids.length) return NextResponse.json({ sent: 0, medalUsers });
+
+  // Domingo: resumen semanal personal (en vez de los recordatorios, para no mandar dos avisos)
+  if (new Date(today + "T12:00:00Z").getUTCDay() === 0) {
+    const weekly = await sendWeeklySummaries(db, today, ids).catch((e) => {
+      console.error("weekly", e);
+      return 0;
+    });
+    return NextResponse.json({ weekly, medalUsers });
+  }
 
   type Mem = { user_id: string; box_id: string; joined_at: string; boxes: { slug: string; name: string } };
   const [{ data: people }, { data: mems }, { data: wods }, { data: res }] = await Promise.all([

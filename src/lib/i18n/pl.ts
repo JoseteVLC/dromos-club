@@ -635,5 +635,17 @@ const d: Record<string, string> = {
   "Ya tengo cuenta": "Mam już konto",
   "Imprimir o guardar PDF": "Drukuj lub zapisz PDF",
   "Ese email ya tiene cuenta: pulsa «Ya tengo cuenta» y entra con tu contraseña.": "Ten e-mail ma już konto: dotknij «Mam już konto» i zaloguj się hasłem.",
+  "Peso y escalado para ti": "Ciężar i skalowanie dla Ciebie",
+  "Sugerencia de la IA con tus marcas. Si algo no te cuadra, pregunta a tu coach.": "Sugestia AI na podstawie Twoich rekordów. Jeśli coś się nie zgadza, zapytaj trenera.",
+  "Pensando…": "Myślę…",
+  "Resultados a revisar": "Wyniki do sprawdzenia",
+  "El detector cree que pueden ser un error al escribirlos. Revísalos antes de que cierre el WOD (2 días) para que las medallas vayan a quien toca.": "Detektor uważa, że mogą to być błędy przy wpisywaniu. Sprawdź je, zanim WOD się zamknie (2 dni), żeby medale trafiły do właściwych osób.",
+  "Es correcto": "Jest poprawny",
+  "revisar": "sprawdź",
+  "Resumen semanal": "Podsumowanie tygodnia",
+  "El domingo por la tarde: tus entrenos, tu puesto, tus PRs y la medalla que tienes más cerca": "W niedzielę wieczorem: Twoje treningi, miejsce w rankingu, PR-y i najbliższy medal",
+  "El consejo con IA no está disponible ahora mismo.": "Porada AI nie jest teraz dostępna.",
+  "Has pedido muchos consejos hoy. Vuelve mañana.": "Poprosiłeś dziś o wiele porad. Wróć jutro.",
+  "La IA no ha podido responder. Prueba en un momento.": "AI nie mogła odpowiedzieć. Spróbuj za chwilę.",
 };
 export default d;
