@@ -6,9 +6,10 @@ import { redirect } from "next/navigation";
 import type { Box, Profile } from "@/lib/types";
 import { BOX_COOKIE, isValidSlug, slugFromHost } from "@/lib/box-shared";
 
-export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-export const SUPABASE_KEY =
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "@/lib/public-config";
+
+export { SUPABASE_URL };
+export const SUPABASE_KEY = SUPABASE_PUBLISHABLE_KEY;
 
 /** Box activo: el del subdominio (cuando haya dominio) o el elegido (cookie). */
 export async function currentBoxSlug(): Promise<string | null> {
