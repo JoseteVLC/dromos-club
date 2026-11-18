@@ -6,9 +6,9 @@ import { MEDALS, MEDAL_GROUPS } from "@/lib/medals";
 import { MedalBadge } from "@/components/medal-badge";
 
 export default async function MedallasPage() {
-  const { supabase, user } = await requireUser();
+  const { supabase, user, box } = await requireUser();
   const { t, locale } = await getI18n();
-  const { progress, owned } = await syncMedals(supabase, user.id);
+  const { progress, owned } = await syncMedals(supabase, user.id, box);
   const prog = new Map(progress.map((p) => [p.code, p]));
   const count = MEDALS.filter((m) => owned.has(m.code)).length;
   const fmt = (d: string) => new Date(d + "T12:00:00Z").toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
@@ -29,7 +29,7 @@ export default async function MedallasPage() {
       <div className="h-2 overflow-hidden rounded-full bg-line">
         <div className="h-full rounded-full bg-accent" style={{ width: `${(count / MEDALS.length) * 100}%` }} />
       </div>
-      <p className="text-sm text-muted">{t("Las 🎁 llevan premio de tu box: cuando la desbloquees te lo harán llegar (revisa tu dirección en el perfil).")}</p>
+      {box.rewards_enabled && <p className="text-sm text-muted">{t("Las 🎁 llevan premio de tu box: cuando la desbloquees te lo harán llegar (revisa tu dirección en el perfil).")}</p>}
 
       {MEDAL_GROUPS.map((g) => (
         <section key={g.value} className="space-y-2">

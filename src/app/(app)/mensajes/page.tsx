@@ -6,7 +6,7 @@ import { MessageForm } from "@/components/message-form";
 import { Avatar } from "@/components/avatar";
 import { AthletePicker } from "@/components/athlete-picker";
 
-const SEL = "id, thread_user_id, sender_id, body, created_at, sender:profiles!messages_sender_id_fkey(full_name, avatar_url, role, is_admin)";
+const SEL = "id, thread_user_id, sender_id, body, created_at, sender:profiles!messages_sender_id_fkey(full_name, avatar_url)";
 
 const PAGE = 30;
 

@@ -12,7 +12,8 @@ const PREF: Record<PushKind, string> = {
   reminders: "notify_reminders",
 };
 
-export type PushPayload = { title: string; body: string; url?: string; tag?: string };
+/** box: slug del box, para que al tocar el aviso se abra en ese box (aunque estés mirando otro). */
+export type PushPayload = { title: string; body: string; url?: string; tag?: string; box?: string };
 
 let configured: boolean | null = null;
 function ready() {
@@ -37,7 +38,9 @@ export async function sendPush(userIds: string[], kind: PushKind, payload: PushP
     const ok = (allowed ?? []).map((p) => p.id as string);
     if (!ok.length) return 0;
     const { data: subs } = await db.from("push_subscriptions").select("id, endpoint, p256dh, auth").in("user_id", ok);
-    const body = JSON.stringify({ ...payload, url: payload.url ?? "/" });
+    const path = payload.url ?? "/";
+    const url = payload.box ? `/${payload.box}?a=${encodeURIComponent(path)}` : path;
+    const body = JSON.stringify({ title: payload.title, body: payload.body, tag: payload.box ? `${payload.box}-${payload.tag ?? ""}` : payload.tag, url });
     const dead: string[] = [];
     let sent = 0;
     await Promise.all(
@@ -58,20 +61,20 @@ export async function sendPush(userIds: string[], kind: PushKind, payload: PushP
   }
 }
 
-/** Todos los coaches y admins activos (para avisarles de mensajes de atletas). */
-export async function staffIds() {
+/** Coaches y admins activos de un box (para avisarles de mensajes de atletas). */
+export async function staffIds(boxId: string) {
   if (!hasAdminKey()) return [];
-  const { data } = await adminDb().from("profiles").select("id").eq("active", true).or("role.eq.coach,is_admin.eq.true");
-  return (data ?? []).map((p) => p.id as string);
+  const { data } = await adminDb().from("box_members").select("user_id").eq("box_id", boxId).eq("active", true).in("role", ["coach", "admin"]);
+  return (data ?? []).map((p) => p.user_id as string);
 }
 
-/** Todos los atletas activos (para anuncios). */
-export async function allActiveIds() {
+/** Todos los miembros activos de un box (para anuncios). */
+export async function allActiveIds(boxId: string) {
   if (!hasAdminKey()) return [];
   const out: string[] = [];
   for (let from = 0; ; from += 1000) {
-    const { data } = await adminDb().from("profiles").select("id").eq("active", true).range(from, from + 999);
-    out.push(...(data ?? []).map((p) => p.id as string));
+    const { data } = await adminDb().from("box_members").select("user_id").eq("box_id", boxId).eq("active", true).order("user_id").range(from, from + 999);
+    out.push(...(data ?? []).map((p) => p.user_id as string));
     if (!data || data.length < 1000) return out;
   }
 }

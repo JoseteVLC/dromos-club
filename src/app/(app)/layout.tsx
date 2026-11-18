@@ -9,7 +9,7 @@ import { PushPrompt } from "@/components/push-prompt";
 import { BRAND } from "@/lib/brand";
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
-  const { supabase, user, profile } = await requireUser();
+  const { supabase, user, profile, box } = await requireUser();
   const { unread: fresh } = await getNotices(supabase, user.id, 30, true);
   const unread = fresh.length;
   const latest = fresh.reduce<string | null>((m, n) => (m && m > n.at ? m : n.at), null);
@@ -33,13 +33,15 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   return (
     <div className="mx-auto flex min-h-full max-w-2xl flex-col">
       <header className="flex items-center justify-between gap-3 px-4 pt-4">
-        <Link href="/" className="flex min-w-0 items-center gap-3" aria-label={BRAND.name}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={BRAND.logo} alt={BRAND.name} className="h-5 w-auto shrink-0" />
-          {/* En móviles estrechos (o con el botón Admin) no cabe: solo se muestra con sitio de sobra */}
-          <span className={`border-l border-line pl-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-muted ${profile?.is_admin ? "hidden md:inline" : "hidden min-[400px]:inline"}`}>
-            Leaderboard
-          </span>
+        <Link href="/" className="flex min-w-0 items-center gap-2.5" aria-label={`${box.name} · ${BRAND.name}`}>
+          {box.logo_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={box.logo_url} alt="" className="h-8 w-8 shrink-0 rounded-lg object-cover" />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={BRAND.mark} alt="" className="h-6 w-auto shrink-0" />
+          )}
+          <span className="truncate font-display text-base font-bold uppercase tracking-wide">{box.name}</span>
         </Link>
         <div className="flex shrink-0 items-center gap-1">
           {profile?.is_admin && (

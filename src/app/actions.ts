@@ -6,6 +6,7 @@ import { syncMedals } from "@/lib/achievements";
 import { allActiveIds, sendPush, staffIds } from "@/lib/push";
 import { wodsFromPhotos } from "@/lib/photo-wods";
 import { COMMENT_EMOJIS } from "@/lib/comment-reactions";
+import { BOX_COOKIE, boxUrl, isValidSlug } from "@/lib/box-shared";
 import { redirect } from "next/navigation";
 import { createClient, isCoachProfile, memberSince, requireAdmin, requireCoach, requireUser } from "@/lib/supabase/server";
 import { adminDb, hasAdminKey } from "@/lib/supabase/admin";
@@ -133,21 +134,22 @@ export async function removeAvatar() {
 
 /** Admin: marcar como entregado (o no) el premio de una medalla. */
 export async function setRewardDelivered(fd: FormData) {
-  await requireAdmin();
+  const { box } = await requireAdmin();
   const delivered = str(fd, "delivered") === "1";
   await adminDb()
     .from("user_achievements")
     .update({ delivered_at: delivered ? new Date().toISOString() : null })
+    .eq("box_id", box.id)
     .eq("user_id", str(fd, "user_id"))
     .eq("code", str(fd, "code"));
   revalidatePath("/admin");
 }
 
 /** Revisa medallas en segundo plano, después de responder al atleta. */
-function checkMedalsLater(supabase: Awaited<ReturnType<typeof requireUser>>["supabase"], userId: string) {
+function checkMedalsLater(supabase: Awaited<ReturnType<typeof requireUser>>["supabase"], userId: string, box: { id: string; slug: string }) {
   after(async () => {
     try {
-      await syncMedals(supabase, userId);
+      await syncMedals(supabase, userId, box);
     } catch {
       // Las medallas se recalculan también al abrir el perfil
     }
@@ -167,7 +169,7 @@ export async function updatePassword(_: ActionState, fd: FormData): Promise<Acti
 // ---------------- RESULTADOS ----------------
 
 export async function saveResult(_: ActionState, fd: FormData): Promise<ActionState> {
-  const { supabase, user } = await requireUser();
+  const { supabase, user, box } = await requireUser();
   const wodId = str(fd, "wod_id");
   const division = str(fd, "division") as Division;
   if (!["elite", "rx", "scaled"].includes(division)) return { error: "Elige Elite, RX o Escalado." };
@@ -251,7 +253,7 @@ export async function saveResult(_: ActionState, fd: FormData): Promise<ActionSt
   const { error } = await supabase.from("results").upsert(row, { onConflict: "wod_id,user_id" });
   if (error) return { error: error.message };
   revalidatePath("/", "layout");
-  checkMedalsLater(supabase, user.id);
+  checkMedalsLater(supabase, user.id, box);
   return { ok: "¡Resultado guardado!" };
 }
 
@@ -417,7 +419,7 @@ export async function createWodsBulk(_: ActionState, fd: FormData): Promise<Acti
 // ---------------- REACCIONES ----------------
 
 export async function setReaction(resultId: string, emoji: string, on: boolean) {
-  const { supabase, user } = await requireUser();
+  const { supabase, user, box } = await requireUser();
   if (!["👊", "🔥"].includes(emoji)) return;
   const row = { result_id: resultId, user_id: user.id, emoji };
   // Idempotente: poner o quitar sin leer antes. Sin revalidar: el cliente ya pinta el cambio.
@@ -432,7 +434,7 @@ export async function setReaction(resultId: string, emoji: string, on: boolean) 
         title: `${emoji} ${profile?.full_name || "Alguien"}`,
         body: `Ha reaccionado a tu resultado${r.wods?.title ? ` en ${r.wods.title}` : ""}`,
         url: `/r/${resultId}`,
-        tag: `react-${resultId}`,
+        tag: `react-${resultId}`, box: box.slug,
       });
     });
   }
@@ -442,7 +444,7 @@ export async function setReaction(resultId: string, emoji: string, on: boolean) 
 // ---------------- COMENTARIOS ----------------
 
 export async function addComment(_: ActionState, fd: FormData): Promise<ActionState> {
-  const { supabase, user } = await requireUser();
+  const { supabase, user, box } = await requireUser();
   const body = str(fd, "body").slice(0, 500);
   const resultId = str(fd, "result_id");
   if (!body) return { error: "Escribe algo." };
@@ -461,16 +463,16 @@ export async function addComment(_: ActionState, fd: FormData): Promise<ActionSt
     const who = profile?.full_name || "Alguien";
     const text = body.length > 120 ? body.slice(0, 117) + "…" : body;
     const wod = r.wods?.title ? ` · ${r.wods.title}` : "";
-    if (r.user_id !== user.id) await sendPush([r.user_id], "social", { title: `💬 ${who}${wod}`, body: text, url: `/r/${resultId}`, tag: `c-${resultId}` });
+    if (r.user_id !== user.id) await sendPush([r.user_id], "social", { title: `💬 ${who}${wod}`, body: text, url: `/r/${resultId}`, tag: `c-${resultId}`, box: box.slug });
     const rest = [...new Set((others ?? []).map((o) => o.user_id as string))].filter((id) => id !== user.id && id !== r.user_id);
-    if (rest.length) await sendPush(rest, "social", { title: `💬 ${who} ha contestado${wod}`, body: text, url: `/r/${resultId}`, tag: `c-${resultId}` });
+    if (rest.length) await sendPush(rest, "social", { title: `💬 ${who} ha contestado${wod}`, body: text, url: `/r/${resultId}`, tag: `c-${resultId}`, box: box.slug });
   });
   return { ok: "sent" };
 }
 
 /** Reacción a un comentario, como en WhatsApp: una por persona; otra la sustituye y `null` la quita. */
 export async function setCommentReaction(commentId: string, emoji: string | null) {
-  const { supabase, user } = await requireUser();
+  const { supabase, user, box } = await requireUser();
   if (emoji !== null && !(COMMENT_EMOJIS as readonly string[]).includes(emoji)) return;
   if (emoji === null) {
     await supabase.from("comment_reactions").delete().match({ comment_id: commentId, user_id: user.id });
@@ -493,7 +495,7 @@ export async function setCommentReaction(commentId: string, emoji: string | null
       title: `${emoji} ${profile?.full_name || "Alguien"}`,
       body: `Ha reaccionado a tu comentario: «${text}»`,
       url: `/r/${c.result_id}`,
-      tag: `cr-${commentId}`,
+      tag: `cr-${commentId}`, box: box.slug,
     });
   });
 }
@@ -511,44 +513,62 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export type InviteState = { error?: string; ok?: string; vars?: Record<string, string | number>; link?: string; name?: string; email?: string } | undefined;
 
 export async function createInvitation(_: InviteState, fd: FormData): Promise<InviteState> {
-  const { user } = await requireAdmin();
+  const { user, box } = await requireAdmin();
   const first_name = str(fd, "first_name");
   const last_name = str(fd, "last_name");
   const email = str(fd, "email").toLowerCase();
-  const role = str(fd, "role") === "coach" ? "coach" : "athlete";
+  const r = str(fd, "role");
+  const role = r === "coach" || r === "admin" ? r : "athlete";
   if (!first_name) return { error: "Pon el nombre." };
   if (!EMAIL_RE.test(email)) return { error: "El email no es válido." };
 
   const db = adminDb();
-  // ¿Ya tiene cuenta?
+  // ¿Ya tiene cuenta en la plataforma (quizá en otro box)? Lo añadimos a este box directamente.
   const { data: existing } = await db.rpc("user_id_by_email", { p_email: email });
-  if (existing) return { error: "Ese email ya tiene cuenta. Búscalo en Personas (puedes activarlo si estaba desactivado)." };
+  if (existing) {
+    const { data: already } = await db.from("box_members").select("active").eq("box_id", box.id).eq("user_id", existing).maybeSingle();
+    if (already) return { error: "Esa persona ya está en tu box. Búscala en Personas (puedes activarla si estaba desactivada)." };
+    const { error } = await db.from("box_members").insert({ box_id: box.id, user_id: existing, role });
+    if (error) return { error: "No se ha podido añadir: {msg}", vars: { msg: error.message } } as InviteState;
+    revalidatePath("/admin");
+    return { ok: "Ya tenía cuenta: la hemos añadido a tu box. Que entre con su email y contraseña de siempre.", link: boxUrl(box.slug, await siteUrl()), name: first_name, email };
+  }
 
   const token = randomBytes(24).toString("base64url");
-  // Si ya había una invitación pendiente para ese email, la sustituimos
-  await db.from("invitations").delete().eq("email", email).is("accepted_at", null);
-  const { error } = await db.from("invitations").insert({ token, email, first_name, last_name, role, created_by: user.id });
+  // Si ya había una invitación pendiente para ese email en este box, la sustituimos
+  await db.from("invitations").delete().eq("box_id", box.id).eq("email", email).is("accepted_at", null);
+  const { error } = await db.from("invitations").insert({ token, email, first_name, last_name, role, created_by: user.id, box_id: box.id });
   if (error) return { error: "No se ha podido crear la invitación: {msg}", vars: { msg: error.message } } as InviteState;
   revalidatePath("/admin");
   return { ok: "Invitación creada.", link: `${await siteUrl()}/invitacion/${token}`, name: first_name, email };
 }
 
 export async function deleteInvitation(fd: FormData) {
-  await requireAdmin();
-  await adminDb().from("invitations").delete().eq("id", str(fd, "id"));
+  const { box } = await requireAdmin();
+  await adminDb().from("invitations").delete().eq("id", str(fd, "id")).eq("box_id", box.id);
   revalidatePath("/admin");
 }
 
+/** Admin del box: activar/desactivar a alguien en el box o cambiar su rol (atleta, coach, admin). */
 export async function setUserFlag(fd: FormData) {
-  const { user } = await requireAdmin();
+  const { user, box } = await requireAdmin();
   const id = str(fd, "id");
   const flag = str(fd, "flag");
   const on = str(fd, "on") === "1";
   if (id === user.id && (flag === "active" || flag === "is_admin") && !on) return; // no te quites a ti mismo
+  const db = adminDb();
+  const { data: m } = await db.from("box_members").select("role").eq("box_id", box.id).eq("user_id", id).maybeSingle<{ role: string }>();
+  if (!m) return;
   const patch =
-    flag === "active" ? { active: on } : flag === "is_admin" ? { is_admin: on } : flag === "coach" ? { role: on ? "coach" : "athlete" } : null;
+    flag === "active"
+      ? { active: on }
+      : flag === "is_admin"
+        ? { role: on ? "admin" : "coach" }
+        : flag === "coach"
+          ? { role: on ? (m.role === "admin" ? "admin" : "coach") : "athlete" }
+          : null;
   if (!patch) return;
-  await adminDb().from("profiles").update(patch).eq("id", id);
+  await db.from("box_members").update(patch).eq("box_id", box.id).eq("user_id", id);
   revalidatePath("/admin");
 }
 
@@ -568,9 +588,9 @@ export async function acceptInvitation(_: ActionState, fd: FormData): Promise<Ac
   const db = adminDb();
   const { data: inv } = await db
     .from("invitations")
-    .select("id, email, role, accepted_at")
+    .select("id, email, role, accepted_at, box_id, boxes(slug)")
     .eq("token", token)
-    .maybeSingle<{ id: string; email: string; role: string; accepted_at: string | null }>();
+    .maybeSingle<{ id: string; email: string; role: string; accepted_at: string | null; box_id: string; boxes: { slug: string } | null }>();
   if (!inv) return { error: "Esta invitación no existe o la han anulado." };
   if (inv.accepted_at) return { error: "Esta invitación ya se usó. Entra con tu email y contraseña." };
 
@@ -585,10 +605,76 @@ export async function acceptInvitation(_: ActionState, fd: FormData): Promise<Ac
     return { error: "No se ha podido crear la cuenta: {msg}", vars: { msg: error?.message ?? "" } };
   }
   await db.from("invitations").update({ accepted_at: new Date().toISOString(), user_id: created.user.id }).eq("id", inv.id);
+  await db.from("box_members").upsert({ box_id: inv.box_id, user_id: created.user.id, role: inv.role }, { onConflict: "box_id,user_id" });
 
-  const supabase = await createClient();
+  const supabase = await createClient(null);
   await supabase.auth.signInWithPassword({ email: inv.email, password });
+  if (inv.boxes?.slug) await setBoxCookie(inv.boxes.slug);
   redirect("/perfil?bienvenida=1");
+}
+
+async function setBoxCookie(slug: string) {
+  const { cookies } = await import("next/headers");
+  (await cookies()).set(BOX_COOKIE, slug, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
+}
+
+// ---------------- AJUSTES DEL BOX (admin) ----------------
+
+export async function updateBox(_: ActionState, fd: FormData): Promise<ActionState> {
+  const { box } = await requireAdmin();
+  const name = str(fd, "box_name").slice(0, 60);
+  if (name.length < 2) return { error: "Pon el nombre del box." };
+  const { error } = await adminDb().from("boxes").update({ name, rewards_enabled: fd.get("rewards") === "on" }).eq("id", box.id);
+  if (error) return { error: "No se han podido guardar los cambios." };
+  revalidatePath("/", "layout");
+  return { ok: "Guardado." };
+}
+
+// ---------------- ALTA DE UN BOX ----------------
+
+export async function createBox(_: ActionState, fd: FormData): Promise<ActionState> {
+  const name = str(fd, "box_name").slice(0, 60);
+  const slug = str(fd, "slug").toLowerCase();
+  if (name.length < 2) return { error: "Pon el nombre del box." };
+  if (!isValidSlug(slug)) return { error: "La dirección no es válida: entre 3 y 30 letras minúsculas, números o guiones." };
+  if (!hasAdminKey()) return { error: "Falta configurar el servidor (SUPABASE_SECRET_KEY)." };
+  const db = adminDb();
+  const { data: taken } = await db.from("boxes").select("id").eq("slug", slug).maybeSingle();
+  if (taken) return { error: "Esa dirección ya la usa otro box. Prueba con otra." };
+
+  // ¿Ya tiene sesión? Si no, creamos la cuenta del dueño
+  let supabase = await createClient(null);
+  let { data: claims } = await supabase.auth.getClaims();
+  let userId = claims?.claims?.sub as string | undefined;
+  if (!userId) {
+    const email = str(fd, "email").toLowerCase();
+    const password = str(fd, "password");
+    const first_name = str(fd, "first_name");
+    const last_name = str(fd, "last_name");
+    if (!first_name) return { error: "Pon tu nombre." };
+    if (!EMAIL_RE.test(email)) return { error: "El email no es válido." };
+    if (password.length < 8) return { error: "La contraseña tiene que tener al menos 8 caracteres." };
+    const { data: created, error } = await db.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { first_name, last_name, full_name: `${first_name} ${last_name}`.trim() },
+    });
+    if (error || !created.user) {
+      if (/already|registered|exists/i.test(error?.message ?? "")) return { error: "Ese email ya tiene cuenta: entra primero y vuelve a esta página." };
+      return { error: "No se ha podido crear la cuenta: {msg}", vars: { msg: error?.message ?? "" } };
+    }
+    userId = created.user.id;
+    supabase = await createClient(null);
+    await supabase.auth.signInWithPassword({ email, password });
+    ({ data: claims } = await supabase.auth.getClaims());
+  }
+
+  const { data: box, error: boxErr } = await db.from("boxes").insert({ slug, name, created_by: userId }).select("id").single();
+  if (boxErr || !box) return { error: "No se ha podido crear el box: {msg}", vars: { msg: boxErr?.message ?? "" } };
+  await db.from("box_members").insert({ box_id: box.id, user_id: userId, role: "admin" });
+  await setBoxCookie(slug);
+  redirect("/admin?nuevo=1");
 }
 
 // ---------------- IDIOMA ----------------
@@ -607,7 +693,7 @@ export async function setLanguage(lang: string) {
 
 /** Apuntar una marca con fecha. Cada vez que la repites queda en tu historial; la mejor es tu PR. */
 export async function savePersonalRecord(_: ActionState, fd: FormData): Promise<ActionState> {
-  const { supabase, user } = await requireUser();
+  const { supabase, user, box } = await requireUser();
   const benchmarkId = str(fd, "benchmark_id");
   const { data: b } = await supabase.from("benchmarks").select("id, category, score_type").eq("id", benchmarkId).maybeSingle();
   if (!b) return { error: "Ese benchmark no existe." };
@@ -670,14 +756,14 @@ export async function savePersonalRecord(_: ActionState, fd: FormData): Promise<
     if (error || !upd?.length) return { error: "No se pudo guardar el cambio." };
     revalidatePath("/marcas", "layout");
     revalidatePath("/historial");
-    checkMedalsLater(supabase, user.id);
+    checkMedalsLater(supabase, user.id, box);
     return { ok: "¡Marca corregida!" };
   }
   const { error } = await supabase.from("personal_records").insert(row);
   if (error) return { error: "No se pudo guardar. ¿Tu cuenta está activa?" };
   revalidatePath("/marcas", "layout");
   revalidatePath("/historial");
-  checkMedalsLater(supabase, user.id);
+  checkMedalsLater(supabase, user.id, box);
   return { ok: "¡Marca guardada!" };
 }
 
@@ -751,7 +837,7 @@ export async function updateNotifyPrefs(fd: FormData) {
 
 /** Un atleta escribe al equipo, o alguien del equipo escribe a un atleta (thread = id del atleta). */
 export async function sendMessage(_: ActionState, fd: FormData): Promise<ActionState> {
-  const { supabase, user, profile } = await requireUser();
+  const { supabase, user, profile, box } = await requireUser();
   const body = str(fd, "body").slice(0, 2000);
   const staff = isCoachProfile(profile);
   const thread = staff ? str(fd, "thread") : user.id;
@@ -765,15 +851,15 @@ export async function sendMessage(_: ActionState, fd: FormData): Promise<ActionS
   const who = profile?.full_name || "Alguien";
   const text = body.length > 140 ? body.slice(0, 137) + "…" : body;
   after(async () => {
-    if (staff) await sendPush([thread], "messages", { title: `✉️ ${who} · ${BRAND.short}`, body: text, url: "/mensajes", tag: "msg" });
-    else await sendPush((await staffIds()).filter((id) => id !== user.id), "messages", { title: `✉️ ${who}`, body: text, url: `/mensajes/${user.id}`, tag: `msg-${user.id}` });
+    if (staff) await sendPush([thread], "messages", { title: `✉️ ${who} · ${box.name}`, body: text, url: "/mensajes", tag: "msg", box: box.slug });
+    else await sendPush((await staffIds(box.id)).filter((id) => id !== user.id), "messages", { title: `✉️ ${who}`, body: text, url: `/mensajes/${user.id}`, tag: `msg-${user.id}`, box: box.slug });
   });
   return { ok: "sent" };
 }
 
 /** Anuncio para toda la comunidad (solo coaches y admins). */
 export async function sendAnnouncement(_: ActionState, fd: FormData): Promise<ActionState> {
-  const { supabase, user, profile } = await requireCoach();
+  const { supabase, user, profile, box } = await requireCoach();
   const body = str(fd, "body").slice(0, 2000);
   if (!body) return { error: "Escribe el anuncio." };
   const { error } = await supabase.from("messages").insert({ thread_user_id: null, sender_id: user.id, body, staff_read_at: new Date().toISOString() });
@@ -781,7 +867,7 @@ export async function sendAnnouncement(_: ActionState, fd: FormData): Promise<Ac
   revalidatePath("/mensajes", "layout");
   const text = body.length > 140 ? body.slice(0, 137) + "…" : body;
   after(async () => {
-    await sendPush((await allActiveIds()).filter((id) => id !== user.id), "messages", { title: `📣 ${BRAND.short} · ${profile?.full_name ?? ""}`.trim(), body: text, url: "/mensajes", tag: "announce" });
+    await sendPush((await allActiveIds(box.id)).filter((id) => id !== user.id), "messages", { title: `📣 ${box.name} · ${profile?.full_name ?? ""}`.trim(), body: text, url: "/mensajes", tag: "announce", box: box.slug });
   });
   return { ok: "Anuncio enviado a toda la comunidad." };
 }

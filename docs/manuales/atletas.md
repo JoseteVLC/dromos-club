@@ -9,6 +9,8 @@ Dromos Club es el leaderboard de tu box: donde apuntas tus resultados de cada WO
 5. **Activa los avisos:** con la app instalada, en Perfil → 🔔 Notificaciones (ver «Notificaciones»).
 6. **Elige tu idioma** en Perfil → Idioma: español, inglés o polaco.
 
+**¿Entrenas en más de un box?** Con la misma cuenta puedes estar en varios. Cada box tiene su dirección (por ejemplo `/tubox`), sus WODs, su ranking, sus medallas y sus mensajes, y lo de uno no se ve en otro. Para pasar de uno a otro: Perfil → «Tu box» → Cambiar o crear box. Arriba a la izquierda siempre ves en qué box estás.
+
 Abajo tienes el menú: **WODs** (el entreno del día), **Ranking**, **Historial** y **Perfil**. Arriba a la derecha, el sobre de **Mensajes** ✉️ y el globo de **Avisos**.
 
 ## El WOD del día

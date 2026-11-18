@@ -17,9 +17,10 @@ type Row = { id: string; wod_id: string; user_id: string; division: Division; fi
 const norm = (x: string) => x.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
 
 /** Calcula el progreso de todas las medallas de un atleta (con su propia sesión). */
-export async function computeMedals(supabase: SupabaseClient, userId: string): Promise<MedalProgress[]> {
+/** boxId: las medallas son de cada box (se filtra explícitamente, también con la clave de servidor). */
+export async function computeMedals(supabase: SupabaseClient, userId: string, boxId: string): Promise<MedalProgress[]> {
   const [{ days, done, today }, myRes, { data: prData }, { data: benchData }, { data: me }] = await Promise.all([
-    myTrainingDays(supabase, userId),
+    myTrainingDays(supabase, userId, boxId),
     (async () => {
       const out: MyResult[] = [];
       for (let from = 0; ; from += 1000) {
@@ -27,6 +28,7 @@ export async function computeMedals(supabase: SupabaseClient, userId: string): P
           .from("results")
           .select("*, wods!inner(wod_date, title, score_type, score_label, is_benchmark, published)")
           .eq("user_id", userId)
+          .eq("box_id", boxId)
           .order("id")
           .range(from, from + 999)
           .returns<MyResult[]>();
@@ -39,10 +41,10 @@ export async function computeMedals(supabase: SupabaseClient, userId: string): P
     supabase.from("profiles").select("gender").eq("id", userId).maybeSingle<{ gender: Gender | null }>(),
   ]);
   const [{ data: myComments }, { data: myReactions }, { data: myCommentReactions }] = await Promise.all([
-    supabase.from("result_comments").select("created_at").eq("user_id", userId).order("created_at").limit(25),
-    supabase.from("reactions").select("created_at").eq("user_id", userId).order("created_at").limit(25),
+    supabase.from("result_comments").select("created_at").eq("user_id", userId).eq("box_id", boxId).order("created_at").limit(25),
+    supabase.from("reactions").select("created_at").eq("user_id", userId).eq("box_id", boxId).order("created_at").limit(25),
     // Si la migración 011 aún no está, da error y cuenta como vacío
-    supabase.from("comment_reactions").select("created_at").eq("user_id", userId).order("created_at").limit(25),
+    supabase.from("comment_reactions").select("created_at").eq("user_id", userId).eq("box_id", boxId).order("created_at").limit(25),
   ]);
 
   const got = new Map<string, MedalProgress>();
@@ -173,6 +175,7 @@ export async function computeMedals(supabase: SupabaseClient, userId: string): P
           .from("results")
           .select("id, wod_id, user_id, division, finished, time_seconds, rounds, reps, value, created_at, profiles!results_user_id_fkey(gender)")
           .in("wod_id", chunk)
+          .eq("box_id", boxId)
           .order("id")
           .range(from, from + 999)
           .returns<Row[]>();
@@ -213,15 +216,15 @@ export async function computeMedals(supabase: SupabaseClient, userId: string): P
  * Calcula y guarda las medallas nuevas. Las medallas no se pierden aunque luego se borre un resultado.
  * Devuelve las medallas guardadas del atleta (código → fecha).
  */
-export async function syncMedals(supabase: SupabaseClient, userId: string) {
-  const progress = await computeMedals(supabase, userId);
-  const { data: have } = await supabase.from("user_achievements").select("code, unlocked_on").eq("user_id", userId);
+export async function syncMedals(supabase: SupabaseClient, userId: string, box: { id: string; slug: string }) {
+  const progress = await computeMedals(supabase, userId, box.id);
+  const { data: have } = await supabase.from("user_achievements").select("code, unlocked_on").eq("user_id", userId).eq("box_id", box.id);
   const owned = new Map((have ?? []).map((h) => [h.code as string, h.unlocked_on as string]));
   const fresh = progress.filter((p) => p.unlockedOn && !owned.has(p.code));
   if (fresh.length && hasAdminKey()) {
     await adminDb()
       .from("user_achievements")
-      .upsert(fresh.map((p) => ({ user_id: userId, code: p.code, unlocked_on: p.unlockedOn })), { onConflict: "user_id,code", ignoreDuplicates: true });
+      .upsert(fresh.map((p) => ({ box_id: box.id, user_id: userId, code: p.code, unlocked_on: p.unlockedOn })), { onConflict: "box_id,user_id,code", ignoreDuplicates: true });
     for (const p of fresh) owned.set(p.code, p.unlockedOn!);
     // Push solo por medallas recién ganadas (de los últimos 3 días), no por las de antes de existir el sistema
     const recent = fresh.filter((p) => p.unlockedOn! >= new Date(Date.now() - 3 * 864e5).toISOString().slice(0, 10));
@@ -232,6 +235,7 @@ export async function syncMedals(supabase: SupabaseClient, userId: string) {
         body: recent.length === 1 ? (first?.desc ?? "") : recent.map((p) => MEDAL_BY_CODE.get(p.code)?.name).join(" · "),
         url: "/medallas",
         tag: "medal",
+        box: box.slug,
       });
     }
   }
@@ -245,20 +249,28 @@ export async function syncMedals(supabase: SupabaseClient, userId: string) {
 export async function syncMedalsForClosedWods(db: SupabaseClient, today: string) {
   const { data: wods } = await db
     .from("wods")
-    .select("id")
+    .select("id, box_id, boxes!inner(slug)")
     .eq("published", true)
     .gte("wod_date", addDays(today, -4))
-    .lte("wod_date", addDays(today, -3));
-  const ids = (wods ?? []).map((w) => w.id as string);
-  if (!ids.length) return 0;
-  const { data: rows } = await db.from("results").select("user_id").in("wod_id", ids).neq("division", "scaled").limit(5000);
-  const users = [...new Set((rows ?? []).map((r) => r.user_id as string))];
-  for (const u of users) {
+    .lte("wod_date", addDays(today, -3))
+    .returns<{ id: string; box_id: string; boxes: { slug: string } }[]>();
+  if (!wods?.length) return 0;
+  const slugOf = new Map(wods.map((w) => [w.box_id, w.boxes.slug]));
+  const { data: rows } = await db
+    .from("results")
+    .select("user_id, box_id")
+    .in("wod_id", wods.map((w) => w.id))
+    .neq("division", "scaled")
+    .limit(5000)
+    .returns<{ user_id: string; box_id: string }[]>();
+  const pairs = [...new Set((rows ?? []).map((r) => `${r.box_id}|${r.user_id}`))];
+  for (const p of pairs) {
+    const [boxId, userId] = p.split("|");
     try {
-      await syncMedals(db, u);
+      await syncMedals(db, userId, { id: boxId, slug: slugOf.get(boxId) ?? "" });
     } catch {
       // seguimos con el resto
     }
   }
-  return users.length;
+  return pairs.length;
 }

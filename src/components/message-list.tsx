@@ -7,7 +7,7 @@ export type Msg = {
   sender_id: string;
   body: string;
   created_at: string;
-  sender: { full_name: string; avatar_url: string | null; role: string; is_admin: boolean } | null;
+  sender: { full_name: string; avatar_url: string | null } | null;
 };
 
 /** Conversación tipo chat. Los mensajes del equipo llevan el nombre de quien escribe; los anuncios, 📣. */
@@ -20,7 +20,8 @@ export function MessageList({ items, me, locale, t, staffView }: { items: Msg[];
       {items.map((m) => {
         const own = m.sender_id === me;
         const announce = m.thread_user_id === null;
-        const fromStaff = !!m.sender && (m.sender.role === "coach" || m.sender.is_admin);
+        // En una conversación, todo lo que no escribe el propio atleta lo escribe el equipo del box
+        const fromStaff = m.sender_id !== m.thread_user_id;
         // En la vista del equipo, "nuestro lado" son todos los mensajes del equipo
         const right = staffView ? fromStaff : own;
         if (announce)

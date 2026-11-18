@@ -15,28 +15,33 @@ async function all<T>(q: (from: number, to: number) => PromiseLike<{ data: T[] |
   }
 }
 
-async function trainingDays(supabase: SupabaseClient, today: string) {
+async function trainingDays(supabase: SupabaseClient, today: string, boxId?: string) {
   const rows = await all<{ wod_date: string }>((a, b) =>
-    supabase.from("wods").select("wod_date").eq("published", true).lte("wod_date", today).order("wod_date").range(a, b),
+    (boxId ? supabase.from("wods").select("wod_date").eq("box_id", boxId) : supabase.from("wods").select("wod_date"))
+      .eq("published", true)
+      .lte("wod_date", today)
+      .order("wod_date")
+      .range(a, b),
   );
   return [...new Set(rows.map((r) => r.wod_date))];
 }
 
 type DoneRow = { user_id: string; day: string };
 
-async function doneRows(supabase: SupabaseClient, today: string, userId?: string): Promise<DoneRow[]> {
+async function doneRows(supabase: SupabaseClient, today: string, userId?: string, boxId?: string): Promise<DoneRow[]> {
   const res = await all<{ user_id: string; wods: { wod_date: string } | null }>((a, b) => {
       let q = supabase.from("results").select("user_id, wods!inner(wod_date)").lte("wods.wod_date", today);
       if (userId) q = q.eq("user_id", userId);
+      if (boxId) q = q.eq("box_id", boxId);
       return q.order("id").range(a, b).returns<{ user_id: string; wods: { wod_date: string } | null }[]>();
     });
   return res.filter((r) => r.wods).map((r) => ({ user_id: r.user_id, day: r.wods!.wod_date }));
 }
 
 /** Días de plani hasta hoy y días que ha entrenado un atleta. */
-export async function myTrainingDays(supabase: SupabaseClient, userId: string) {
+export async function myTrainingDays(supabase: SupabaseClient, userId: string, boxId?: string) {
   const today = todayISO();
-  const [days, rows] = await Promise.all([trainingDays(supabase, today), doneRows(supabase, today, userId)]);
+  const [days, rows] = await Promise.all([trainingDays(supabase, today, boxId), doneRows(supabase, today, userId, boxId)]);
   return { days, done: new Set(rows.map((r) => r.day)), today };
 }
 

@@ -75,11 +75,19 @@ Un atleta solo ve y participa en la plani **desde el día de su alta**: no puede
 
 En **Historial → Mis marcas** está el catálogo de benchmarks (Girls, Heroes, clásicos, básicos, halterofilia, gimnásticos y cardio) donde los atletas apuntan sus PRs. Como coach puedes **añadir benchmarks** al catálogo (formulario al final de la lista) y editar o borrar los existentes desde su página.
 
+## Dar de alta tu box
+
+Cualquiera puede crear un box en **/nuevo-box** (en la pantalla de entrar: «¿Tienes un box…? Créalo aquí»). Pones el nombre del box, su dirección (3–30 letras minúsculas, números o guiones; quedará como `/tubox` y, más adelante, `tubox.dromosclub.com`) y, si no tienes cuenta, tu nombre, email y contraseña. Quien lo crea es su **admin**.
+
+En **Admin → Tu box** puedes cambiar el nombre del box y activar o desactivar los **premios por medallas**. La dirección no se cambia desde la app: escríbenos.
+
+Cada box es independiente: WODs, resultados, ranking, medallas, mensajes, invitaciones y roles son de ese box. Una misma persona puede ser atleta en un box y coach en otro.
+
 ## Gestionar personas (admins)
 
 Nadie entra sin invitación. Todo se hace en **Admin**.
 
-1. **Invitar:** en «Invitar a alguien» pon nombre, apellidos, email y rol (Atleta o Coach) y pulsa **Crear invitación**.
+1. **Invitar:** en «Invitar a alguien» pon nombre, apellidos, email y rol (Atleta, Coach o Admin) y pulsa **Crear invitación**. Si esa persona ya tiene cuenta en Dromos Club (por ejemplo, de otro box), entra en tu box directamente, sin enlace.
 2. **Enviar:** copia el enlace o ábrelo por email y mándaselo por WhatsApp o correo. Con ese enlace la persona crea su contraseña y entra.
 3. **Pendientes:** las invitaciones que aún nadie ha usado salen en «Invitaciones pendientes».
 
@@ -98,7 +106,7 @@ En **Admin → Descargar datos de atletas (CSV)** tienes a todo el mundo en un a
 
 Hay 20 medallas que los atletas desbloquean solos al entrenar, batir PRs y completar benchmarks (el detalle está en el manual de atletas). Cuatro llevan **premio 🎁**: Imparable (30 días seguidos), Centurión (100 entrenos), Leyenda (250) e Inmortal (500).
 
-En **Admin → 🎁 Premios de medallas** ves quién ha ganado una de esas, cuándo, y sus datos de envío (dirección, talla, teléfono). Cuando lo mandéis, pulsa **Marcar entregado**; si te equivocas, se puede desmarcar.
+Si tu box usa premios (Admin → Tu box), en **Admin → 🎁 Premios de medallas** ves quién ha ganado una de esas, cuándo, y sus datos de envío (dirección, talla, teléfono). Cuando lo mandéis, pulsa **Marcar entregado**; si te equivocas, se puede desmarcar.
 
 **Medallas de competición (Podio, Campeón, Dinastía).** Se reparten cuando cierra el WOD, con 2 días de margen (el del lunes cierra el miércoles a las 23:59), y solo con los resultados metidos a tiempo. Lo que llega después sale en el ranking como «fuera de plazo» y no cuenta. Si borras un resultado imposible antes del cierre, la medalla irá a quien de verdad le toca; después del cierre, las medallas ya dadas no se quitan.
 

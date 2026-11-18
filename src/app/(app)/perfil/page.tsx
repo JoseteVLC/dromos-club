@@ -15,7 +15,7 @@ import { LangSwitcher } from "@/components/lang-switcher";
 
 export default async function PerfilPage({ searchParams }: PageProps<"/perfil">) {
   const sp = await searchParams;
-  const { supabase, user, profile } = await requireUser();
+  const { supabase, user, profile, box } = await requireUser();
   const { t } = await getI18n();
   // Teléfono y nacimiento son privados: solo el dueño los lee, mediante una función de la base de datos
   const { data: priv, error: privErr } = await supabase.rpc("my_private_profile").maybeSingle<Partial<Profile>>();
@@ -31,7 +31,7 @@ export default async function PerfilPage({ searchParams }: PageProps<"/perfil">)
   const { data: myMedals } = await supabase.from("user_achievements").select("code").eq("user_id", user.id);
   const ownedMedals = new Set((myMedals ?? []).map((m) => m.code as string));
   // Recalcula medallas en segundo plano (por si hay alguna nueva de antes de existir el sistema)
-  after(() => syncMedals(supabase, user.id).catch(() => {}));
+  after(() => syncMedals(supabase, user.id, box).catch(() => {}));
   return (
     <div className="space-y-6">
       <h1 className="h-title text-5xl">{t("Perfil")}</h1>
@@ -117,6 +117,14 @@ export default async function PerfilPage({ searchParams }: PageProps<"/perfil">)
           {t("Administración")} <span className="text-accent">→</span>
         </Link>
       )}
+
+      <Link href="/boxes?cambiar=1" className="card flex items-center justify-between p-4">
+        <span>
+          <span className="block text-xs uppercase tracking-wider text-muted">{t("Tu box")}</span>
+          <span className="font-semibold">{box.name}</span>
+        </span>
+        <span className="text-sm text-accent">{t("Cambiar o crear box")} →</span>
+      </Link>
 
       <form action={logout}>
         <button className="btn-ghost w-full py-3 text-muted">{t("Cerrar sesión")}</button>

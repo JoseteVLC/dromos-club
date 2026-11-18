@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/supabase/server";
-import { adminDb, hasAdminKey } from "@/lib/supabase/admin";
+import { adminDb, boxPeople, emailsOf, hasAdminKey } from "@/lib/supabase/admin";
+import { boxUrl } from "@/lib/box-shared";
+import { BoxSettingsForm } from "@/components/box-settings-form";
 import { siteUrl } from "@/lib/site";
 import { deleteInvitation, setRewardDelivered, setUserFlag } from "@/app/actions";
 import { MEDAL_BY_CODE, REWARD_CODES } from "@/lib/medals";
@@ -21,7 +23,7 @@ type Person = {
 type Invitation = { id: string; token: string; email: string; first_name: string; last_name: string; role: string; created_at: string };
 
 export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
-  const { user } = await requireAdmin();
+  const { user, box } = await requireAdmin();
   const { t, locale } = await getI18n();
   const sp = await searchParams;
   const filter = sp.f === "inactivos" ? "inactivos" : sp.f === "todos" ? "todos" : "activos";
@@ -38,22 +40,13 @@ export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
     );
 
   const db = adminDb();
-  const [{ data: people, error: peopleErr }, { data: invites, error: invErr }, emails, { data: lastRes }] = await Promise.all([
-    db.from("profiles").select("id, full_name, role, is_admin, active, gender, created_at").order("full_name").returns<Person[]>(),
-    db.from("invitations").select("id, token, email, first_name, last_name, role, created_at").is("accepted_at", null).order("created_at", { ascending: false }).returns<Invitation[]>(),
-    (async () => {
-      const map = new Map<string, string>();
-      try {
-        for (let page = 1; page < 50; page++) {
-          const { data } = await db.auth.admin.listUsers({ page, perPage: 1000 });
-          for (const u of data?.users ?? []) map.set(u.id, u.email ?? "");
-          if (!data || data.users.length < 1000) break;
-        }
-      } catch {}
-      return map;
-    })(),
-    db.from("results").select("user_id, updated_at").order("updated_at", { ascending: false }).limit(2000).returns<{ user_id: string; updated_at: string }[]>(),
+  const [{ people: peopleList, error: peopleErr }, { data: invites, error: invErr }, { data: lastRes }] = await Promise.all([
+    boxPeople<Person>(box.id, "id, full_name, gender"),
+    db.from("invitations").select("id, token, email, first_name, last_name, role, created_at").eq("box_id", box.id).is("accepted_at", null).order("created_at", { ascending: false }).returns<Invitation[]>(),
+    db.from("results").select("user_id, updated_at").eq("box_id", box.id).order("updated_at", { ascending: false }).limit(2000).returns<{ user_id: string; updated_at: string }[]>(),
   ]);
+  const people = [...peopleList].sort((a, b) => (a.full_name || "").localeCompare(b.full_name || ""));
+  const emails = await emailsOf(people.map((p) => p.id));
   // Diagnóstico visible en vez de una pantalla vacía
   const problems: string[] = [];
   if (peopleErr) problems.push(`Personas: ${peopleErr.message}`);
@@ -65,6 +58,7 @@ export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
   const { data: awardsData } = await db
     .from("user_achievements")
     .select("user_id, code, unlocked_on, created_at, delivered_at")
+    .eq("box_id", box.id)
     .in("code", REWARD_CODES)
     .order("created_at", { ascending: false })
     .limit(100)
@@ -102,6 +96,18 @@ export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
         </div>
       )}
 
+      {sp.nuevo && (
+        <div className="card space-y-2 border-accent/60 p-4">
+          <p className="font-semibold">{t("¡Tu box está listo!")}</p>
+          <p className="text-sm text-muted">{t("Su dirección es {url}. Invita a tus coaches y atletas aquí abajo y crea el primer WOD en Coach.", { url: boxUrl(box.slug, base) })}</p>
+        </div>
+      )}
+
+      <section className="space-y-3">
+        <h2 className="h-display text-xl">{t("Tu box")}</h2>
+        <BoxSettingsForm name={box.name} rewards={box.rewards_enabled} url={boxUrl(box.slug, base)} />
+      </section>
+
       <section className="space-y-3">
         <h2 className="h-display text-xl">{t("Invitar a alguien")}</h2>
         <InviteForm />
@@ -133,6 +139,7 @@ export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
         </section>
       )}
 
+      {box.rewards_enabled && (
       <section className="space-y-3">
         <div className="flex items-baseline justify-between gap-3">
           <h2 className="h-display text-xl">🎁 {t("Premios de medallas")} · {pendingAwards.length}</h2>
@@ -172,6 +179,7 @@ export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
           </ul>
         )}
       </section>
+      )}
 
       <section className="space-y-3">
         <h2 className="h-display text-xl">{t("Personas")}</h2>

@@ -17,7 +17,7 @@ export default async function HiloPage({ params, searchParams }: { params: Promi
     supabase.from("profiles").select("id, full_name, avatar_url").eq("id", id).maybeSingle(),
     supabase
       .from("messages")
-      .select("id, thread_user_id, sender_id, body, created_at, sender:profiles!messages_sender_id_fkey(full_name, avatar_url, role, is_admin)")
+      .select("id, thread_user_id, sender_id, body, created_at, sender:profiles!messages_sender_id_fkey(full_name, avatar_url)")
       .eq("thread_user_id", id)
       .order("created_at", { ascending: false })
       .limit(n + 1)

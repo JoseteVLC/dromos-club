@@ -15,7 +15,7 @@ type Pub = { id: string; full_name: string; avatar_url: string | null; bio: stri
 export default async function AtletaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
-  const { supabase, user, profile } = await requireUser();
+  const { supabase, user, profile, box } = await requireUser();
   const { t, locale } = await getI18n();
 
   const [{ data: pub }, { data: medals }, { data: prs }, { data: benches }, training] = await Promise.all([
@@ -23,7 +23,7 @@ export default async function AtletaPage({ params }: { params: Promise<{ id: str
     supabase.from("user_achievements").select("code, unlocked_on").eq("user_id", id),
     supabase.from("personal_records").select("*").eq("user_id", id).eq("division", "rx").returns<PersonalRecord[]>(),
     supabase.from("benchmarks").select("*").returns<Benchmark[]>(),
-    myTrainingDays(supabase, id),
+    myTrainingDays(supabase, id, box.id),
   ]);
   if (!pub) notFound();
 

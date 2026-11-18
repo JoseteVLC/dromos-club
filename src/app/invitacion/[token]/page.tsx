@@ -12,9 +12,9 @@ export default async function InvitationPage({ params }: PageProps<"/invitacion/
   const { t } = await getI18n();
   const { data: inv } = await adminDb()
     .from("invitations")
-    .select("email, first_name, last_name, accepted_at")
+    .select("email, first_name, last_name, accepted_at, boxes(name, slug)")
     .eq("token", token)
-    .maybeSingle<{ email: string; first_name: string; last_name: string; accepted_at: string | null }>();
+    .maybeSingle<{ email: string; first_name: string; last_name: string; accepted_at: string | null; boxes: { name: string; slug: string } | null }>();
 
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-4 py-10">
@@ -42,7 +42,7 @@ export default async function InvitationPage({ params }: PageProps<"/invitacion/
           <div className="space-y-2 text-center">
             <h1 className="h-title text-4xl">{inv.first_name ? t("¡Hola, {name}!", { name: inv.first_name }) : t("¡Hola!")}</h1>
             <p className="text-sm text-muted">
-              {t("Te han invitado al leaderboard de {app}: mete tus resultados de los WODs y compárate con el resto. Crea tu contraseña y listo.")}
+              {t("{box} te ha invitado a su leaderboard en {app}: mete tus resultados de los WODs y compárate con el resto. Crea tu contraseña y listo.", { box: inv.boxes?.name ?? "" })}
             </p>
           </div>
           <AcceptInviteForm token={token} email={inv.email} firstName={inv.first_name} lastName={inv.last_name} />

@@ -96,3 +96,13 @@ export const DIVISIONS: { value: Division; label: string }[] = [
 ];
 /** Solo Elite y RX tienen ranking; los escalados salen aparte, sin posición. */
 export const RANKED_DIVISIONS = DIVISIONS.filter((d) => d.value !== "scaled");
+
+export type Box = {
+  id: string;
+  slug: string;
+  name: string;
+  logo_url: string | null;
+  accent: string | null;
+  rewards_enabled: boolean;
+  status: "trial" | "active" | "paused";
+};
