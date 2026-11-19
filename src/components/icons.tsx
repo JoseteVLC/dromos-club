@@ -36,14 +36,16 @@ export function RepeatIcon({ className = "", size = 18 }: P) {
   );
 }
 
-/** Disco con %: calculadora de porcentajes y discos. */
+/** Barra cargada con %: calculadora de porcentajes y discos. */
 export function CalcIcon({ className = "", size = 18 }: P) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
-      <circle cx="12" cy="12" r="9.5" />
-      <path d="M8.5 15.5l7-7" />
-      <circle cx="9" cy="9" r="1.4" />
-      <circle cx="15" cy="15" r="1.4" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+      <rect x="1" y="16" width="22" height="1.8" rx="0.9" />
+      <rect x="3" y="12" width="2.6" height="10" rx="0.9" />
+      <rect x="18.4" y="12" width="2.6" height="10" rx="0.9" />
+      <path d="M9.5 10l5-7" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="9.7" cy="4" r="1.5" />
+      <circle cx="14.3" cy="9" r="1.5" />
     </svg>
   );
 }
