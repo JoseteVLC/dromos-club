@@ -318,24 +318,22 @@ export function parseWeek(text: string, weekStart: string): ParsedWeek {
       skipped++;
       return;
     }
-    // Accesorios y trabajo «for quality» no llevan leaderboard
+    // Accesorios sin marca no llevan leaderboard. El trabajo «for quality» sí entra (p. ej. strongman con pesos):
+    // el atleta apunta su peso o sus reps y el coach puede quitarlo en la vista previa si no lo quiere
     if (ACCESSORY.test(b.head) || (!b.head && ACCESSORY.test(firstLine))) {
       skipped++;
       return;
     }
-    const formatLines = `${b.head}\n${description}`.split("\n").filter((l) => l.trim() && !l.trim().startsWith("*")).slice(0, 3).join("\n");
-    const qualityType = guessScoreType(formatLines.replace(/\bfor\s+quality\b/gi, ""));
-    if (/\bfor\s+quality\b/i.test(formatLines) && (!qualityType || qualityType === "emom")) {
-      skipped++;
-      return;
-    }
+    const isQuality = /\bfor\s+quality\b/i.test(`${b.head}\n${description}`);
     const n = letters.get(b.date) ?? 0;
     letters.set(b.date, n + 1);
     const part = String.fromCharCode(65 + Math.min(n, 25));
     const title = makeTitle(b.head, body, part);
     const headInfo = b.head.replace(/^[^:]*:\s*/, ""); // «WOD: for time» → «for time»
     const scoreSource = `${b.head.includes(":") ? headInfo : b.head}\n${description}`;
-    let score_type = guessScoreType(scoreSource);
+    let score_type = guessScoreType(isQuality ? scoreSource.replace(/\bfor\s+quality\b/gi, "") : scoreSource);
+    // «For quality» sin otro formato: lo normal es apuntar el peso
+    if (isQuality && (!score_type || score_type === "emom")) score_type = /\d\s*(kg|lb|#)|\bkilos?\b|\bpeso\b|\bheavy\b|\bpesad/i.test(description) ? "load" : "";
     // «EL RESULTADO ES: Ax1 + Bx2 + Cx3» dentro de un EMOM/EVERY: el resultado no es un EMOM, que elija el coach
     if (score_type === "emom" && /\b(?:el\s+)?resultado\s+es\b|\bscore\s+is\b/i.test(description)) score_type = "";
     parts.push({

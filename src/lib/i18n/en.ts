@@ -116,7 +116,6 @@ const d: Record<string, string> = {
   "Hacer admin": "Make admin",
   "Hacer coach": "Make coach",
   "Hay una parte sin título.": "One part has no title.",
-  "He quitado {n} parte(s) sin leaderboard (calentamientos, vuelta a la calma, accesorios y «for quality»).": "I removed {n} part(s) without a leaderboard (warm-ups, cool-downs, accessories and \"for quality\").",
   "Historial": "History",
   "Hoy": "Today",
   "Idioma": "Language",
@@ -237,7 +236,6 @@ const d: Record<string, string> = {
   "Tú": "You",
   "Unidad / etiqueta (opcional)": "Unit / label (optional)",
   "Usa siempre el mismo título (p. ej. «Fran» o «Back Squat 1RM») para que se comparen entre fechas.": "Always use the same title (e.g. \"Fran\" or \"Back Squat 1RM\") so they're compared across dates.",
-  "Vale el Word de la plani, el texto de TrueCoach o el del PDF, tal cual. Detecto días, partes (A, B, C…), quito calentamientos, accesorios, trabajo «for quality» y descansos, y pongo el tipo de score si el texto lo dice. Si trae fechas («Mon, Nov 9») uso esas; si no, cuento desde el lunes de arriba.": "The programming Word file, the TrueCoach text or the PDF text all work, as they are. I detect days and parts (A, B, C…), remove warm-ups, accessories, \"for quality\" work and rest, and set the score type if the text says so. If it has dates (\"Mon, Nov 9\") I use them; otherwise I count from the Monday above.",
   "Ver / editar texto": "View / edit text",
   "Ver constancia →": "See consistency →",
   "Volver al día": "Back to the day",
@@ -666,5 +664,7 @@ const d: Record<string, string> = {
   "Orden de la parte {part}:": "Order of part {part}:",
   "Mover antes": "Move earlier",
   "Mover después": "Move later",
+  "Vale el Word de la plani, el texto de TrueCoach o el del PDF, tal cual. Detecto días, partes (A, B, C…), quito calentamientos, accesorios y descansos (el trabajo «for quality» sí lo meto, para que apuntéis los pesos), y pongo el tipo de score si el texto lo dice. Si trae fechas («Mon, Nov 9») uso esas; si no, cuento desde el lunes de arriba.": "The plan's Word file, the TrueCoach text or the PDF text work as they are. I detect days and parts (A, B, C…), remove warm-ups, accessories and rest days (\"for quality\" work stays in, so you can log your weights), and set the score type if the text says it. If it has dates (\"Mon, Nov 9\") I use them; otherwise I count from the Monday above.",
+  "He quitado {n} parte(s) sin leaderboard (calentamientos, vuelta a la calma y accesorios).": "I removed {n} part(s) without a leaderboard (warm-ups, cool-downs and accessories).",
 };
 export default d;

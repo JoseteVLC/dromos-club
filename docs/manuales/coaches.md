@@ -43,7 +43,7 @@ Es la forma rápida: subes la plani de la semana y la app crea todos los WODs de
 
 1. **Elige el lunes** de la semana, por si el texto no trae fechas. Si las trae («Mon, Nov 9»), usa esas.
 2. **Sube el Word** (.docx) de la plani, o pega el texto tal cual: vale el de TrueCoach u otra app, o el del PDF.
-3. **Pulsa Analizar.** La app separa días y partes (A, B, C…) y quita sola calentamientos, vuelta a la calma, accesorios, trabajo «for quality» y descansos. Si el texto dice el tipo de score, lo pone.
+3. **Pulsa Analizar.** La app separa días y partes (A, B, C…) y quita sola calentamientos, vuelta a la calma, accesorios y descansos. El trabajo «for quality» (strongman, fuerza con pesos…) sí lo mete, como Carga, para que los atletas apunten el peso que han movido; si no lo quieres, desmárcalo en la vista previa. Si el texto dice el tipo de score, lo pone.
 4. **Revisa cada parte:** fecha, letra, título y tipo de resultado. Las que salen en **amarillo** no tienen tipo: elígelo. Desmarca lo que no quieras con leaderboard.
 5. **Pulsa «Crear N WODs».**
 

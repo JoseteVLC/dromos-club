@@ -116,7 +116,6 @@ const d: Record<string, string> = {
   "Hacer admin": "Nadaj admina",
   "Hacer coach": "Nadaj trenera",
   "Hay una parte sin título.": "Jedna część nie ma tytułu.",
-  "He quitado {n} parte(s) sin leaderboard (calentamientos, vuelta a la calma, accesorios y «for quality»).": "Usunąłem części bez rankingu (rozgrzewki, schłodzenie, akcesoria i „for quality”): {n}.",
   "Historial": "Historia",
   "Hoy": "Dziś",
   "Idioma": "Język",
@@ -237,7 +236,6 @@ const d: Record<string, string> = {
   "Tú": "Ty",
   "Unidad / etiqueta (opcional)": "Jednostka / etykieta (opcjonalnie)",
   "Usa siempre el mismo título (p. ej. «Fran» o «Back Squat 1RM») para que se comparen entre fechas.": "Używaj zawsze tego samego tytułu (np. „Fran” lub „Back Squat 1RM”), aby wyniki porównywały się między datami.",
-  "Vale el Word de la plani, el texto de TrueCoach o el del PDF, tal cual. Detecto días, partes (A, B, C…), quito calentamientos, accesorios, trabajo «for quality» y descansos, y pongo el tipo de score si el texto lo dice. Si trae fechas («Mon, Nov 9») uso esas; si no, cuento desde el lunes de arriba.": "Działa plik Word z planem, tekst z TrueCoach lub z PDF-a, bez zmian. Wykrywam dni i części (A, B, C…), usuwam rozgrzewki, akcesoria, pracę „for quality” i odpoczynek oraz ustawiam typ wyniku, jeśli tekst go podaje. Jeśli są daty („Mon, Nov 9”), używam ich; jeśli nie, liczę od poniedziałku powyżej.",
   "Ver / editar texto": "Pokaż / edytuj tekst",
   "Ver constancia →": "Zobacz regularność →",
   "Volver al día": "Wróć do dnia",
@@ -666,5 +664,7 @@ const d: Record<string, string> = {
   "Orden de la parte {part}:": "Kolejność części {part}:",
   "Mover antes": "Przesuń wcześniej",
   "Mover después": "Przesuń później",
+  "Vale el Word de la plani, el texto de TrueCoach o el del PDF, tal cual. Detecto días, partes (A, B, C…), quito calentamientos, accesorios y descansos (el trabajo «for quality» sí lo meto, para que apuntéis los pesos), y pongo el tipo de score si el texto lo dice. Si trae fechas («Mon, Nov 9») uso esas; si no, cuento desde el lunes de arriba.": "Działa Word z planem, tekst z TrueCoach albo z PDF-a, bez zmian. Wykrywam dni i części (A, B, C…), usuwam rozgrzewki, akcesoria i dni wolne (praca «for quality» zostaje, żebyście mogli wpisać ciężary) i ustawiam typ wyniku, jeśli tekst go podaje. Jeśli są daty («Mon, Nov 9»), używam ich; jeśli nie, liczę od poniedziałku powyżej.",
+  "He quitado {n} parte(s) sin leaderboard (calentamientos, vuelta a la calma y accesorios).": "Usunąłem {n} części bez rankingu (rozgrzewki, schłodzenia i akcesoria).",
 };
 export default d;

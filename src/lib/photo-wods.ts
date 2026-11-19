@@ -34,15 +34,16 @@ const TOOL = {
 
 const PROMPT = (defaultDate: string) => `Eres el asistente de un box de CrossFit. Te paso foto(s) de la pizarra del box o de la planificación (puede ser letra a mano, una pantalla o un papel).
 
-Extrae SOLO las partes que tienen resultado para un leaderboard (metcons, levantamientos con marca, AMRAP, EMOM con score, benchmarks…).
-NO incluyas calentamiento, movilidad, activación, técnica sin marca, accesorios, vuelta a la calma ni trabajo «for quality».
+Extrae SOLO las partes que tienen resultado para un leaderboard (metcons, levantamientos con marca, AMRAP, EMOM con score, benchmarks, strongman…).
+SÍ incluye el trabajo «for quality» (p. ej. strongman o fuerza con pesos): el atleta apuntará el peso que ha usado o sus reps.
+NO incluyas calentamiento, movilidad, activación, técnica sin carga, accesorios ni vuelta a la calma.
 
 Para cada parte:
 - date: si la foto indica el día (lunes, martes… o una fecha), conviértelo a fecha real tomando como referencia que la fecha por defecto es ${defaultDate}. Si no indica día, usa ${defaultDate}.
 - part: A, B, C… en el orden en que aparecen ese día (respeta la letra si la pizarra la pone).
 - title: corto y claro. Benchmarks con su nombre exacto.
 - description: transcribe el WOD completo y fiel, con saltos de línea, sin inventar nada. Si algo no se lee, pon [ilegible].
-- score_type: elige según cómo se puntúa: For Time → for_time; AMRAP → amrap; buscar peso/RM → load; máximo de reps → reps; calorías → calories; metros → distance; EMOM con score → emom.
+- score_type: elige según cómo se puntúa: For Time → for_time; AMRAP → amrap; buscar peso/RM → load; máximo de reps → reps; calorías → calories; metros → distance; EMOM con score → emom. «For quality» con pesos (yoke, sandbag, farmer, sled…) → load (el peso más alto que ha movido); si no hay peso, reps.
 - time_cap: mm:ss solo si aparece (p. ej. "TC 12'" → "12:00").
 
 Responde SIEMPRE llamando a la herramienta guardar_wods (aunque no encuentres nada: parts vacío y explícalo en notes).`;

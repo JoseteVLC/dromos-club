@@ -146,7 +146,7 @@ export function WeekImport({ defaultMonday, today }: { defaultMonday: string; to
             placeholder={"LUNES\nA) Back Squat\n5-5-3-3-1-1\nB) Metcon\nFor time: 21-15-9 ...\n\nMARTES\nAMRAP 12'\n..."}
           />
           <p className="mt-1 text-xs text-muted">
-            {t("Vale el Word de la plani, el texto de TrueCoach o el del PDF, tal cual. Detecto días, partes (A, B, C…), quito calentamientos, accesorios, trabajo «for quality» y descansos, y pongo el tipo de score si el texto lo dice. Si trae fechas («Mon, Nov 9») uso esas; si no, cuento desde el lunes de arriba.")}
+            {t("Vale el Word de la plani, el texto de TrueCoach o el del PDF, tal cual. Detecto días, partes (A, B, C…), quito calentamientos, accesorios y descansos (el trabajo «for quality» sí lo meto, para que apuntéis los pesos), y pongo el tipo de score si el texto lo dice. Si trae fechas («Mon, Nov 9») uso esas; si no, cuento desde el lunes de arriba.")}
           </p>
         </div>
         <button type="button" className="btn w-full" disabled={!text.trim() || !monday} onClick={() => analyze(text)}>
@@ -160,7 +160,7 @@ export function WeekImport({ defaultMonday, today }: { defaultMonday: string; to
           <h2 className="h-display text-3xl">{t("Revisión · {n} partes", { n: parts.length })}</h2>
           {skipped > 0 && (
             <p className="text-sm text-muted">
-              {t("He quitado {n} parte(s) sin leaderboard (calentamientos, vuelta a la calma, accesorios y «for quality»).", { n: skipped })}
+              {t("He quitado {n} parte(s) sin leaderboard (calentamientos, vuelta a la calma y accesorios).", { n: skipped })}
             </p>
           )}
           {parts.length === 0 && <p className="card p-4 text-muted">{t("No he encontrado nada. Revisa el texto.")}</p>}
