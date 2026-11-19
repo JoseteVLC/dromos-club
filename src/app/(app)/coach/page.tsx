@@ -5,12 +5,14 @@ import { SCORE_TYPES, type Wod } from "@/lib/types";
 import { WodForm } from "@/components/wod-form";
 import { addDays, dayHref, isISODate, todayISO } from "@/lib/dates";
 import { FlaggedResults, type FlaggedRow } from "@/components/flagged-results";
+import { FlaggedRecords, type FlaggedRecord } from "@/components/flagged-records";
+import { adminDb, hasAdminKey } from "@/lib/supabase/admin";
 
 export default async function CoachPage({ searchParams }: PageProps<"/coach">) {
   const sp = await searchParams;
   const defaultDate = isISODate(String(sp.date)) ? String(sp.date) : undefined;
   const defaultPart = /^[A-Z]$/.test(String(sp.part)) ? String(sp.part) : undefined;
-  const { supabase } = await requireCoach();
+  const { supabase, box } = await requireCoach();
   const { t } = await getI18n();
   const { data } = await supabase
     .from("wods")
@@ -30,9 +32,25 @@ export default async function CoachPage({ searchParams }: PageProps<"/coach">) {
     .limit(30)
     .returns<FlaggedRow[]>();
 
+  // Marcas personales imposibles confirmadas por el atleta (con la clave de servidor: el coach no ve las marcas privadas)
+  let flaggedPrs: FlaggedRecord[] = [];
+  if (hasAdminKey()) {
+    let q = adminDb()
+      .from("personal_records")
+      .select("*, benchmarks(name, score_type), profiles!personal_records_user_id_fkey(id, full_name, avatar_url)")
+      .not("flag", "is", null)
+      .eq("flag_reviewed", false)
+      .order("created_at", { ascending: false })
+      .limit(30);
+    const { data: mem } = await adminDb().from("box_members").select("user_id").eq("box_id", box.id);
+    q = q.in("user_id", (mem ?? []).map((m) => m.user_id as string));
+    flaggedPrs = ((await q.returns<FlaggedRecord[]>()).data ?? []);
+  }
+
   return (
     <div className="space-y-8">
       <FlaggedResults rows={flagged ?? []} t={t} />
+      <FlaggedRecords rows={flaggedPrs} t={t} />
       <Link href="/coach/semana" className="card flex items-center justify-between border-accent/60 p-4">
         <span>
           <span className="h-display block text-2xl">{t("Importar WODs")}</span>

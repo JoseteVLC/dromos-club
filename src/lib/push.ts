@@ -79,3 +79,10 @@ export async function allActiveIds(boxId: string) {
     if (!data || data.length < 1000) return out;
   }
 }
+
+/** Admins activos del box (avisos de marcas o resultados imposibles). */
+export async function adminIds(boxId: string) {
+  if (!hasAdminKey()) return [];
+  const { data } = await adminDb().from("box_members").select("user_id").eq("box_id", boxId).eq("active", true).eq("role", "admin");
+  return (data ?? []).map((p) => p.user_id as string);
+}

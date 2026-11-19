@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { syncMedals } from "@/lib/achievements";
-import { allActiveIds, sendPush, staffIds } from "@/lib/push";
+import { adminIds, allActiveIds, sendPush, staffIds } from "@/lib/push";
 import { wodsFromPhotos } from "@/lib/photo-wods";
 import { checkCandidate, checkPersonalRecord } from "@/lib/plausibility";
 import { makeTip, tipFor } from "@/lib/ai-tips";
@@ -16,7 +16,7 @@ import { createClient, isCoachProfile, memberSince, requireAdmin, requireCoach, 
 import { adminDb, hasAdminKey } from "@/lib/supabase/admin";
 import { siteUrl } from "@/lib/site";
 import { randomBytes } from "node:crypto";
-import { parseTime } from "@/lib/scoring";
+import { formatScore, parseTime } from "@/lib/scoring";
 import { dayHref, isISODate } from "@/lib/dates";
 import { DIVISIONS, detectDivisions, wodDivisions, SCORE2_TYPES, SCORE_TYPES, type Division, type Result, type Score2Type, type ScoreType, type Wod } from "@/lib/types";
 import { BRAND } from "@/lib/brand";
@@ -188,7 +188,7 @@ export async function saveResult(_: ActionState, fd: FormData): Promise<ActionSt
     .from("wods")
     .select("*")
     .eq("id", wodId)
-    .single<Pick<Wod, "score_type" | "time_cap_seconds" | "score2_type" | "wod_date" | "divisions">>();
+    .single<Pick<Wod, "score_type" | "time_cap_seconds" | "score2_type" | "wod_date" | "divisions" | "title" | "score_label">>();
   if (!wod) return { error: "WOD no encontrado." };
   if (!wodDivisions(wod).includes(division)) return { error: "Este WOD no tiene esa categoría." };
   const since = memberSince((await requireUser()).profile);
@@ -279,6 +279,15 @@ export async function saveResult(_: ActionState, fd: FormData): Promise<ActionSt
         .update({ flag: check?.hard ? `El atleta confirma: ${check.reasonEs}` : null, flag_reviewed: false })
         .eq("wod_id", wodId)
         .eq("user_id", user.id);
+      if (check?.hard) {
+        const who = (await adminDb().from("profiles").select("full_name").eq("id", user.id).maybeSingle<{ full_name: string }>()).data?.full_name || "Un atleta";
+        await sendPush(await adminIds(box.id), "messages", {
+          title: `⚠️ ${who} ha confirmado un resultado imposible`,
+          body: `${wod.title}: ${formatScore(wod, row as unknown as Result)}. Revísalo en Coach.`,
+          url: "/coach",
+          tag: `flag-r-${wodId}-${user.id}`, box: box.slug,
+        });
+      }
     });
   return { ok: "¡Resultado guardado!" };
 }
@@ -1063,26 +1072,77 @@ export async function savePersonalRecord(_: ActionState, fd: FormData): Promise<
     }
   }
   const editId = str(fd, "id");
-  // Marca imposible: se pregunta antes de guardarla
-  if (hasAdminKey() && str(fd, "confirm") !== "1") {
-    const i18n = await getI18n();
-    const check = await checkPersonalRecord(adminDb(), user.id, b, row, editId, i18n.t, i18n.locale).catch(() => null);
-    if (check) return { confirm: check.reason };
-  }
+  // Marca imposible: se pregunta antes de guardarla. Si la confirma, queda para que la revise el equipo.
+  const check =
+    hasAdminKey() ? await getI18n().then((i18n) => checkPersonalRecord(adminDb(), user.id, b, row, editId, i18n.t, i18n.locale)).catch(() => null) : null;
+  if (check && str(fd, "confirm") !== "1") return { confirm: check.reason };
   if (editId) {
     const { data: upd, error } = await supabase.from("personal_records").update(row).eq("id", editId).eq("user_id", user.id).select("id");
     if (error || !upd?.length) return { error: "No se pudo guardar el cambio." };
+    flagRecordLater(editId, check, user.id, b, row, box);
     revalidatePath("/marcas", "layout");
     revalidatePath("/historial");
     checkMedalsLater(supabase, user.id, box);
     return { ok: "¡Marca corregida!" };
   }
-  const { error } = await supabase.from("personal_records").insert(row);
-  if (error) return { error: "No se pudo guardar. ¿Tu cuenta está activa?" };
+  const { data: ins, error } = await supabase.from("personal_records").insert(row).select("id").single<{ id: string }>();
+  if (error || !ins) return { error: "No se pudo guardar. ¿Tu cuenta está activa?" };
+  flagRecordLater(ins.id, check, user.id, b, row, box);
   revalidatePath("/marcas", "layout");
   revalidatePath("/historial");
   checkMedalsLater(supabase, user.id, box);
   return { ok: "¡Marca guardada!" };
+}
+
+/** Marca personal imposible confirmada: queda marcada para el equipo y avisa a los admins. Si ya es razonable, se quita la marca. */
+function flagRecordLater(
+  recordId: string,
+  check: { reasonEs: string; hard: boolean } | null,
+  userId: string,
+  b: { name: string; score_type: string },
+  row: Record<string, unknown>, box: { id: string; slug: string },
+) {
+  if (!hasAdminKey()) return;
+  after(async () => {
+    const db = adminDb();
+    await db.from("personal_records").update({ flag: check?.hard ? `El atleta confirma: ${check.reasonEs}` : null, flag_reviewed: false }).eq("id", recordId);
+    if (!check?.hard) return;
+    const who = (await db.from("profiles").select("full_name").eq("id", userId).maybeSingle<{ full_name: string }>()).data?.full_name || "Un atleta";
+    const score = formatScore({ score_type: b.score_type as ScoreType, score_label: null }, row as unknown as Result);
+    await sendPush(await adminIds(box.id), "messages", {
+      title: `⚠️ ${who} ha confirmado una marca imposible`,
+      body: `${b.name}: ${score}. Revísala en Coach.`,
+      url: "/coach",
+      tag: `flag-pr-${recordId}`, box: box.slug,
+    });
+  });
+}
+
+/** El coach da por buena una marca personal que el detector había marcado. */
+export async function markRecordOk(fd: FormData) {
+  const { box } = await requireCoach();
+  const id = str(fd, "id");
+  if (!(await recordInBox(id, box.id))) return;
+  await adminDb().from("personal_records").update({ flag_reviewed: true }).eq("id", id);
+  revalidatePath("/coach");
+}
+
+/** El coach borra una marca personal imposible. */
+export async function deleteFlaggedRecord(fd: FormData) {
+  const { box } = await requireCoach();
+  const id = str(fd, "id");
+  if (!(await recordInBox(id, box.id))) return;
+  await adminDb().from("personal_records").delete().eq("id", id).not("flag", "is", null);
+  revalidatePath("/coach");
+}
+
+/** La marca es de alguien de este box (las marcas personales son de la persona, no del box). */
+async function recordInBox(recordId: string, boxId: string) {
+  const db = adminDb();
+  const { data: pr } = await db.from("personal_records").select("user_id").eq("id", recordId).maybeSingle<{ user_id: string }>();
+  if (!pr) return false;
+  const { data: m } = await db.from("box_members").select("user_id").eq("box_id", boxId).eq("user_id", pr.user_id).maybeSingle();
+  return !!m;
 }
 
 export async function deletePersonalRecord(fd: FormData) {

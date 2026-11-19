@@ -716,5 +716,8 @@ const d: Record<string, string> = {
   "El calentamiento no está disponible ahora mismo.": "Rozgrzewka nie jest teraz dostępna.",
   "No hemos podido preparar el calentamiento. Prueba en un momento.": "Nie udało się przygotować rozgrzewki. Spróbuj za chwilę.",
   "Peso y escalado": "Ciężar i skalowanie",
+  "Marcas a revisar": "Rekordy do sprawdzenia",
+  "Marcas personales imposibles que el atleta ha confirmado igualmente. Si no son reales, bórralas.": "Niemożliwe rekordy osobiste, które sportowiec mimo to potwierdził. Jeśli nie są prawdziwe, usuń je.",
+  "Borrar marca": "Usuń rekord",
 };
 export default d;
