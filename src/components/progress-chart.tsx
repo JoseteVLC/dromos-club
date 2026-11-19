@@ -1,4 +1,5 @@
 import { formatTime } from "@/lib/scoring";
+import { TrendIcon } from "./icons";
 
 export type ProgressPoint = { date: string; v: number; label: string };
 
@@ -66,7 +67,7 @@ export function ProgressChart({
   return (
     <section className="card space-y-2 p-4">
       <div className="flex items-baseline justify-between gap-2">
-        <h2 className="text-sm font-semibold">{title}</h2>
+        <h2 className="flex items-center gap-2 text-sm font-semibold"><TrendIcon className="text-accent" /> {title}</h2>
         {gain > 0 && (
           <span className="text-xs font-semibold text-accent">
             {lowerIsBetter ? `−${formatTime(Math.round(gain))}` : `+${Math.round(gain * 10) / 10}`}

@@ -771,5 +771,6 @@ const d: Record<string, string> = {
   "Tu progreso": "Twoje postępy",
   "Ya hiciste este WOD": "Ten WOD już robiłeś",
   "A ver si hoy lo mejoras.": "Zobaczymy, czy dziś to poprawisz.",
+  "Los cierres no cuentan: en CrossFit no pesan.": "Zaciski się nie liczą: w CrossFicie nic nie ważą.",
 };
 export default d;

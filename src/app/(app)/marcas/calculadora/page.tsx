@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BarbellIcon } from "@/components/icons";
 import { requireUser } from "@/lib/supabase/server";
 import { getI18n } from "@/lib/i18n/server";
 import { RM_CATEGORIES, type Benchmark, type PersonalRecord } from "@/lib/marcas";
@@ -31,7 +32,7 @@ export default async function CalculadoraPage() {
       <h1 className="h-title text-5xl">{t("Historial")}</h1>
       <HistoryTabs active="marcas" t={t} />
       <Link href="/marcas?c=lifts" className="text-sm text-muted">← {t("Mis marcas")}</Link>
-      <h2 className="h-display text-3xl">🧮 {t("Calculadora de % y discos")}</h2>
+      <h2 className="h-display flex items-center gap-2 text-3xl"><BarbellIcon size={28} className="text-accent" /> {t("Calculadora de % y discos")}</h2>
       <p className="text-sm text-muted">
         {lifts.length
           ? t("Elige el movimiento y el % de tu 1RM, o escribe el peso: te dice qué discos poner a cada lado.")

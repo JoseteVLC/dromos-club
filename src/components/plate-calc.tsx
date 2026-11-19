@@ -4,14 +4,15 @@ import { useState } from "react";
 import { useI18n } from "@/lib/i18n/client";
 
 /** Discos de un box (kg) y sus colores de competición. */
-const PLATES: { kg: number; color: string; h: number }[] = [
-  { kg: 25, color: "#d62828", h: 64 },
-  { kg: 20, color: "#1d4ed8", h: 64 },
-  { kg: 15, color: "#eab308", h: 58 },
-  { kg: 10, color: "#16a34a", h: 52 },
-  { kg: 5, color: "#e5e7eb", h: 42 },
-  { kg: 2.5, color: "#d62828", h: 34 },
-  { kg: 1.25, color: "#9ca3af", h: 28 },
+// Bumpers de box: de 10 a 25 kg tienen el mismo diámetro y cambia el grosor; los de 5 y los de cambio son más pequeños.
+const PLATES: { kg: number; color: string; h: number; w: number; dark?: boolean }[] = [
+  { kg: 25, color: "#c81e1e", h: 100, w: 22 },
+  { kg: 20, color: "#1d4ed8", h: 100, w: 18 },
+  { kg: 15, color: "#e3b505", h: 100, w: 15, dark: true },
+  { kg: 10, color: "#15803d", h: 100, w: 12 },
+  { kg: 5, color: "#e7e5e4", h: 72, w: 9, dark: true },
+  { kg: 2.5, color: "#b91c1c", h: 52, w: 6 },
+  { kg: 1.25, color: "#a8a29e", h: 42, w: 5, dark: true },
 ];
 const BARS = [20, 15, 10];
 const PCTS = [100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 40];
@@ -121,29 +122,71 @@ export function PlateCalc({ oneRM, lifts }: { oneRM?: number | null; lifts?: { n
             <p className="text-sm">{t("Solo la barra.")}</p>
           ) : (
             <>
-              <div className="flex h-20 items-center gap-0.5" aria-hidden>
-                <div className="h-3 w-6 rounded-l bg-muted/50" />
-                <div className="h-6 w-2 bg-muted/70" />
-                {res.plates.map((kg, i) => {
-                  const p = PLATES.find((x) => x.kg === kg)!;
-                  return (
-                    <div
-                      key={i}
-                      className="flex items-center justify-center rounded-sm text-[10px] font-bold"
-                      style={{ background: p.color, height: p.h, width: kg >= 10 ? 18 : 12, color: kg === 5 || kg === 15 ? "#111" : "#fff" }}
-                    />
-                  );
-                })}
-                <div className="h-3 flex-1 rounded-r bg-muted/50" />
-              </div>
+              <BarSleeve plates={res.plates} />
               <p className="text-sm">
                 <span className="text-muted">{t("Por lado")}:</span> <b className="tabular-nums">{res.plates.map((k) => fmt(k, locale)).join(" + ")}</b>
               </p>
             </>
           )}
           {res.rest > 0 && target >= bar && <p className="text-xs text-muted">{t("Con discos no se llega exacto: faltan {kg} kg.", { kg: fmt(res.rest, locale) })}</p>}
+          <p className="text-[11px] text-muted">{t("Los cierres no cuentan: en CrossFit no pesan.")}</p>
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * Un lado de la barra a escala: a la derecha el tope de la barra con los discos grandes pegados,
+ * y hacia la izquierda, donde acaba la barra, los pequeños y el cierre.
+ */
+function BarSleeve({ plates }: { plates: number[] }) {
+  const H = 110;
+  const cy = H / 2;
+  const gap = 1.5;
+  const specs = plates.map((kg) => PLATES.find((p) => p.kg === kg)!);
+  const stack = specs.reduce((a, p) => a + p.w + gap, 0);
+  const clipW = 7;
+  const endPad = 14; // barra libre tras el cierre
+  const stopW = 8;
+  const shaft = 46;
+  const W = endPad + clipW + 3 + stack + stopW + shaft;
+  const stopX = endPad + clipW + 3 + stack; // tope interior
+  // Discos de dentro a fuera: el primero (el más pesado) pegado al tope
+  const rects = specs.map((p, i) => {
+    const used = specs.slice(0, i + 1).reduce((a, q) => a + q.w + gap, 0);
+    return { ...p, x: stopX - used + gap };
+  });
+  const clipX = stopX - stack - clipW - 2;
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="h-28 w-full max-w-md" preserveAspectRatio="xMinYMid meet" aria-hidden>
+      {/* manga y barra */}
+      <rect x={2} y={cy - 7} width={stopX - 2} height={14} rx={3} fill="#a1a1aa" />
+      <rect x={stopX} y={cy - 13} width={stopW} height={26} rx={2} fill="#71717a" />
+      <rect x={stopX + stopW} y={cy - 4} width={shaft} height={8} rx={2} fill="#a1a1aa" />
+      {rects.map((p, i) => (
+        <g key={i}>
+          <rect x={p.x} y={cy - p.h / 2} width={p.w} height={p.h} rx={2.5} fill={p.color} />
+          <rect x={p.x} y={cy - p.h / 2} width={p.w} height={p.h} rx={2.5} fill="none" stroke="#000" strokeOpacity={0.25} />
+          {p.w >= 9 && (
+            <text
+              x={p.x + p.w / 2}
+              y={cy}
+              fill={p.dark ? "#18181b" : "#fff"}
+              fontSize={p.w >= 15 ? 10 : 8}
+              fontWeight={700}
+              textAnchor="middle"
+              dominantBaseline="central"
+              transform={`rotate(-90 ${p.x + p.w / 2} ${cy})`}
+            >
+              {String(p.kg).replace(".", ",")}
+            </text>
+          )}
+        </g>
+      ))}
+      {/* cierre */}
+      <rect x={clipX} y={cy - 11} width={clipW} height={22} rx={2} fill="#3f3f46" />
+      <rect x={clipX + 1.5} y={cy - 16} width={3} height={6} rx={1} fill="#3f3f46" />
+    </svg>
   );
 }
