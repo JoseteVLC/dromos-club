@@ -3,7 +3,7 @@
 import { startTransition, useActionState, useRef, useState } from "react";
 import { saveResult } from "@/app/actions";
 import { formatTime } from "@/lib/scoring";
-import { DIVISIONS, SCORE_TYPES, type Division, type Result, type Wod } from "@/lib/types";
+import { DIVISIONS, SCORE_TYPES, wodDivisions, type Division, type Result, type Wod } from "@/lib/types";
 import { FormMessage, Segmented } from "./ui";
 import { useI18n } from "@/lib/i18n/client";
 
@@ -17,7 +17,10 @@ export function ResultForm({ wod, existing, defaultDivision }: { wod: Wod; exist
   };
   const { t } = useI18n();
   const [finished, setFinished] = useState<"yes" | "no">(existing && !existing.finished ? "no" : "yes");
-  const [div, setDiv] = useState<Division>(existing?.division ?? defaultDivision ?? "rx");
+  // Solo las categorías que tiene este WOD; si la tuya no está, la más cercana (RX ↔ Élite)
+  const allowed = wodDivisions(wod);
+  const pick = (d?: Division) => (d && allowed.includes(d) ? d : d === "rx" && allowed.includes("elite") ? "elite" : d === "elite" && allowed.includes("rx") ? "rx" : allowed[0]);
+  const [div, setDiv] = useState<Division>(pick(existing?.division ?? defaultDivision ?? "rx"));
   const unit = wod.score_label || SCORE_TYPES[wod.score_type].unit;
 
   return (
@@ -35,7 +38,7 @@ export function ResultForm({ wod, existing, defaultDivision }: { wod: Wod; exist
         <span className="label">{t("Categoría")}</span>
         <Segmented<Division>
           name="division"
-          options={DIVISIONS.map((d) => ({ ...d, label: t(d.label) }))}
+          options={DIVISIONS.filter((d) => allowed.includes(d.value)).map((d) => ({ ...d, label: t(d.label) }))}
           defaultValue={div}
           onChange={setDiv}
         />

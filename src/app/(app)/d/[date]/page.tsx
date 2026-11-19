@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AiTip } from "@/components/ai-tip";
+import { moveWod } from "@/app/actions";
 import { tipFor } from "@/lib/ai-tips";
 import { notFound, redirect } from "next/navigation";
 import { isCoachProfile, memberSince, requireUser } from "@/lib/supabase/server";
@@ -149,6 +150,25 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
                   );
                 })}
               </nav>
+            )}
+
+            {isCoach && wods.length > 1 && (
+              <div className="flex items-center justify-end gap-2 text-xs text-muted" data-noswipe>
+                <span>{t("Orden de la parte {part}:", { part: selected!.part })}</span>
+                {(["up", "down"] as const).map((dir) => {
+                  const i = wods.findIndex((w) => w.id === selected!.id);
+                  const disabled = dir === "up" ? i === 0 : i === wods.length - 1;
+                  return (
+                    <form key={dir} action={moveWod}>
+                      <input type="hidden" name="id" value={selected!.id} />
+                      <input type="hidden" name="dir" value={dir} />
+                      <button disabled={disabled} className="btn-ghost px-3 py-1.5 text-sm disabled:opacity-30" aria-label={dir === "up" ? t("Mover antes") : t("Mover después")}>
+                        {dir === "up" ? "◀" : "▶"}
+                      </button>
+                    </form>
+                  );
+                })}
+              </div>
             )}
 
             <WodHeader wod={selected!} isCoach={isCoach} t={t} />

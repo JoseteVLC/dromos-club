@@ -4,7 +4,7 @@ import { DateInput } from "./date-input";
 import { useActionState, useState } from "react";
 import { createWod, updateWod } from "@/app/actions";
 import { formatTime } from "@/lib/scoring";
-import { SCORE2_TYPES, SCORE_TYPES, type Score2Type, type ScoreType, type Wod } from "@/lib/types";
+import { DIVISIONS, SCORE2_TYPES, SCORE_TYPES, wodDivisions, type Score2Type, type ScoreType, type Wod } from "@/lib/types";
 import { useI18n } from "@/lib/i18n/client";
 import { FormMessage, SubmitButton } from "./ui";
 
@@ -141,6 +141,19 @@ export function WodForm({ wod, defaultDate, defaultPart }: { wod?: Wod; defaultD
             </div>
           </>
         )}
+      </div>
+
+      <div>
+        <span className="label">{t("Categorías de este WOD")}</span>
+        <div className="flex flex-wrap gap-4 text-sm">
+          {DIVISIONS.map((d) => (
+            <label key={d.value} className="flex items-center gap-2">
+              <input type="checkbox" name="divisions" value={d.value} defaultChecked={wodDivisions(wod ?? {}).includes(d.value)} className="size-4 accent-[var(--accent)]" />
+              {t(d.label)}
+            </label>
+          ))}
+        </div>
+        <p className="mt-1 text-xs text-muted">{t("Si Élite y RX son iguales, desmarca una: así todos compiten en el mismo ranking.")}</p>
       </div>
 
       <label className="flex items-start gap-2 text-sm">

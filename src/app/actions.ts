@@ -17,7 +17,7 @@ import { siteUrl } from "@/lib/site";
 import { randomBytes } from "node:crypto";
 import { parseTime } from "@/lib/scoring";
 import { dayHref, isISODate } from "@/lib/dates";
-import { SCORE2_TYPES, SCORE_TYPES, type Division, type Result, type Score2Type, type ScoreType, type Wod } from "@/lib/types";
+import { DIVISIONS, detectDivisions, wodDivisions, SCORE2_TYPES, SCORE_TYPES, type Division, type Result, type Score2Type, type ScoreType, type Wod } from "@/lib/types";
 import { BRAND } from "@/lib/brand";
 import { getI18n } from "@/lib/i18n/server";
 
@@ -187,8 +187,9 @@ export async function saveResult(_: ActionState, fd: FormData): Promise<ActionSt
     .from("wods")
     .select("*")
     .eq("id", wodId)
-    .single<Pick<Wod, "score_type" | "time_cap_seconds" | "score2_type" | "wod_date">>();
+    .single<Pick<Wod, "score_type" | "time_cap_seconds" | "score2_type" | "wod_date" | "divisions">>();
   if (!wod) return { error: "WOD no encontrado." };
+  if (!wodDivisions(wod).includes(division)) return { error: "Este WOD no tiene esa categoría." };
   const since = memberSince((await requireUser()).profile);
   if (since && wod.wod_date < since) return { error: "Este WOD es anterior a tu alta: no puedes meter resultado." };
 
@@ -334,6 +335,7 @@ function wodFromForm(fd: FormData) {
     published: fd.get("published") === "on",
     part: (str(fd, "part") || "A").toUpperCase().slice(0, 3),
     is_benchmark: fd.get("is_benchmark") === "on",
+    divisions: DIVISIONS.map((d) => d.value).filter((v) => fd.getAll("divisions").includes(v)),
     capRaw,
   };
 }
@@ -355,6 +357,7 @@ function validateWod(w: ReturnType<typeof wodFromForm>): string | null {
   if (!w.title) return "Pon un título al WOD.";
   if (!w.wod_date) return "Pon la fecha.";
   if (!(w.score_type in SCORE_TYPES)) return "Elige el tipo de resultado.";
+  if (!w.divisions.some((d) => d !== "scaled")) return "Deja al menos Élite o RX.";
   if (w.score_type === "for_time" && w.capRaw && w.time_cap_seconds == null)
     return "Time cap no válido. Usa mm:ss.";
   return null;
@@ -398,8 +401,30 @@ export async function updateWod(_: ActionState, fd: FormData): Promise<ActionSta
   const data = before?.score2_type && !newScore2 ? { ...rest, score_name: null, score2_type: null, score2_name: null, score2_label: null } : rest;
   const { error } = await supabase.from("wods").update(data).eq("id", id);
   if (error) return { error: error.message };
+  // Si se quita Élite o RX, los resultados que ya estaban ahí pasan a la que queda (un solo ranking)
+  const kept = w.divisions;
+  for (const [gone, to] of [["rx", "elite"], ["elite", "rx"]] as const)
+    if (!kept.includes(gone) && kept.includes(to)) await supabase.from("results").update({ division: to }).eq("wod_id", id).eq("division", gone);
   revalidatePath("/", "layout");
   redirect(dayHref(data.wod_date, { w: id }));
+}
+
+/** Cambiar el orden de las partes de un día (A ↔ B…): intercambia la letra con la de al lado. */
+export async function moveWod(fd: FormData) {
+  const { supabase } = await requireCoach();
+  const id = str(fd, "id");
+  const dir = str(fd, "dir") === "up" ? -1 : 1;
+  const { data: me } = await supabase.from("wods").select("id, part, wod_date").eq("id", id).maybeSingle<{ id: string; part: string; wod_date: string }>();
+  if (!me) return;
+  const { data: day } = await supabase.from("wods").select("id, part").eq("wod_date", me.wod_date).order("part").returns<{ id: string; part: string }[]>();
+  const list = day ?? [];
+  const i = list.findIndex((w) => w.id === id);
+  const other = list[i + dir];
+  if (i < 0 || !other) return;
+  await supabase.from("wods").update({ part: other.part }).eq("id", me.id);
+  await supabase.from("wods").update({ part: me.part }).eq("id", other.id);
+  revalidatePath("/", "layout");
+  redirect(dayHref(me.wod_date, { w: me.id }));
 }
 
 export async function deleteWod(fd: FormData) {
@@ -457,6 +482,7 @@ export async function createWodsBulk(_: ActionState, fd: FormData): Promise<Acti
       score_type: it.score_type,
       time_cap_seconds: cap,
       is_benchmark: Boolean(it.is_benchmark),
+      divisions: detectDivisions(`${title}\n${it.description ?? ""}`),
       published: true,
       created_by: user.id,
     });

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Avatar } from "./avatar";
 import { MIN_FOR_PERCENTILE, PercentileCard } from "./percentile-card";
 import { formatScore, formatScore2, rankResults } from "@/lib/scoring";
-import { RANKED_DIVISIONS, SCORE_TYPES, type Division, type Gender, type Result, type Wod } from "@/lib/types";
+import { RANKED_DIVISIONS, SCORE_TYPES, wodDivisions, type Division, type Gender, type Result, type Wod } from "@/lib/types";
 import { deleteResult } from "@/app/actions";
 import { Reactions, type ReactionSummary } from "./reactions";
 import { ConfirmDelete } from "./ui";
@@ -88,7 +88,7 @@ export async function Leaderboard({
           </Link>
         ))}
         <span className="mx-1 w-px self-stretch bg-line" />
-        {[{ value: "all", label: t("Todas") }, ...RANKED_DIVISIONS].map((d) => (
+        {[{ value: "all", label: t("Todas") }, ...RANKED_DIVISIONS.filter((d) => wodDivisions(wod).includes(d.value))].map((d) => (
           <Link key={d.value} href={href(gender, d.value, score)} scroll={false} replace className={`chip ${division === d.value ? "chip-on" : ""}`}>
             {d.label}
           </Link>

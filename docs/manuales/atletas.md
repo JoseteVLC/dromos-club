@@ -51,7 +51,7 @@ Baja hasta «Mete tu resultado», elige tu categoría, escribe tu marca y pulsa 
 
 ## El leaderboard del WOD
 
-Debajo de cada WOD está su clasificación, con la foto de cada atleta. Elite va siempre por delante de RX; dentro de cada una, gana la mejor marca.
+Debajo de cada WOD está su clasificación, con la foto de cada atleta. Elite va siempre por delante de RX; dentro de cada una, gana la mejor marca. Algunos días Élite y RX son el mismo WOD: entonces solo verás una de las dos (y Escalado) y todos competís juntos.
 
 - **Filtros:** Absoluto, Chicos o Chicas, y Todas, Elite o RX.
 - **Dos scores:** si el WOD tiene dos, arriba eliges cuál ver; la otra marca sale en pequeño bajo cada nombre.

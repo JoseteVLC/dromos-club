@@ -55,6 +55,8 @@ export type Wod = {
   score2_type?: Score2Type | null;
   score2_name?: string | null;
   score2_label?: string | null;
+  /** Categorías que tiene este WOD (si Élite y RX son iguales, se quita una). Por defecto las tres */
+  divisions?: Division[] | null;
 };
 
 export type Score2Type = "load" | "reps" | "calories" | "distance";
@@ -99,6 +101,22 @@ export const DIVISIONS: { value: Division; label: string }[] = [
 ];
 /** Solo Elite y RX tienen ranking; los escalados salen aparte, sin posición. */
 export const RANKED_DIVISIONS = DIVISIONS.filter((d) => d.value !== "scaled");
+
+/** Categorías activas de un WOD (los antiguos, sin el dato, tienen las tres). */
+export const wodDivisions = (w: Pick<Wod, "divisions">): Division[] =>
+  w.divisions?.length ? DIVISIONS.map((d) => d.value).filter((v) => w.divisions!.includes(v)) : ["elite", "rx", "scaled"];
+
+/**
+ * Categorías al importar una plani: si el texto solo habla de Élite (o solo de RX), la otra no existe ese día.
+ * Si no dice nada o habla de las dos, las tres.
+ */
+export function detectDivisions(text: string): Division[] {
+  const elite = /(^|[^\p{L}])[éeÉE]lite([^\p{L}]|$)/iu.test(text);
+  const rx = /(^|[^\p{L}])rx([^\p{L}]|$)/iu.test(text);
+  if (elite && !rx) return ["elite", "scaled"];
+  if (rx && !elite) return ["rx", "scaled"];
+  return ["elite", "rx", "scaled"];
+}
 
 export type Box = {
   id: string;

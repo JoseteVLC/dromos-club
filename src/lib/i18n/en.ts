@@ -659,5 +659,12 @@ const d: Record<string, string> = {
   "{v} kg: por encima del récord mundial aproximado (~{kg} kg).": "{v} kg: above the approximate world record (~{kg} kg).",
   "{v} kg: parece imposible.": "{v} kg: looks impossible.",
   "{v} {unit}: parece imposible.": "{v} {unit}: looks impossible.",
+  "Categorías de este WOD": "Divisions in this WOD",
+  "Si Élite y RX son iguales, desmarca una: así todos compiten en el mismo ranking.": "If Elite and RX are the same, untick one so everyone competes in the same ranking.",
+  "Deja al menos Élite o RX.": "Keep at least Elite or RX.",
+  "Este WOD no tiene esa categoría.": "This WOD doesn't have that division.",
+  "Orden de la parte {part}:": "Order of part {part}:",
+  "Mover antes": "Move earlier",
+  "Mover después": "Move later",
 };
 export default d;

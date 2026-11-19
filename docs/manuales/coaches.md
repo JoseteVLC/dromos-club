@@ -23,18 +23,19 @@ En **Coach** rellenas el formulario y pulsas **Crear WOD**. Úsalo para un WOD s
 | Unidad | Opcional, si quieres otra etiqueta (p. ej. «rondas») |
 | Segundo score | Marca la casilla si el WOD tiene dos marcas: elige el tipo y nombra cada score («Back squat» y «Sandbag clean») |
 | ★ Benchmark | Márcalo si debe contar para los PRs. Si el título es igual que un benchmark del catálogo («Fran», «Murph»…), cuenta como benchmark aunque no lo marques |
+| Categorías | Élite, RX y Escalado vienen marcadas. Si ese día Élite y RX son iguales, desmarca una: todos compiten en el mismo ranking y nadie pasa por delante solo por elegir «Élite». Al importar la plani, si el texto solo habla de Élite (o solo de RX), la otra se quita sola |
 | Publicado | Si lo desmarcas, los atletas no lo ven hasta que lo publiques |
 
 ## Importar WODs desde una foto
 
-En **Coach → Importar WODs → 📷 Desde una foto** haces una foto a la pizarra del box, a la plani en papel o una captura de pantalla, y la IA te prepara los WODs.
+En **Coach → Importar WODs → 📷 Desde una foto** haces una foto a la pizarra del box, a la plani en papel o una captura de pantalla, y la app te prepara los WODs.
 
 1. **Fecha:** pon el día al que corresponde si la foto no lo indica (por defecto, hoy). Si la foto trae los días de la semana, los usa.
 2. **Pulsa «Hacer foto o elegir imagen».** Puedes elegir hasta 4 fotos a la vez (por ejemplo, la semana en varias páginas).
-3. En unos segundos aparecen las partes en la **misma pantalla de revisión** que la importación de la semana: fecha, letra, título, texto y tipo de resultado. Si la IA ve algo dudoso, sale un aviso amarillo.
+3. En unos segundos aparecen las partes en la **misma pantalla de revisión** que la importación de la semana: fecha, letra, título, texto y tipo de resultado. Si la app ve algo dudoso, sale un aviso amarillo.
 4. Corrige lo que haga falta y pulsa **«Crear N WODs»**.
 
-La IA quita calentamientos, accesorios y vuelta a la calma, y pone el nombre exacto de los benchmarks. Con letra muy mala o reflejos puede equivocarse: revisa siempre antes de crear.
+La app quita calentamientos, accesorios y vuelta a la calma, y pone el nombre exacto de los benchmarks. Con letra muy mala o reflejos puede equivocarse: revisa siempre antes de crear.
 
 ## Importar la semana desde la plani
 
@@ -53,6 +54,8 @@ En la revisión puedes marcar ★ Benchmark en cada parte. El segundo score no s
 Abre el día del WOD y pulsa **Editar**, junto a su título. Desde ahí cambias cualquier campo o lo borras.
 
 - **Cambiar el tipo de resultado** solo se puede mientras nadie ha metido resultado; después la app lo bloquea para no descuadrar el ranking.
+- **Cambiar el orden de las partes:** en el día, encima del WOD, tienes **◀ ▶** («Orden de la parte A»). Mueve la parte seleccionada antes o después: la A pasa a B y la B a A, con sus resultados. Repite para mover más de un puesto.
+- **Quitar Élite o RX** de un WOD que ya tiene resultados: los que estaban en la que quitas pasan a la que queda.
 - **Borrar una parte** renombra sola las que quedan ese día: si borras la A, la B pasa a A y la C a B. Los resultados de las demás partes no se pierden.
 - **Borrar un WOD** borra también sus resultados. No tiene vuelta atrás.
 
