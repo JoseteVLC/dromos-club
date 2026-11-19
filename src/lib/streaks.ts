@@ -1,28 +1,57 @@
 /**
- * Rachas tipo Duolingo sobre los días de plani.
- * - Día de plani = día con algún WOD publicado. Los días sin plani (descanso) no rompen la racha.
- * - Día hecho = has metido algún resultado en un WOD de ese día.
- * - Hoy todavía no cuenta como fallo: la racha sigue viva hasta que acaba el día.
+ * Racha semanal: semanas seguidas entrenando al menos 5 días (de lunes a domingo).
+ * - Día de plani = día con algún WOD publicado. Día hecho = has metido algún resultado en un WOD de ese día.
+ * - Objetivo de cada semana = 5 días, o todos los días de plani si esa semana hay menos (festivos, vacaciones).
+ * - La semana en curso no rompe la racha hasta que acaba: cuenta en cuanto llegas al objetivo.
+ * - Las semanas sin plani no rompen la racha.
  */
-export type StreakStats = { current: number; best: number; total: number; lastDone: string | null };
+export const WEEK_GOAL = 5;
+
+export type StreakStats = {
+  current: number; // semanas seguidas cumpliendo
+  best: number; // récord de semanas seguidas
+  total: number; // días entrenados en total
+  lastDone: string | null;
+  weekDone: number; // días hechos esta semana
+  weekGoal: number; // objetivo de esta semana
+};
+
+/** Lunes (YYYY-MM-DD) de la semana de una fecha. */
+export function weekOf(iso: string): string {
+  const d = new Date(iso + "T12:00:00Z");
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+  return d.toISOString().slice(0, 10);
+}
 
 export function computeStreak(trainingDays: string[], done: Set<string>, today: string): StreakStats {
-  let run = 0;
-  let best = 0;
+  const plan = new Map<string, number>();
+  const hit = new Map<string, number>();
   let total = 0;
   let lastDone: string | null = null;
-  for (const d of [...trainingDays].sort()) {
+  for (const d of [...new Set(trainingDays)].sort()) {
     if (d > today) break;
+    const w = weekOf(d);
+    plan.set(w, (plan.get(w) ?? 0) + 1);
     if (done.has(d)) {
-      run++;
+      hit.set(w, (hit.get(w) ?? 0) + 1);
       total++;
       lastDone = d;
+    }
+  }
+  const thisWeek = weekOf(today);
+  let run = 0;
+  let best = 0;
+  for (const w of [...plan.keys()].sort()) {
+    // La semana en curso solo cuenta al llegar a 5 (aún no sabemos cuántos días de plani tendrá); las pasadas, con su plani real
+    const goal = w === thisWeek ? WEEK_GOAL : Math.min(WEEK_GOAL, plan.get(w)!);
+    if ((hit.get(w) ?? 0) >= goal) {
+      run++;
       if (run > best) best = run;
-    } else if (d < today) {
+    } else if (w < thisWeek) {
       run = 0;
     }
   }
-  return { current: run, best, total, lastDone };
+  return { current: run, best, total, lastDone, weekDone: hit.get(thisWeek) ?? 0, weekGoal: WEEK_GOAL };
 }
 
 export type StreakRow = StreakStats & { user_id: string; name: string; gender: "M" | "F" | null; avatar_url?: string | null; rank: number };

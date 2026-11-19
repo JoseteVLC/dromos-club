@@ -80,8 +80,8 @@ export default async function AtletaPage({ params }: { params: Promise<{ id: str
       <div className="grid grid-cols-3 gap-2 text-center">
         {[
           { v: stats.total, l: t("entrenos") },
-          { v: stats.current, l: t("racha actual") },
-          { v: stats.best, l: t("mejor racha") },
+          { v: stats.current, l: t("semanas seguidas") },
+          { v: stats.best, l: t("récord de semanas") },
         ].map((x) => (
           <div key={x.l} className="card p-3">
             <div className="h-display text-3xl text-accent">{x.v}</div>

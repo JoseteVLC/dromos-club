@@ -11,6 +11,7 @@ import { addDays, dayHref, isISODate, todayISO } from "@/lib/dates";
 import { mondayOf } from "@/lib/week-parser";
 import { myStreak } from "@/lib/streak-data";
 import { StreakCard } from "@/components/streak-card";
+import { WEEK_GOAL } from "@/lib/streaks";
 import { formatTime } from "@/lib/scoring";
 import { SCORE_TYPES, type Division, type Gender, type Result, type Wod } from "@/lib/types";
 import { DayNav, SwipeDays } from "@/components/day-nav";
@@ -146,6 +147,7 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
           current={streak.stats.current}
           best={streak.stats.best}
           week={week}
+          goal={Math.min(WEEK_GOAL, Math.max(1, planDays.size))}
           hint={pendingToday ? t("Mete tu resultado y el día cuenta para la racha.") : undefined}
         />
 

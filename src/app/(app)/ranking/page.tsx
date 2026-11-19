@@ -203,7 +203,7 @@ async function StreakRanking({ gender }: { gender: Gender | "all" }) {
                     {me && <span className="ml-1 text-xs text-accent">{t("(tú)")}</span>}
                   </Link>
                   <div className="text-xs text-muted">
-                    {t("Récord")} {s.best} · {s.total === 1 ? t("1 día en total") : t("{n} días en total", { n: s.total })}
+                    {t("Récord")} {s.best} {s.best === 1 ? t("semana") : t("semanas")} · {s.total === 1 ? t("1 día en total") : t("{n} días en total", { n: s.total })}
                   </div>
                 </div>
                 <div className="text-right">
@@ -211,7 +211,7 @@ async function StreakRanking({ gender }: { gender: Gender | "all" }) {
                     {s.current > 0 && "🔥"}
                     {s.current}
                   </div>
-                  <div className="text-[10px] uppercase tracking-wider text-muted">{t("seguidos")}</div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted">{t("semanas")}</div>
                 </div>
               </li>
             );
@@ -219,7 +219,7 @@ async function StreakRanking({ gender }: { gender: Gender | "all" }) {
         </ol>
       )}
       <p className="text-xs leading-relaxed text-muted">
-        {t("Cuenta los días de WOD seguidos en los que has metido tu resultado. Los días sin WOD no rompen la racha, y hoy no cuenta como fallo hasta que acaba el día.")}
+        {t("Cuenta las semanas seguidas en las que has entrenado al menos 5 días (los que quieras, de lunes a domingo). Si una semana tiene menos días de plani, basta con hacerlos todos. La semana en curso no rompe la racha hasta que acaba.")}
       </p>
     </div>
   );

@@ -51,6 +51,13 @@ export default async function CoachPage({ searchParams }: PageProps<"/coach">) {
     <div className="space-y-8">
       <FlaggedResults rows={flagged ?? []} t={t} />
       <FlaggedRecords rows={flaggedPrs} t={t} />
+      <Link href="/coach/panel" className="card flex items-center justify-between border-accent/60 p-4">
+        <span>
+          <span className="h-display block text-2xl">📊 {t("Panel del box")}</span>
+          <span className="text-sm text-muted">{t("Activos por semana, asistencia, WODs más hechos y quién está dejando de venir")}</span>
+        </span>
+        <span className="text-2xl text-accent">→</span>
+      </Link>
       <Link href="/coach/semana" className="card flex items-center justify-between border-accent/60 p-4">
         <span>
           <span className="h-display block text-2xl">{t("Importar WODs")}</span>

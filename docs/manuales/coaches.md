@@ -137,10 +137,13 @@ Como coach puedes borrar cualquier resultado (papelera en su fila del leaderboar
 Para ver quién está activo:
 
 - **Admin → Personas:** fecha del último resultado de cada uno. Quien lleva semanas sin meter nada es alguien a quien escribir.
-- **Ranking → Constancia:** rachas de días seguidos.
+- **Ranking → Constancia:** semanas seguidas entrenando al menos 5 días.
+- **📊 Panel del box** (Coach → Panel del box): atletas activos esta semana y comparación con la anterior, % del total, resultados de la semana, altas en 30 días, gráfica de activos de las últimas 8 semanas, asistencia media por día de la semana, los WODs más hechos y la lista **⚠️ En riesgo de dejarlo**.
 - **Ranking → Leaderboards:** cuántos resultados tiene cada WOD de la semana.
 
-A los atletas con los avisos activados les llega cada tarde un **recordatorio automático** si su racha está en peligro o llevan varios días sin meter resultado. Si alguien sigue desaparecido, escríbele por Mensajes.
+A los atletas con los avisos activados les llega cada tarde un **recordatorio automático** si están a punto de perder la racha de la semana o llevan varios días sin meter resultado.
+
+**⚠️ En riesgo de dejarlo.** En el panel del box salen quienes llevan **10 días o más sin meter ningún resultado** (hasta 60) y quienes se dieron de alta hace una semana y aún no han empezado, con los días que llevan y un botón **✉️ Escribir** que abre su conversación. Cada **lunes** os llega a coaches y admins un push con cuántos hay («⚠️ 3 atletas en riesgo de dejarlo»). Un mensaje vuestro a tiempo es lo que más funciona para que no se den de baja.
 
 ## Buenas prácticas y checklist semanal
 
