@@ -7,7 +7,7 @@ Dromos Club es el leaderboard de tu box: donde apuntas tus resultados de cada WO
 3. **Instálala en el móvil.** En Perfil → «Instala la app» tienes los pasos. En iPhone: botón Compartir de Safari → «Añadir a pantalla de inicio». En Android: menú de Chrome → «Instalar app».
 4. **Completa tu perfil:** sube tu foto y rellena tus datos (lo explicamos más abajo, en «Tu perfil»).
 5. **Activa los avisos:** con la app instalada, en Perfil → 🔔 Notificaciones (ver «Notificaciones»).
-6. **Elige tu idioma** en Perfil → Idioma: español, inglés o polaco.
+6. **Elige tu idioma** en Perfil → Idioma: español, inglés, francés o polaco. También puedes elegirlo antes de entrar, abajo en la pantalla de acceso o de alta.
 
 **¿Entrenas en más de un box?** Con la misma cuenta puedes estar en varios. Cada box tiene su dirección (por ejemplo `/tubox`), sus WODs, su ranking, sus medallas y sus mensajes, y lo de uno no se ve en otro. Para pasar de uno a otro: Perfil → «Tu box» → Cambiar o crear box. Si dejas de ir a un box, en Perfil → «Salir de este box» te sales tú: tu cuenta sigue funcionando en los demás y tus resultados se guardan por si vuelves. Arriba a la izquierda siempre ves en qué box estás.
 

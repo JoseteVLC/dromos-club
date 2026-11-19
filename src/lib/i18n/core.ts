@@ -1,15 +1,16 @@
 import en from "./en";
 import pl from "./pl";
+import fr from "./fr";
 import { BRAND } from "../brand";
 
-/** Idiomas de la app. El español es el texto original (la clave); en/pl son traducciones. */
-export const LANGS = ["es", "en", "pl"] as const;
+/** Idiomas de la app. El español es el texto original (la clave); en/fr/pl son traducciones. */
+export const LANGS = ["es", "en", "fr", "pl"] as const;
 export type Lang = (typeof LANGS)[number];
-export const LANG_NAMES: Record<Lang, string> = { es: "Español", en: "English", pl: "Polski" };
-export const LOCALES: Record<Lang, string> = { es: "es-ES", en: "en-GB", pl: "pl-PL" };
+export const LANG_NAMES: Record<Lang, string> = { es: "Español", en: "English", fr: "Français", pl: "Polski" };
+export const LOCALES: Record<Lang, string> = { es: "es-ES", en: "en-GB", fr: "fr-FR", pl: "pl-PL" };
 export const LANG_COOKIE = "lang";
 
-const DICTS: Record<Lang, Record<string, string>> = { es: {}, en, pl };
+const DICTS: Record<Lang, Record<string, string>> = { es: {}, en, fr, pl };
 
 export type Vars = Record<string, string | number>;
 export type T = (text: string, vars?: Vars) => string;
@@ -28,7 +29,7 @@ export function makeT(lang: Lang): T {
   };
 }
 
-/** Idioma preferido según Accept-Language (es/en/pl), por defecto español. */
+/** Idioma preferido según Accept-Language (es/en/fr/pl), por defecto español. */
 export function langFromHeader(h: string | null | undefined): Lang {
   for (const part of (h ?? "").split(",")) {
     const code = part.trim().slice(0, 2).toLowerCase();

@@ -7,7 +7,7 @@ import type { Gender, Wod } from "./types";
 type PR = { rm: number | null; value: number | null; time_seconds: number | null; rounds: number | null; reps: number | null; division: string; performed_on: string; benchmarks: { name: string; category: string; score_type: string } | null };
 type LoadRes = { value: number | null; division: string; wods: { title: string; wod_date: string } };
 
-const LANG: Record<string, string> = { es: "español", en: "English", pl: "polski" };
+const LANG: Record<string, string> = { es: "español", en: "English", fr: "français", pl: "polski" };
 
 /** Lo que sabemos del atleta para afinar el consejo: mejores marcas y cargas recientes. */
 async function athleteContext(db: SupabaseClient, userId: string, boxId: string) {

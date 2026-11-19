@@ -18,7 +18,7 @@ Responde SOLO con JSON: {"plausible": true|false, "motivo": "una frase corta y n
 
 export type Check = { reason: string; reasonEs: string; hard: boolean };
 type Tr = (msg: string, vars?: Msg["vars"]) => string;
-const LANG: Record<string, string> = { es: "español", en: "English", pl: "polski" };
+const LANG: Record<string, string> = { es: "español", en: "English", fr: "français", pl: "polski" };
 
 /** Motivo de la duda (hard = imposible sin discusión) o null si el resultado es razonable. */
 export async function checkResult(ctx: Ctx, t: Tr = (x) => x, locale = "es"): Promise<Check | null> {

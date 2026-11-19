@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { adminDb, hasAdminKey } from "@/lib/supabase/admin";
 import { getI18n } from "@/lib/i18n/server";
+import { LangSwitcher } from "@/components/lang-switcher";
 import { BRAND } from "@/lib/brand";
 import { JoinBoxForm } from "@/components/join-box-form";
 
@@ -36,6 +37,7 @@ export default async function JoinPage({ params }: PageProps<"/unirse/[code]">) 
         )}
       </div>
       {box && <JoinBoxForm code={code} loggedIn={loggedIn} boxName={box.name} approval={box.join_mode !== "open"} />}
+      <LangSwitcher compact />
     </main>
   );
 }

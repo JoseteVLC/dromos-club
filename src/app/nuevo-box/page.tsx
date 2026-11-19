@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getI18n } from "@/lib/i18n/server";
+import { LangSwitcher } from "@/components/lang-switcher";
 import { BRAND } from "@/lib/brand";
 import { NewBoxForm } from "@/components/new-box-form";
 
@@ -18,6 +19,7 @@ export default async function NewBoxPage() {
         <p className="mt-2 text-sm text-muted">{t("En un minuto tienes tu box con su dirección propia. Luego invitas a tus coaches y atletas.")}</p>
       </div>
       <NewBoxForm loggedIn={!!data?.claims?.sub} />
+      <LangSwitcher compact />
     </main>
   );
 }
