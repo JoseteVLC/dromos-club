@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AiTip } from "@/components/ai-tip";
+import { WodTimer } from "@/components/wod-timer";
 import { moveWod } from "@/app/actions";
 import { tipFor } from "@/lib/ai-tips";
 import { notFound, redirect } from "next/navigation";
@@ -172,6 +173,8 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
             )}
 
             <WodHeader wod={selected!} isCoach={isCoach} t={t} />
+
+            <WodTimer key={`timer-${selected!.id}`} wod={selected!} />
 
             <AiTip key={`tip-${selected!.id}`} wodId={selected!.id} initial={tip ? tipFor(tip.body, locale) : null} />
 
