@@ -354,14 +354,33 @@ export function WodTimer({ wod }: { wod: Pick<Wod, "id" | "title" | "description
           onClick={() => (cfg.mode !== "intervals" && running && elapsed >= PREP ? setTaps((n) => n + 1) : undefined)}
         >
           <p className={`h-display text-2xl uppercase ${tone}`}>{view.label}</p>
-          <p className={`h-display tabular-nums leading-none ${tone}`} style={{ fontSize: "min(32vw, 40vh)" }}>{view.big}</p>
+          <p className={`h-display tabular-nums leading-none ${tone}`} style={{ fontSize: cfg.mode !== "intervals" && elapsed >= PREP ? "min(26vw, 28vh)" : "min(32vw, 40vh)" }}>{view.big}</p>
           {view.sub && <p className="text-lg text-muted">{view.sub}</p>}
           <div className="h-1.5 w-full max-w-md overflow-hidden rounded-full bg-line">
             <div className="h-full bg-accent transition-[width]" style={{ width: `${Math.min(100, view.progress * 100)}%` }} />
           </div>
           {cfg.mode !== "intervals" && elapsed >= PREP && (
-            <p className="text-base text-muted">{t("Rondas: {n} · toca la pantalla para sumar una", { n: taps })}</p>
+            <div className="mt-2 flex items-center gap-5">
+              <div className="flex flex-col items-center">
+                <span className="text-sm font-semibold uppercase tracking-widest text-muted">{t("Rondas")}</span>
+                <span className="h-display tabular-nums leading-none text-fg" style={{ fontSize: "min(22vw, 24vh)" }}>{taps}</span>
+              </div>
+              {taps > 0 && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setTaps((n) => Math.max(0, n - 1));
+                  }}
+                  className="btn-ghost h-14 w-14 text-2xl"
+                  aria-label={t("Quitar una ronda")}
+                >
+                  −1
+                </button>
+              )}
+            </div>
           )}
+          {cfg.mode !== "intervals" && elapsed >= PREP && <p className="text-sm text-muted">{t("Toca la pantalla para sumar una ronda")}</p>}
         </div>
       )}
 

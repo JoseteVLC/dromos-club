@@ -697,5 +697,7 @@ const d: Record<string, string> = {
   "Volver a empezar": "Zacznij od nowa",
   "Terminar": "Zakończ",
   "Del timer: {v}. Revísalo (puedes cambiarlo) y guarda.": "Z timera: {v}. Sprawdź (możesz zmienić) i zapisz.",
+  "Quitar una ronda": "Usuń rundę",
+  "Toca la pantalla para sumar una ronda": "Dotknij ekranu, aby dodać rundę",
 };
 export default d;
