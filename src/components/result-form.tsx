@@ -70,6 +70,7 @@ export function ResultForm({ wod, existing, defaultDivision }: { wod: Wod; exist
       <div>
         <span className="label">{t("Categoría")}</span>
         <Segmented<Division>
+          small
           name="division"
           options={DIVISIONS.filter((d) => allowed.includes(d.value)).map((d) => ({ ...d, label: t(d.label) }))}
           defaultValue={div}
@@ -83,6 +84,7 @@ export function ResultForm({ wod, existing, defaultDivision }: { wod: Wod; exist
           <div>
             <span className="label">{wod.time_cap_seconds ? t("¿Acabaste en el cap ({cap})?", { cap: formatTime(wod.time_cap_seconds) }) : t("¿Acabaste?")}</span>
             <Segmented
+              small
               name="finished"
               options={[
                 { value: "yes", label: t("Acabé") },

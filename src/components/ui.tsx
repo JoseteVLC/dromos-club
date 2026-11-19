@@ -33,11 +33,14 @@ export function Segmented<T extends string>({
   options,
   defaultValue,
   onChange,
+  small = false,
 }: {
   name: string;
   options: { value: T; label: string }[];
   defaultValue?: T;
   onChange?: (v: T) => void;
+  /** Versión compacta (p. ej. categoría y «¿acabaste?» del resultado) */
+  small?: boolean;
 }) {
   return (
     <div className="grid gap-1 rounded-lg border border-line bg-bg p-1" style={{ gridTemplateColumns: `repeat(${options.length}, 1fr)` }}>
@@ -51,7 +54,7 @@ export function Segmented<T extends string>({
             onChange={() => onChange?.(o.value)}
             className="peer sr-only"
           />
-          <span className="block rounded-md py-2 text-center font-display text-lg font-bold uppercase text-muted transition peer-checked:bg-accent peer-checked:text-accent-fg">
+          <span className={`block rounded-md text-center font-display font-bold uppercase text-muted transition peer-checked:bg-accent peer-checked:text-accent-fg ${small ? "py-1 text-sm" : "py-2 text-lg"}`}>
             {o.label}
           </span>
         </label>
