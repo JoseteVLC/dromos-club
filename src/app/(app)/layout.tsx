@@ -10,16 +10,13 @@ import { BRAND } from "@/lib/brand";
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const { supabase, user, profile, box } = await requireUser();
-  const { unread: fresh } = await getNotices(supabase, user.id, 30, true);
-  const unread = fresh.length;
-  const latest = fresh.reduce<string | null>((m, n) => (m && m > n.at ? m : n.at), null);
-  const names = [...new Set(fresh.map((n) => n.who).filter(Boolean))];
+  const noticesP = getNotices(supabase, user.id, 30, true);
   const isCoach = isCoachProfile(profile);
   const { t } = await getI18n();
   // Mensajes sin leer: para el equipo, los de atletas sin contestar; para el atleta, los del equipo y anuncios nuevos
-  const { data: unreadMsgs } = isCoach
-    ? await supabase.from("messages").select("created_at").is("staff_read_at", null).not("thread_user_id", "is", null).order("created_at", { ascending: false }).limit(50)
-    : await supabase
+  const msgsP = isCoach
+    ? supabase.from("messages").select("created_at").is("staff_read_at", null).not("thread_user_id", "is", null).order("created_at", { ascending: false }).limit(50)
+    : supabase
         .from("messages")
         .select("created_at")
         .or(`thread_user_id.eq.${user.id},thread_user_id.is.null`)
@@ -27,6 +24,10 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
         .gt("created_at", profile?.messages_seen_at ?? "1970-01-01")
         .order("created_at", { ascending: false })
         .limit(50);
+  const [{ unread: fresh }, { data: unreadMsgs }] = await Promise.all([noticesP, msgsP]);
+  const unread = fresh.length;
+  const latest = fresh.reduce<string | null>((m, n) => (m && m > n.at ? m : n.at), null);
+  const names = [...new Set(fresh.map((n) => n.who).filter(Boolean))];
   const msgCount = unreadMsgs?.length ?? 0;
   const msgLatest = (unreadMsgs?.[0]?.created_at as string | undefined) ?? null;
 

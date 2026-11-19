@@ -53,6 +53,21 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
     .returns<Wod[]>();
   const wods = wodsData ?? [];
   const selected = wods.find((w) => w.id === sp.w) ?? wods[0] ?? null;
+  // Todo lo del WOD elegido se pide a la vez (antes iba en cadena y la página tardaba más)
+  type Row = Result & { reactions?: { user_id: string; emoji: string }[]; result_comments?: { count: number }[] };
+  const tipP = selected
+    ? supabase.from("ai_tips").select("body").eq("wod_id", selected.id).eq("user_id", user.id).maybeSingle<{ body: string }>()
+    : Promise.resolve({ data: null as { body: string } | null });
+  const resultsP = selected
+    ? Promise.all([
+        supabase
+          .from("results")
+          .select("*, profiles!results_user_id_fkey(full_name, gender, avatar_url), reactions(user_id, emoji), result_comments(count)")
+          .eq("wod_id", selected.id)
+          .returns<Row[]>(),
+        supabase.from("results").select("wod_id").eq("user_id", user.id).in("wod_id", wods.map((w) => w.id)),
+      ])
+    : null;
   // Dudas del WOD: comentarios, sus reacciones y quién es del equipo (sus respuestas salen destacadas)
   const [{ data: wodComments }, staffList] = selected
     ? await Promise.all([
@@ -74,26 +89,14 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
       .returns<{ comment_id: string; user_id: string; emoji: string; profiles: { full_name: string } | null }[]>();
     for (const x of rx ?? []) wcReactions.set(x.comment_id, [...(wcReactions.get(x.comment_id) ?? []), { user_id: x.user_id, emoji: x.emoji, name: x.profiles?.full_name ?? "" }]);
   }
-  // Consejo de IA ya pedido para este WOD (si lo hay, sale abierto)
-  const { data: tip } = selected
-    ? await supabase.from("ai_tips").select("body").eq("wod_id", selected.id).eq("user_id", user.id).maybeSingle<{ body: string }>()
-    : { data: null };
+  const { data: tip } = await tipP;
 
   let results: Result[] = [];
   let doneIds = new Set<string>();
   const reactions: Record<string, ReactionSummary> = {};
   const commentCounts: Record<string, number> = {};
   if (selected) {
-    // Resultados (con nombre y reacciones embebidos) y mis WODs hechos, en paralelo
-    type Row = Result & { reactions?: { user_id: string; emoji: string }[]; result_comments?: { count: number }[] };
-    const [{ data: full, error: fullErr }, { data: mine }] = await Promise.all([
-      supabase
-        .from("results")
-        .select("*, profiles!results_user_id_fkey(full_name, gender, avatar_url), reactions(user_id, emoji), result_comments(count)")
-        .eq("wod_id", selected.id)
-        .returns<Row[]>(),
-      supabase.from("results").select("wod_id").eq("user_id", user.id).in("wod_id", wods.map((w) => w.id)),
-    ]);
+    const [{ data: full, error: fullErr }, { data: mine }] = await resultsP!;
     let r: Row[] | null = full;
     if (fullErr) {
       // Si falla lo embebido (reacciones/comentarios), que al menos salga el leaderboard
