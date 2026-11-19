@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { AiTip } from "@/components/ai-tip";
 import { WodTimer } from "@/components/wod-timer";
+import { WarmupButton } from "@/components/warmup-button";
+import { WodComments, type WodComment } from "@/components/wod-comments";
+import type { CommentReaction } from "@/lib/comment-reactions";
+import { staffIds } from "@/lib/push";
 import { moveWod } from "@/app/actions";
 import { tipFor } from "@/lib/ai-tips";
 import { notFound, redirect } from "next/navigation";
@@ -26,7 +30,7 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
   const division = (["elite", "rx"].includes(String(sp.d)) ? sp.d : "all") as Division | "all";
   const score = (sp.s === "2" ? 2 : 1) as 1 | 2;
 
-  const { supabase, user, profile } = await requireUser();
+  const { supabase, user, profile, box } = await requireUser();
   const isCoach = isCoachProfile(profile);
   // Atletas nuevos: no ven ni participan en la plani anterior a su alta
   const since = memberSince(profile);
@@ -51,6 +55,27 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
     .returns<Wod[]>();
   const wods = wodsData ?? [];
   const selected = wods.find((w) => w.id === sp.w) ?? wods[0] ?? null;
+  // Dudas del WOD: comentarios, sus reacciones y quién es del equipo (sus respuestas salen destacadas)
+  const [{ data: wodComments }, staffList] = selected
+    ? await Promise.all([
+        supabase
+          .from("wod_comments")
+          .select("id, user_id, body, pinned, created_at, profiles!wod_comments_user_id_fkey(full_name, avatar_url)")
+          .eq("wod_id", selected.id)
+          .order("created_at")
+          .returns<WodComment[]>(),
+        staffIds(box.id),
+      ])
+    : [{ data: [] as WodComment[] }, [] as string[]];
+  const wcReactions = new Map<string, CommentReaction[]>();
+  if (wodComments?.length) {
+    const { data: rx } = await supabase
+      .from("wod_comment_reactions")
+      .select("comment_id, user_id, emoji, profiles!wod_comment_reactions_user_id_fkey(full_name)")
+      .in("comment_id", wodComments.map((c) => c.id))
+      .returns<{ comment_id: string; user_id: string; emoji: string; profiles: { full_name: string } | null }[]>();
+    for (const x of rx ?? []) wcReactions.set(x.comment_id, [...(wcReactions.get(x.comment_id) ?? []), { user_id: x.user_id, emoji: x.emoji, name: x.profiles?.full_name ?? "" }]);
+  }
   // Consejo de IA ya pedido para este WOD (si lo hay, sale abierto)
   const { data: tip } = selected
     ? await supabase.from("ai_tips").select("body").eq("wod_id", selected.id).eq("user_id", user.id).maybeSingle<{ body: string }>()
@@ -174,9 +199,23 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
 
             <WodHeader wod={selected!} isCoach={isCoach} t={t} />
 
+            <WarmupButton key={`warm-${selected!.id}`} wodId={selected!.id} />
+
             <WodTimer key={`timer-${selected!.id}`} wod={selected!} />
 
             <AiTip key={`tip-${selected!.id}`} wodId={selected!.id} initial={tip ? tipFor(tip.body, locale) : null} />
+
+            <WodComments
+              wodId={selected!.id}
+              comments={wodComments ?? []}
+              reactions={wcReactions}
+              staff={new Set(staffList)}
+              me={user.id}
+              myName={profile?.full_name ?? ""}
+              isCoach={isCoach}
+              t={t}
+              locale={locale}
+            />
 
             <ResultForm key={selected!.id} wod={selected!} existing={mine} defaultDivision={profile?.division ?? undefined} />
 

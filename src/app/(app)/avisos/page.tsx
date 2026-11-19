@@ -45,6 +45,27 @@ export default async function AvisosPage() {
               );
             }
             const wod = n.wod ?? t("un WOD");
+            if (n.kind === "wcomment" || n.kind === "wcreaction")
+              return (
+                <li key={n.id}>
+                  <Link href={`/wod/${n.wodId}#dudas`} className={`flex gap-3 p-4 ${isNew ? "bg-accent/10" : ""}`}>
+                    <span className="text-xl">{n.kind === "wcomment" ? "❓" : n.emoji}</span>
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="text-sm">
+                        <b>{n.who || t("Alguien")}</b>{" "}
+                        <span className="text-muted">
+                          {n.kind === "wcomment" ? t("ha respondido en las dudas de {wod}", { wod }) : t("ha reaccionado a tu comentario en las dudas de {wod}", { wod })}
+                        </span>
+                      </div>
+                      <p className={n.kind === "wcomment" ? "line-clamp-2 text-[15px]" : "line-clamp-1 text-sm text-muted"}>“{n.body}”</p>
+                      <div className="text-xs text-muted">
+                        {new Date(n.at).toLocaleString(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid" })}
+                        {isNew && <span className="ml-2 font-semibold text-accent">{t("Nuevo")}</span>}
+                      </div>
+                    </div>
+                  </Link>
+                </li>
+              );
             return (
               <li key={n.id}>
                 <Link href={`/r/${n.resultId}`} className={`flex gap-3 p-4 ${isNew ? "bg-accent/10" : ""}`}>

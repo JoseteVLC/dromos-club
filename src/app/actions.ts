@@ -7,6 +7,7 @@ import { allActiveIds, sendPush, staffIds } from "@/lib/push";
 import { wodsFromPhotos } from "@/lib/photo-wods";
 import { checkCandidate, checkPersonalRecord } from "@/lib/plausibility";
 import { makeTip, tipFor } from "@/lib/ai-tips";
+import { makeWarmup } from "@/lib/warmup";
 import { hasAi } from "@/lib/ai";
 import { COMMENT_EMOJIS } from "@/lib/comment-reactions";
 import { BOX_COOKIE, boxUrl, isValidSlug } from "@/lib/box-shared";
@@ -560,6 +561,97 @@ export async function addComment(_: ActionState, fd: FormData): Promise<ActionSt
     if (rest.length) await sendPush(rest, "social", { title: `💬 ${who} ha contestado${wod}`, body: text, url: `/r/${resultId}`, tag: `c-${resultId}`, box: box.slug });
   });
   return { ok: "sent" };
+}
+
+// ---------------- DUDAS DEL WOD ----------------
+
+/** Pregunta o respuesta en las dudas del WOD. Avisa a los coaches (si pregunta un atleta) y a quien ya participó. */
+export async function addWodComment(_: ActionState, fd: FormData): Promise<ActionState> {
+  const { supabase, user, profile, box } = await requireUser();
+  const body = str(fd, "body").slice(0, 500);
+  const wodId = str(fd, "wod_id");
+  if (!body) return { error: "Escribe algo." };
+  const { error } = await supabase.from("wod_comments").insert({ wod_id: wodId, user_id: user.id, body });
+  if (error) return { error: "No se ha podido enviar el comentario." };
+  revalidatePath("/", "layout");
+  after(async () => {
+    const [{ data: w }, { data: others }, staff] = await Promise.all([
+      supabase.from("wods").select("title, part").eq("id", wodId).maybeSingle<{ title: string; part: string }>(),
+      supabase.from("wod_comments").select("user_id").eq("wod_id", wodId),
+      staffIds(box.id),
+    ]);
+    if (!w) return;
+    const who = profile?.full_name || "Alguien";
+    const text = body.length > 120 ? body.slice(0, 117) + "…" : body;
+    const url = `/wod/${wodId}#dudas`;
+    const isStaff = staff.includes(user.id);
+    const done = new Set<string>([user.id]);
+    // A los coaches les llega cada duda de un atleta
+    if (!isStaff) {
+      const to = staff.filter((id) => !done.has(id));
+      to.forEach((id) => done.add(id));
+      if (to.length) await sendPush(to, "messages", { title: `❓ ${who} · ${w.part} ${w.title}`, body: text, url, tag: `wc-${wodId}`, box: box.slug });
+    }
+    const rest = [...new Set((others ?? []).map((o) => o.user_id as string))].filter((id) => !done.has(id));
+    if (rest.length) await sendPush(rest, "social", { title: `💬 ${who} · ${w.part} ${w.title}`, body: text, url, tag: `wc-${wodId}`, box: box.slug });
+  });
+  return { ok: "sent" };
+}
+
+/** Reacción a un comentario de las dudas (una por persona; `null` la quita). */
+export async function setWodCommentReaction(commentId: string, emoji: string | null) {
+  const { supabase, user, profile, box } = await requireUser();
+  if (emoji !== null && !(COMMENT_EMOJIS as readonly string[]).includes(emoji)) return;
+  if (emoji === null) {
+    await supabase.from("wod_comment_reactions").delete().match({ comment_id: commentId, user_id: user.id });
+    return;
+  }
+  const { error } = await supabase
+    .from("wod_comment_reactions")
+    .upsert({ comment_id: commentId, user_id: user.id, emoji, created_at: new Date().toISOString() }, { onConflict: "comment_id,user_id" });
+  if (error) throw new Error("reaction");
+  after(async () => {
+    const { data: c } = await supabase.from("wod_comments").select("user_id, body, wod_id").eq("id", commentId).maybeSingle<{ user_id: string; body: string; wod_id: string }>();
+    if (!c || c.user_id === user.id) return;
+    const text = c.body.length > 80 ? c.body.slice(0, 77) + "…" : c.body;
+    await sendPush([c.user_id], "social", { title: `${emoji} ${profile?.full_name || "Alguien"}`, body: `Ha reaccionado a tu comentario: «${text}»`, url: `/wod/${c.wod_id}#dudas`, tag: `wcr-${commentId}`, box: box.slug });
+  });
+}
+
+export async function deleteWodComment(fd: FormData) {
+  const { supabase } = await requireUser();
+  await supabase.from("wod_comments").delete().eq("id", str(fd, "id"));
+  revalidatePath("/", "layout");
+}
+
+/** El coach fija la respuesta buena arriba (solo una fijada por WOD); tocarla otra vez la suelta. */
+export async function pinWodComment(fd: FormData) {
+  const { supabase } = await requireCoach();
+  const id = str(fd, "id");
+  const { data: c } = await supabase.from("wod_comments").select("wod_id, pinned").eq("id", id).maybeSingle<{ wod_id: string; pinned: boolean }>();
+  if (!c) return;
+  const db = adminDb();
+  await db.from("wod_comments").update({ pinned: false }).eq("wod_id", c.wod_id);
+  if (!c.pinned) await db.from("wod_comments").update({ pinned: true }).eq("id", id);
+  revalidatePath("/", "layout");
+}
+
+/** Calentamiento específico para el WOD (se prepara una vez por WOD e idioma). */
+export async function getWarmup(wodId: string): Promise<{ body?: string; error?: string }> {
+  const { supabase } = await requireUser();
+  if (!hasAdminKey() || !hasAi()) return { error: "El calentamiento no está disponible ahora mismo." };
+  const { locale } = await getI18n();
+  const db = adminDb();
+  const { data: cached } = await db.from("wod_warmups").select("body").eq("wod_id", wodId).eq("locale", locale).maybeSingle<{ body: string }>();
+  if (cached) return { body: cached.body };
+  // Con el cliente del atleta: si no puede ver el WOD, no hay calentamiento
+  const { data: wod } = await supabase.from("wods").select("*").eq("id", wodId).maybeSingle<Wod>();
+  if (!wod) return { error: "WOD no encontrado." };
+  const { data: day } = await supabase.from("wods").select("part, title").eq("wod_date", wod.wod_date).neq("id", wod.id).order("part").returns<{ part: string; title: string }[]>();
+  const body = await makeWarmup(wod, day ?? [], locale);
+  if (!body) return { error: "No hemos podido preparar el calentamiento. Prueba en un momento." };
+  await db.from("wod_warmups").upsert({ wod_id: wodId, locale, body });
+  return { body };
 }
 
 /** Reacción a un comentario, como en WhatsApp: una por persona; otra la sustituye y `null` la quita. */

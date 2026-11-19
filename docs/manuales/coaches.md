@@ -130,6 +130,8 @@ Cada mes o en eventos como el Open podemos añadir **retos de temporada** con su
 
 Como coach puedes borrar cualquier resultado (papelera en su fila del leaderboard, pulsando dos veces) y cualquier comentario. Úsalo para marcas imposibles o duplicadas; si dudas, pregunta antes al atleta.
 
+**💬 Dudas del WOD.** Debajo de cada WOD los atletas pueden preguntar. Os llega un aviso a los coaches con cada duda de un atleta; contestad ahí mismo para que lo vea todo el mundo. Vuestras respuestas salen con la etiqueta **Coach**, y con **📌 Fijar** dejáis la buena arriba del todo (solo una por WOD; «Soltar» la quita). Podéis borrar cualquier comentario.
+
 **⚠️ Resultados imposibles.** Cuando alguien mete un resultado que se sale de lo normal (supera un récord mundial o se aleja mucho de lo que ha hecho el resto), la app le pregunta **«¿Seguro que es así?»** antes de guardarlo, con el motivo, para que corrija el error de tecleo. Si aun así confirma algo por encima del récord mundial, aparece arriba del todo en **Coach → Resultados a revisar** y con la etiqueta «⚠️ revisar» en el leaderboard (solo la veis los coaches). Pulsa **Es correcto** si está bien o **Borrar resultado** si no. Mientras no lo revises, **no cuenta para las medallas** de Podio, Campeón y Dinastía. Si el atleta lo corrige, el aviso desaparece solo.
 
 Para ver quién está activo:

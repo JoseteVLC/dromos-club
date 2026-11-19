@@ -17,7 +17,10 @@ export function ReactableBubble({
   initial,
   className,
   children,
+  react = setCommentReaction,
 }: {
+  /** Acción que guarda la reacción (por defecto, la de los comentarios de resultados) */
+  react?: (commentId: string, emoji: string | null) => Promise<void>;
   commentId: string;
   me: string;
   myName: string;
@@ -53,7 +56,7 @@ export function ReactableBubble({
     const rest = list.filter((r) => r.user_id !== me);
     setList(next ? [...rest, { user_id: me, emoji: next, name: myName }] : rest);
     setOpen(false);
-    setCommentReaction(commentId, next).catch(() => setList(before));
+    react(commentId, next).catch(() => setList(before));
   };
 
   const startPress = () => {

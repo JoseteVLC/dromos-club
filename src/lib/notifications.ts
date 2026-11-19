@@ -4,7 +4,9 @@ export type Notice =
   | { kind: "comment"; id: string; at: string; who: string; resultId: string; onMine: boolean; body: string; wod: string | null }
   | { kind: "reaction"; id: string; at: string; who: string; resultId: string; emoji: string; wod: string | null }
   | { kind: "creaction"; id: string; at: string; who: string; resultId: string; emoji: string; body: string; wod: string | null }
-  | { kind: "medal"; id: string; at: string; who: string; code: string };
+  | { kind: "medal"; id: string; at: string; who: string; code: string }
+  | { kind: "wcomment"; id: string; at: string; who: string; wodId: string; body: string; wod: string | null }
+  | { kind: "wcreaction"; id: string; at: string; who: string; wodId: string; emoji: string; body: string; wod: string | null };
 
 type WodRef = { part: string; title: string } | null;
 
@@ -13,7 +15,7 @@ type WodRef = { part: string; title: string } | null;
  * y reacciones a sus resultados. `unread` = los posteriores a la última vez que abrió Avisos.
  */
 type Row = {
-  n_kind: "comment" | "reaction" | "creaction" | "medal"; n_id: string; n_at: string; n_who: string | null; n_result: string | null;
+  n_kind: "comment" | "reaction" | "creaction" | "medal" | "wcomment" | "wcreaction"; n_id: string; n_at: string; n_who: string | null; n_result: string | null;
   n_on_mine: boolean; n_body: string | null; n_emoji: string | null; n_wod_title: string | null; n_wod_part: string | null; n_seen: string;
 };
 
@@ -25,6 +27,9 @@ export async function getNotices(supabase: SupabaseClient, userId: string, limit
     const items: Notice[] = rows.map((r) => {
       const wod = r.n_wod_title ? `${r.n_wod_part ?? ""} · ${r.n_wod_title}` : null;
       if (r.n_kind === "medal") return { kind: "medal", id: r.n_id, at: r.n_at, who: "", code: r.n_body ?? "" };
+      if (r.n_kind === "wcomment") return { kind: "wcomment", id: r.n_id, at: r.n_at, who: r.n_who ?? "", wodId: r.n_result ?? "", body: r.n_body ?? "", wod };
+      if (r.n_kind === "wcreaction")
+        return { kind: "wcreaction", id: r.n_id, at: r.n_at, who: r.n_who ?? "", wodId: r.n_result ?? "", emoji: r.n_emoji ?? "", body: r.n_body ?? "", wod };
       if (r.n_kind === "creaction")
         return { kind: "creaction", id: r.n_id, at: r.n_at, who: r.n_who ?? "", resultId: r.n_result ?? "", emoji: r.n_emoji ?? "", body: r.n_body ?? "", wod };
       return r.n_kind === "comment"

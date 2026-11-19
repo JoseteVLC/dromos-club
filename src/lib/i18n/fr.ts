@@ -699,6 +699,22 @@ const d: Record<string, string> = {
   "Del timer: {v}. Revísalo (puedes cambiarlo) y guarda.": "Du timer : {v}. Vérifie-le (tu peux le modifier) et enregistre.",
   "Quitar una ronda": "Retirer un round",
   "Toca la pantalla para sumar una ronda": "Touche l'écran pour ajouter un round",
+  "ha respondido en las dudas de {wod}": "a répondu dans les questions de {wod}",
+  "ha reaccionado a tu comentario en las dudas de {wod}": "a réagi à ton commentaire dans les questions de {wod}",
+  "Calentamiento para este WOD": "Échauffement pour ce WOD",
+  "Después del calentamiento general. Ajusta los pesos a cómo te encuentres hoy.": "Après l'échauffement général. Adapte les charges à ta forme du jour.",
+  "Preparando…": "Préparation…",
+  "Calentamiento": "Échauffement",
+  "Dudas del WOD": "Questions sur le WOD",
+  "¿Alguna duda con el WOD (pesos, escalado, estándares)? Pregunta aquí y te contesta el equipo o el resto del box.": "Une question sur le WOD (charges, adaptation, standards) ? Pose-la ici et l'équipe ou le reste du box te répondra.",
+  "¿Alguna duda con el WOD (pesos, escalado, estándares)? Pregunta aquí y te contesta el equipo o el resto de la comunidad.": "Une question sur le WOD (charges, adaptation, standards) ? Pose-la ici et l'équipe ou le reste de la communauté te répondra.",
+  "Fijada": "Épinglée",
+  "Soltar": "Désépingler",
+  "Fijar": "Épingler",
+  "Responde o pregunta algo…": "Réponds ou pose une question…",
+  "Escribe tu duda…": "Écris ta question…",
+  "El calentamiento no está disponible ahora mismo.": "L'échauffement n'est pas disponible pour le moment.",
+  "No hemos podido preparar el calentamiento. Prueba en un momento.": "Nous n'avons pas pu préparer l'échauffement. Réessaie dans un instant.",
 };
 
 export default d;
