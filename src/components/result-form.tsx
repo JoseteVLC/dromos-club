@@ -1,6 +1,7 @@
 "use client";
 
-import { startTransition, useActionState, useRef, useState } from "react";
+import { startTransition, useActionState, useEffect, useRef, useState } from "react";
+import { TIMER_EVENT, type TimerResult } from "./wod-timer";
 import { saveResult } from "@/app/actions";
 import { formatTime } from "@/lib/scoring";
 import { DIVISIONS, SCORE_TYPES, wodDivisions, type Division, type Result, type Wod } from "@/lib/types";
@@ -21,10 +22,41 @@ export function ResultForm({ wod, existing, defaultDivision }: { wod: Wod; exist
   const allowed = wodDivisions(wod);
   const pick = (d?: Division) => (d && allowed.includes(d) ? d : d === "rx" && allowed.includes("elite") ? "elite" : d === "elite" && allowed.includes("rx") ? "rx" : allowed[0]);
   const [div, setDiv] = useState<Division>(pick(existing?.division ?? defaultDivision ?? "rx"));
+  const formRef = useRef<HTMLFormElement>(null);
+  const [fromTimer, setFromTimer] = useState<string | null>(null);
+
+  // «Usar en mi resultado» del timer: rellena el tiempo (o las rondas); el atleta lo revisa y guarda
+  useEffect(() => {
+    const on = (ev: Event) => {
+      const d = (ev as CustomEvent<TimerResult>).detail;
+      if (!d || d.wodId !== wod.id) return;
+      if (d.seconds != null) setFinished("yes");
+      if (d.capped) setFinished("no");
+      setTimeout(() => {
+        const f = formRef.current;
+        if (!f) return;
+        const put = (name: string, v: string) => {
+          const el = f.elements.namedItem(name) as HTMLInputElement | null;
+          if (el) el.value = v;
+        };
+        if (d.seconds != null) {
+          put("time_min", String(Math.floor(d.seconds / 60)));
+          put("time_sec", String(d.seconds % 60));
+        }
+        if (d.rounds != null && wod.score_type === "amrap") put("rounds", String(d.rounds));
+        f.scrollIntoView({ behavior: "smooth", block: "center" });
+        (f.elements.namedItem(d.capped ? "reps" : d.seconds != null ? "time_min" : "reps") as HTMLInputElement | null)?.focus({ preventScroll: true });
+      }, 50);
+      setFromTimer(d.seconds != null ? `${Math.floor(d.seconds / 60)}:${String(d.seconds % 60).padStart(2, "0")}` : d.capped ? "CAP" : String(d.rounds ?? 0));
+    };
+    window.addEventListener(TIMER_EVENT, on);
+    return () => window.removeEventListener(TIMER_EVENT, on);
+  }, [wod.id, wod.score_type]);
   const unit = wod.score_label || SCORE_TYPES[wod.score_type].unit;
 
   return (
     <form
+      ref={formRef}
       onSubmit={(e) => {
         e.preventDefault();
         send(new FormData(e.currentTarget));
@@ -161,6 +193,11 @@ export function ResultForm({ wod, existing, defaultDivision }: { wod: Wod; exist
         )}
       </div>
 
+      {fromTimer && !state && (
+        <p className="rounded-lg border border-accent/40 bg-accent/10 px-3 py-2 text-sm">
+          ⏱️ {t("Del timer: {v}. Revísalo (puedes cambiarlo) y guarda.", { v: fromTimer })}
+        </p>
+      )}
       {state?.confirm && !pending ? (
         <div className="space-y-3 rounded-lg border border-amber-400/50 bg-amber-400/10 p-3 text-sm">
           <p className="font-semibold">🤔 {t("¿Seguro que es así?")}</p>

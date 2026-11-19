@@ -20,10 +20,6 @@ const mmss = (s: number) => {
   const ss = String(v % 60).padStart(2, "0");
   return h ? `${h}:${String(m).padStart(2, "0")}:${ss}` : `${m}:${ss}`;
 };
-const toSec = (txt: string) => {
-  const p = txt.trim().split(":").map((x) => parseInt(x, 10) || 0);
-  return p.length === 1 ? p[0] * 60 : p[0] * 60 + (p[1] ?? 0);
-};
 
 /** Lo que se puede deducir del WOD para no tener que configurar nada. */
 export function guess(wod: Pick<Wod, "title" | "description" | "score_type" | "time_cap_seconds">): Cfg {
@@ -146,13 +142,33 @@ function beepAt(cfg: Cfg, sec: number): "go" | "tick" | "end" | null {
   return toNext <= 3 ? "tick" : null;
 }
 
-export function WodTimer({ wod }: { wod: Pick<Wod, "title" | "description" | "score_type" | "time_cap_seconds"> }) {
+/** Lo que el timer pasa al formulario de resultado («Usar en mi resultado»). */
+export type TimerResult = { wodId: string; seconds?: number; capped?: boolean; rounds?: number };
+export const TIMER_EVENT = "wod-timer-result";
+
+/** Botones − valor + grandes, para no teclear con las manos sudadas. */
+function Stepper({ label, value, onChange, step, min, max, fmt }: { label: string; value: number; onChange: (v: number) => void; step: number; min: number; max: number; fmt: (v: number) => string }) {
+  const btn = "btn-ghost h-14 w-14 shrink-0 text-2xl";
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-sm">{label}</span>
+      <div className="flex items-center gap-2">
+        <button type="button" className={btn} onClick={() => onChange(Math.max(min, value - step))} aria-label="−">−</button>
+        <span className="h-display w-24 text-center text-3xl tabular-nums">{fmt(value)}</span>
+        <button type="button" className={btn} onClick={() => onChange(Math.min(max, value + step))} aria-label="+">+</button>
+      </div>
+    </div>
+  );
+}
+
+export function WodTimer({ wod }: { wod: Pick<Wod, "id" | "title" | "description" | "score_type" | "time_cap_seconds"> }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [cfg, setCfg] = useState<Cfg>(() => guess(wod));
   const [running, setRunning] = useState(false);
   const [started, setStarted] = useState(false);
   const [elapsed, setElapsed] = useState(0);
+  const [stoppedAt, setStoppedAt] = useState<number | null>(null); // For Time: cuando pulsa «Terminar»
   const [taps, setTaps] = useState(0);
   const base = useRef(0); // ms acumulados antes de la última pausa
   const since = useRef(0); // instante en que se reanudó
@@ -180,8 +196,6 @@ export function WodTimer({ wod }: { wod: Pick<Wod, "title" | "description" | "sc
     return () => clearInterval(id);
   }, [running, cfg]);
 
-  const view = viewAt(cfg, elapsed, t);
-
   // Pantalla encendida mientras corre
   useEffect(() => {
     if (!running) return;
@@ -193,6 +207,9 @@ export function WodTimer({ wod }: { wod: Pick<Wod, "title" | "description" | "sc
     };
   }, [running]);
 
+  const view = viewAt(cfg, elapsed, t);
+  const done = view.finished || stoppedAt != null;
+
   const start = () => {
     unlockSounds(); // el primer toque desbloquea el sonido (iPhone)
     since.current = performance.now();
@@ -203,17 +220,36 @@ export function WodTimer({ wod }: { wod: Pick<Wod, "title" | "description" | "sc
     base.current += performance.now() - since.current;
     setRunning(false);
   };
+  const finish = () => {
+    pause();
+    const e = (base.current) / 1000;
+    setElapsed(e);
+    setStoppedAt(Math.max(0, Math.round(e - PREP)));
+    play("end");
+  };
   const reset = () => {
     base.current = 0;
     lastBeep.current = -1;
     setElapsed(0);
     setTaps(0);
+    setStoppedAt(null);
     setRunning(false);
     setStarted(false);
   };
   const close = () => {
     reset();
     setOpen(false);
+  };
+  /** Pasa el tiempo (o las rondas) al formulario de resultado, que el atleta revisa y guarda. */
+  const useIt = () => {
+    const detail: TimerResult = { wodId: wod.id };
+    if (cfg.mode === "fortime") {
+      if (stoppedAt != null) detail.seconds = stoppedAt;
+      else detail.capped = true;
+      if (taps) detail.rounds = taps;
+    } else detail.rounds = taps;
+    window.dispatchEvent(new CustomEvent<TimerResult>(TIMER_EVENT, { detail }));
+    close();
   };
 
   if (!open)
@@ -224,18 +260,18 @@ export function WodTimer({ wod }: { wod: Pick<Wod, "title" | "description" | "sc
     );
 
   const tone = { prep: "text-muted", work: "text-accent", rest: "text-sky-400", done: "text-fg" }[view.tone];
-  const field = "input w-24 text-center";
   const set = (k: keyof Cfg, v: number | Mode) => setCfg((c) => ({ ...c, [k]: v }));
+  const canUse = cfg.mode !== "intervals" && wod.score_type !== "load";
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-bg" data-noswipe>
-      <div className="flex items-center justify-between p-4">
+      <div className="flex items-center justify-between gap-3 p-4">
         <p className="truncate text-sm text-muted">{wod.title}</p>
-        <button type="button" onClick={close} className="btn-ghost px-3 py-1.5 text-sm">✕ {t("Cerrar")}</button>
+        <button type="button" onClick={close} className="btn-ghost shrink-0 px-4 py-2 text-sm">✕ {t("Cerrar")}</button>
       </div>
 
       {!started ? (
-        <div className="mx-auto w-full max-w-sm flex-1 space-y-6 overflow-y-auto p-4">
+        <div className="mx-auto w-full max-w-md flex-1 space-y-6 overflow-y-auto p-4">
           <div className="grid grid-cols-3 gap-2">
             {(
               [
@@ -250,41 +286,68 @@ export function WodTimer({ wod }: { wod: Pick<Wod, "title" | "description" | "sc
             ))}
           </div>
 
-          {cfg.mode === "fortime" && (
-            <label className="flex items-center justify-between gap-3">
-              <span>{t("Time cap (mm:ss, vacío = sin cap)")}</span>
-              <input className={field} inputMode="numeric" defaultValue={cfg.cap ? mmss(cfg.cap) : ""} placeholder="—" onChange={(e) => set("cap", e.target.value.trim() ? toSec(e.target.value) : 0)} />
-            </label>
-          )}
-          {cfg.mode === "amrap" && (
-            <label className="flex items-center justify-between gap-3">
-              <span>{t("Duración (mm:ss)")}</span>
-              <input className={field} inputMode="numeric" defaultValue={mmss(cfg.amrap)} onChange={(e) => set("amrap", Math.max(1, toSec(e.target.value)))} />
-            </label>
-          )}
-          {cfg.mode === "intervals" && (
-            <div className="space-y-3">
-              <label className="flex items-center justify-between gap-3">
-                <span>{t("Trabajo (mm:ss)")}</span>
-                <input className={field} inputMode="numeric" defaultValue={mmss(cfg.work)} onChange={(e) => set("work", Math.max(1, toSec(e.target.value)))} />
-              </label>
-              <label className="flex items-center justify-between gap-3">
-                <span>{t("Descanso (mm:ss, 0 = EMOM)")}</span>
-                <input className={field} inputMode="numeric" defaultValue={mmss(cfg.rest)} onChange={(e) => set("rest", Math.max(0, toSec(e.target.value)))} />
-              </label>
-              <label className="flex items-center justify-between gap-3">
-                <span>{t("Rondas")}</span>
-                <input className={field} type="number" min={1} max={99} defaultValue={cfg.rounds} onChange={(e) => set("rounds", Math.max(1, parseInt(e.target.value, 10) || 1))} />
-              </label>
-              <p className="text-xs text-muted">
-                {t("Ejemplos: EMOM 10 → 1:00 / 0:00 / 10 · Every 2 min x 5 → 2:00 / 0:00 / 5 · 1 min on 1 min off x 8 → 1:00 / 1:00 / 8 · Tabata → 0:20 / 0:10 / 8")}
-              </p>
+          <div className="card space-y-4 p-4">
+            {cfg.mode === "fortime" && (
+              <>
+                <Stepper label={t("Time cap")} value={cfg.cap} step={60} min={0} max={180 * 60} onChange={(v) => set("cap", v)} fmt={(v) => (v ? mmss(v) : t("Sin cap"))} />
+                <p className="text-xs text-muted">{t("Cuando acabes, pulsa «Terminar» y tu tiempo pasa al resultado.")}</p>
+              </>
+            )}
+            {cfg.mode === "amrap" && (
+              <>
+                <Stepper label={t("Duración")} value={cfg.amrap} step={60} min={60} max={120 * 60} onChange={(v) => set("amrap", v)} fmt={mmss} />
+                <div className="flex flex-wrap gap-2">
+                  {[5, 7, 10, 12, 15, 20].map((m) => (
+                    <button key={m} type="button" onClick={() => set("amrap", m * 60)} className={`chip ${cfg.amrap === m * 60 ? "chip-on" : ""}`}>{m}&apos;</button>
+                  ))}
+                </div>
+              </>
+            )}
+            {cfg.mode === "intervals" && (
+              <>
+                <div className="flex flex-wrap gap-2">
+                  {(
+                    [
+                      ["EMOM", 60, 0, cfg.rounds],
+                      ["E2MOM", 120, 0, cfg.rounds],
+                      ["E3MOM", 180, 0, cfg.rounds],
+                      ["1' on / 1' off", 60, 60, cfg.rounds],
+                      ["Tabata", 20, 10, 8],
+                    ] as const
+                  ).map(([name, w, r, n]) => (
+                    <button key={name} type="button" onClick={() => setCfg((c) => ({ ...c, work: w, rest: r, rounds: n }))} className={`chip ${cfg.work === w && cfg.rest === r ? "chip-on" : ""}`}>{name}</button>
+                  ))}
+                </div>
+                <Stepper label={t("Trabajo")} value={cfg.work} step={cfg.work >= 60 ? 15 : 5} min={5} max={30 * 60} onChange={(v) => set("work", v)} fmt={mmss} />
+                <Stepper label={t("Descanso")} value={cfg.rest} step={cfg.rest >= 60 ? 15 : 5} min={0} max={30 * 60} onChange={(v) => set("rest", v)} fmt={(v) => (v ? mmss(v) : "—")} />
+                <Stepper label={t("Rondas")} value={cfg.rounds} step={1} min={1} max={99} onChange={(v) => set("rounds", v)} fmt={(v) => String(v)} />
+                <p className="text-xs text-muted">{t("Total: {t}", { t: mmss((cfg.work + cfg.rest) * cfg.rounds) })}</p>
+              </>
+            )}
+          </div>
+          <button type="button" onClick={start} className="btn w-full py-5 text-xl">▶ {t("Empezar")}</button>
+        </div>
+      ) : done ? (
+        <div className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center gap-5 p-4 text-center">
+          <p className="h-display text-2xl uppercase text-accent">{cfg.mode === "fortime" ? (stoppedAt == null ? t("Time cap") : t("¡Terminado!")) : view.label}</p>
+          {cfg.mode === "fortime" && stoppedAt != null && <p className="h-display tabular-nums leading-none" style={{ fontSize: "min(26vw, 30vh)" }}>{mmss(stoppedAt)}</p>}
+          {cfg.mode !== "intervals" && (
+            <div className="w-full">
+              <Stepper label={t("Rondas completas")} value={taps} step={1} min={0} max={999} onChange={setTaps} fmt={(v) => String(v)} />
             </div>
           )}
-          <button type="button" onClick={start} className="btn w-full py-4 text-lg">▶ {t("Empezar")}</button>
+          {canUse && (
+            <button type="button" onClick={useIt} className="btn w-full py-4 text-lg">
+              ✓ {t("Usar en mi resultado")}
+            </button>
+          )}
+          <button type="button" onClick={reset} className="btn-ghost w-full py-3">↺ {t("Volver a empezar")}</button>
         </div>
       ) : (
-        <div className="flex flex-1 flex-col items-center justify-center gap-4 p-4 text-center" onClick={() => (cfg.mode !== "intervals" && running ? setTaps((n) => n + 1) : undefined)}>
+        <div
+          className="flex flex-1 select-none flex-col items-center justify-center gap-4 p-4 text-center"
+          onClick={() => (cfg.mode !== "intervals" && running && elapsed >= PREP ? setTaps((n) => n + 1) : undefined)}
+        >
           <p className={`h-display text-2xl uppercase ${tone}`}>{view.label}</p>
           <p className={`h-display tabular-nums leading-none ${tone}`} style={{ fontSize: "min(32vw, 40vh)" }}>{view.big}</p>
           {view.sub && <p className="text-lg text-muted">{view.sub}</p>}
@@ -292,19 +355,23 @@ export function WodTimer({ wod }: { wod: Pick<Wod, "title" | "description" | "sc
             <div className="h-full bg-accent transition-[width]" style={{ width: `${Math.min(100, view.progress * 100)}%` }} />
           </div>
           {cfg.mode !== "intervals" && elapsed >= PREP && (
-            <p className="text-sm text-muted">{t("Rondas: {n} · toca la pantalla para sumar una", { n: taps })}</p>
+            <p className="text-base text-muted">{t("Rondas: {n} · toca la pantalla para sumar una", { n: taps })}</p>
           )}
         </div>
       )}
 
-      {started && (
-        <div className="flex justify-center gap-3 p-6" onClick={(e) => e.stopPropagation()}>
-          {!view.finished && (running ? (
-            <button type="button" onClick={pause} className="btn px-8 py-4">⏸ {t("Pausa")}</button>
+      {started && !done && (
+        <div className="grid grid-cols-2 gap-3 p-6">
+          {running ? (
+            <button type="button" onClick={pause} className="btn-ghost py-5 text-lg">⏸ {t("Pausa")}</button>
           ) : (
-            <button type="button" onClick={start} className="btn px-8 py-4">▶ {t("Seguir")}</button>
-          ))}
-          <button type="button" onClick={reset} className="btn-ghost px-6 py-4">↺ {t("Reiniciar")}</button>
+            <button type="button" onClick={start} className="btn-ghost py-5 text-lg">▶ {t("Seguir")}</button>
+          )}
+          {cfg.mode === "fortime" && elapsed >= PREP ? (
+            <button type="button" onClick={finish} className="btn py-5 text-lg">🏁 {t("Terminar")}</button>
+          ) : (
+            <button type="button" onClick={reset} className="btn-ghost py-5 text-lg">↺ {t("Reiniciar")}</button>
+          )}
         </div>
       )}
     </div>

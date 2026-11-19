@@ -688,5 +688,14 @@ const d: Record<string, string> = {
   "Pausa": "Pauza",
   "Seguir": "Wznów",
   "Reiniciar": "Od nowa",
+  "Sin cap": "Bez limitu",
+  "Cuando acabes, pulsa «Terminar» y tu tiempo pasa al resultado.": "Gdy skończysz, dotknij «Zakończ», a Twój czas trafi do wyniku.",
+  "Duración": "Czas trwania",
+  "Total: {t}": "Razem: {t}",
+  "Rondas completas": "Pełne rundy",
+  "Usar en mi resultado": "Użyj w moim wyniku",
+  "Volver a empezar": "Zacznij od nowa",
+  "Terminar": "Zakończ",
+  "Del timer: {v}. Revísalo (puedes cambiarlo) y guarda.": "Z timera: {v}. Sprawdź (możesz zmienić) i zapisz.",
 };
 export default d;
