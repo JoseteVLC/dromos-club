@@ -108,3 +108,9 @@ export function rankResults(
   });
   return ranked;
 }
+
+/** Casillas de minutos y segundos: solo cifras, como mucho dos (y los segundos, hasta 59). */
+export function twoDigits(v: string, max?: number): string {
+  const d = v.replace(/\D/g, "").slice(0, 2);
+  return max != null && d && Number(d) > max ? String(max) : d;
+}

@@ -1,5 +1,6 @@
 "use client";
 
+import { twoDigits } from "@/lib/scoring";
 import { startTransition, useActionState, useRef, useState } from "react";
 import { saveBenchmark, savePersonalRecord } from "@/app/actions";
 import { BENCH_CATEGORIES, RM_CATEGORIES, RX_CATEGORIES, unitFor, type Benchmark, type PersonalRecord } from "@/lib/marcas";
@@ -77,9 +78,9 @@ export function PRForm({ benchmark, today, record }: { benchmark: Benchmark; tod
                     <span className="h-display text-3xl text-muted">:</span>
                   </>
                 )}
-                <input name="time_min" type="number" min={0} inputMode="numeric" value={mm} onChange={(e) => setMm(e.target.value)} className="input text-center text-2xl font-bold" placeholder="min" aria-label={t("Minutos")} />
+                <input name="time_min" type="text" inputMode="numeric" pattern="[0-9]*" maxLength={2} value={mm} onChange={(e) => setMm(twoDigits(e.target.value))} className="input text-center text-2xl font-bold" placeholder="min" aria-label={t("Minutos")} />
                 <span className="h-display text-3xl text-muted">:</span>
-                <input name="time_sec" type="number" min={0} max={59} inputMode="numeric" value={ss} onChange={(e) => setSs(e.target.value)} className="input text-center text-2xl font-bold" placeholder={t("seg")} aria-label={t("Segundos")} />
+                <input name="time_sec" type="text" inputMode="numeric" pattern="[0-9]*" maxLength={2} value={ss} onChange={(e) => setSs(twoDigits(e.target.value, 59))} className="input text-center text-2xl font-bold" placeholder={t("seg")} aria-label={t("Segundos")} />
               </div>
               {(mm || ss || hh) && (
                 <p className="mt-1 text-sm text-muted">

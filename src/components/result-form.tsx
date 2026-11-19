@@ -2,6 +2,7 @@
 
 import { startTransition, useActionState, useEffect, useRef, useState } from "react";
 import { TIMER_EVENT, type TimerResult } from "./wod-timer";
+import { twoDigits } from "@/lib/scoring";
 import { saveResult } from "@/app/actions";
 import { formatTime } from "@/lib/scoring";
 import { DIVISIONS, SCORE_TYPES, wodDivisions, type Division, type Result, type Wod } from "@/lib/types";
@@ -99,9 +100,11 @@ export function ResultForm({ wod, existing, defaultDivision }: { wod: Wod; exist
                 <input
                   name="time_min"
                   aria-label={t("Minutos")}
-                  type="number"
-                  min={0}
+                  type="text"
                   inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={2}
+                  onInput={(e) => (e.currentTarget.value = twoDigits(e.currentTarget.value))}
                   className="input text-center text-2xl font-bold"
                   placeholder="min"
                   defaultValue={existing?.time_seconds ? Math.floor(existing.time_seconds / 60) : ""}
@@ -110,10 +113,11 @@ export function ResultForm({ wod, existing, defaultDivision }: { wod: Wod; exist
                 <input
                   name="time_sec"
                   aria-label={t("Segundos")}
-                  type="number"
-                  min={0}
-                  max={59}
+                  type="text"
                   inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={2}
+                  onInput={(e) => (e.currentTarget.value = twoDigits(e.currentTarget.value, 59))}
                   className="input text-center text-2xl font-bold"
                   placeholder={t("seg")}
                   defaultValue={existing?.time_seconds ? String(existing.time_seconds % 60).padStart(2, "0") : ""}
