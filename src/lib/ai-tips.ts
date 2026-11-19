@@ -1,13 +1,13 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { askAi } from "./ai";
+import { langName, voice } from "./coach-voice";
 import { formatTime } from "./scoring";
 import type { Gender, Wod } from "./types";
 
 type PR = { rm: number | null; value: number | null; time_seconds: number | null; rounds: number | null; reps: number | null; division: string; performed_on: string; benchmarks: { name: string; category: string; score_type: string } | null };
 type LoadRes = { value: number | null; division: string; wods: { title: string; wod_date: string } };
 
-const LANG: Record<string, string> = { es: "español", en: "English", fr: "français", pl: "polski" };
 
 /** Lo que sabemos del atleta para afinar el consejo: mejores marcas y cargas recientes. */
 async function athleteContext(db: SupabaseClient, userId: string, boxId: string) {
@@ -72,7 +72,7 @@ Sus mejores marcas:
 ${a.prs.length ? a.prs.join("\n") : "(no ha apuntado ninguna)"}
 Cargas recientes en WODs del box:
 ${a.loads.length ? a.loads.join("\n") : "(ninguna)"}`;
-  return askAi(SYSTEM(LANG[locale] ?? "español"), prompt, 450);
+  return askAi(`${SYSTEM(langName(locale))}\n\n${voice(locale)}`, prompt, 450);
 }
 
 /** Texto del consejo guardado si está en ese idioma (los antiguos, sin marca, cuentan como español). */

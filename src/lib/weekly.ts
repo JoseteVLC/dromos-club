@@ -1,6 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { askAi } from "./ai";
+import { voice } from "./coach-voice";
 import { addDays } from "./dates";
 import { mondayOf } from "./week-parser";
 import { computeStandings } from "./ranking";
@@ -97,7 +98,7 @@ export async function sendWeeklySummaries(db: SupabaseClient, today: string, use
           medals: (newMedals ?? []).filter((x) => x.user_id === m.user_id).map((x) => MEDALS.find((d) => d.code === x.code)?.name ?? x.code),
           next,
         };
-        const ai = await askAi(SYSTEM, JSON.stringify(s), 120);
+        const ai = await askAi(`${SYSTEM}\n\n${voice("es")}`, JSON.stringify(s), 120);
         const body = (ai && ai.length <= 200 ? ai : template(s)).replace(/^["«]|["»]$/g, "");
         const n = await sendPush([m.user_id], "weekly", { title: `📊 Tu semana${s.name ? `, ${s.name}` : ""}`, body, url: "/ranking", tag: "weekly", box: m.boxes.slug });
         return n > 0;
