@@ -50,21 +50,52 @@ export function guess(wod: Pick<Wod, "title" | "description" | "score_type" | "t
   return cfg;
 }
 
-// --- sonido (Web Audio: sin ficheros)
-let ctx: AudioContext | null = null;
-function beep(freq = 880, ms = 160) {
+// --- sonido
+// Se usa <audio> con un pitido generado al vuelo (WAV): en iPhone, Web Audio se calla con el interruptor de silencio
+// y el audio «multimedia» no. Cada sonido se desbloquea con el primer toque en «Empezar».
+type Sound = "tick" | "go" | "end";
+const TONES: Record<Sound, [number, number]> = { tick: [880, 0.15], go: [1320, 0.45], end: [660, 1.2] };
+
+function wav(freq: number, secs: number): string {
+  const rate = 22050;
+  const n = Math.floor(rate * secs);
+  const buf = new ArrayBuffer(44 + n * 2);
+  const v = new DataView(buf);
+  const str = (o: number, x: string) => [...x].forEach((c, k) => v.setUint8(o + k, c.charCodeAt(0)));
+  str(0, "RIFF"); v.setUint32(4, 36 + n * 2, true); str(8, "WAVE"); str(12, "fmt ");
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  str(36, "data"); v.setUint32(40, n * 2, true);
+  for (let k = 0; k < n; k++) {
+    const fade = Math.min(1, k / 200, (n - k) / 800); // sin chasquidos al empezar y acabar
+    v.setInt16(44 + k * 2, Math.sin((2 * Math.PI * freq * k) / rate) * 0.9 * fade * 32767, true);
+  }
+  return URL.createObjectURL(new Blob([buf], { type: "audio/wav" }));
+}
+
+const sounds: Partial<Record<Sound, HTMLAudioElement>> = {};
+let unlocked = false;
+function unlockSounds() {
+  if (unlocked) return;
+  unlocked = true;
+  for (const k of Object.keys(TONES) as Sound[]) {
+    const a = (sounds[k] ??= new Audio(wav(...TONES[k])));
+    a.muted = true;
+    void a.play().then(() => {
+      a.pause();
+      a.currentTime = 0;
+      a.muted = false;
+    }).catch(() => (a.muted = false));
+  }
+}
+function play(k: Sound) {
+  const a = sounds[k];
+  if (a) {
+    a.currentTime = 0;
+    void a.play().catch(() => {});
+  }
   try {
-    ctx ??= new AudioContext();
-    if (ctx.state === "suspended") void ctx.resume();
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.frequency.value = freq;
-    o.connect(g);
-    g.connect(ctx.destination);
-    g.gain.setValueAtTime(0.25, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + ms / 1000);
-    o.start();
-    o.stop(ctx.currentTime + ms / 1000);
+    navigator.vibrate?.(k === "tick" ? 80 : k === "go" ? 300 : [300, 100, 300]);
   } catch {}
 }
 
@@ -100,7 +131,7 @@ function viewAt(cfg: Cfg, elapsed: number, t: (s: string, v?: Record<string, str
 /** Segundo exacto en el que debe pitar (cambio de fase o últimos 3 s de la cuenta atrás de cada fase). */
 function beepAt(cfg: Cfg, sec: number): "go" | "tick" | "end" | null {
   if (sec <= 0) return null;
-  if (sec < PREP) return sec >= PREP - 3 ? "tick" : null;
+  if (sec < PREP) return sec >= PREP - 5 ? "tick" : null;
   if (sec === PREP) return "go";
   const s = sec - PREP;
   if (cfg.mode === "fortime") return cfg.cap && s === cfg.cap ? "end" : cfg.cap && s >= cfg.cap - 3 && s < cfg.cap ? "tick" : null;
@@ -138,9 +169,7 @@ export function WodTimer({ wod }: { wod: Pick<Wod, "title" | "description" | "sc
       if (sec !== lastBeep.current) {
         lastBeep.current = sec;
         const b = beepAt(cfg, sec);
-        if (b === "tick") beep(660, 120);
-        if (b === "go") beep(1040, 380);
-        if (b === "end") beep(440, 900);
+        if (b) play(b);
       }
       // Al acabar, se para solo
       if (viewAt(cfg, e, (x) => x).finished) {
@@ -165,7 +194,7 @@ export function WodTimer({ wod }: { wod: Pick<Wod, "title" | "description" | "sc
   }, [running]);
 
   const start = () => {
-    beep(880, 60); // desbloquea el audio en iOS con el primer toque
+    unlockSounds(); // el primer toque desbloquea el sonido (iPhone)
     since.current = performance.now();
     setStarted(true);
     setRunning(true);
