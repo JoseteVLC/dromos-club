@@ -74,3 +74,10 @@ Cargas recientes en WODs del box:
 ${a.loads.length ? a.loads.join("\n") : "(ninguna)"}`;
   return askAi(SYSTEM(LANG[locale] ?? "español"), prompt, 450);
 }
+
+/** Texto del consejo guardado si está en ese idioma (los antiguos, sin marca, cuentan como español). */
+export function tipFor(stored: string, locale: string): string | null {
+  const mm = stored.match(/^\[(\w{2})\] ([\s\S]*)$/);
+  const lang = mm ? mm[1] : "es";
+  return lang === locale ? (mm ? mm[2] : stored) : null;
+}

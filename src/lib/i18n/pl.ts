@@ -650,5 +650,14 @@ const d: Record<string, string> = {
   "El consejo no está disponible ahora mismo.": "Porada nie jest teraz dostępna.",
   "No hemos podido preparar el consejo. Prueba en un momento.": "Nie udało się przygotować porady. Spróbuj za chwilę.",
   "Resultados que superan un récord mundial y el atleta ha confirmado igualmente. Revísalos antes de que cierre el WOD (2 días): mientras tanto no cuentan para las medallas.": "Wyniki powyżej rekordu świata, które zawodnik mimo to potwierdził. Sprawdź je, zanim WOD się zamknie (2 dni): do tego czasu nie liczą się do medali.",
+  "{title} en {time}: más rápido que el récord mundial (~{rec}).": "{title} w {time}: szybciej niż rekord świata (~{rec}).",
+  "Un WOD For Time en {s} s.": "WOD na czas w {s} s.",
+  "{v} frente a una mediana de {med} en el box (mejor: {best}).": "{v} przy medianie {med} w boxie (najlepszy: {best}).",
+  "{n} rondas en {title}: más que el récord mundial (~{rec}).": "{n} rund w {title}: więcej niż rekord świata (~{rec}).",
+  "{n} rondas en un AMRAP.": "{n} rund w AMRAP-ie.",
+  "{n} rondas frente a una mediana de {med} en el box.": "{n} rund przy medianie {med} w boxie.",
+  "{v} kg: por encima del récord mundial aproximado (~{kg} kg).": "{v} kg: powyżej przybliżonego rekordu świata (~{kg} kg).",
+  "{v} kg: parece imposible.": "{v} kg: wygląda na niemożliwe.",
+  "{v} {unit}: parece imposible.": "{v} {unit}: wygląda na niemożliwe.",
 };
 export default d;

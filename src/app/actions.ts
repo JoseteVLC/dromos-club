@@ -6,7 +6,7 @@ import { syncMedals } from "@/lib/achievements";
 import { allActiveIds, sendPush, staffIds } from "@/lib/push";
 import { wodsFromPhotos } from "@/lib/photo-wods";
 import { checkCandidate } from "@/lib/plausibility";
-import { makeTip } from "@/lib/ai-tips";
+import { makeTip, tipFor } from "@/lib/ai-tips";
 import { hasAi } from "@/lib/ai";
 import { COMMENT_EMOJIS } from "@/lib/comment-reactions";
 import { BOX_COOKIE, boxUrl, isValidSlug } from "@/lib/box-shared";
@@ -260,7 +260,8 @@ export async function saveResult(_: ActionState, fd: FormData): Promise<ActionSt
   }
 
   // Si el resultado parece imposible, se lo preguntamos a quien lo mete antes de guardarlo
-  const check = hasAdminKey() ? await checkCandidate(adminDb(), wodId, user.id, { ...row, id: "" } as unknown as Result).catch(() => null) : null;
+  const i18n = await getI18n();
+  const check = hasAdminKey() ? await checkCandidate(adminDb(), wodId, user.id, { ...row, id: "" } as unknown as Result, i18n.t, i18n.locale).catch(() => null) : null;
   if (check && str(fd, "confirm") !== "1") return { confirm: check.reason };
 
   const { error } = await supabase.from("results").upsert(row, { onConflict: "wod_id,user_id" });
@@ -273,7 +274,7 @@ export async function saveResult(_: ActionState, fd: FormData): Promise<ActionSt
     after(async () => {
       await adminDb()
         .from("results")
-        .update({ flag: check?.hard ? `El atleta confirma: ${check.reason}` : null, flag_reviewed: false })
+        .update({ flag: check?.hard ? `El atleta confirma: ${check.reasonEs}` : null, flag_reviewed: false })
         .eq("wod_id", wodId)
         .eq("user_id", user.id);
     });
@@ -293,17 +294,19 @@ export async function getAiTip(wodId: string): Promise<{ body?: string; error?: 
   const { supabase, user, box } = await requireUser();
   if (!hasAdminKey() || !hasAi()) return { error: "El consejo no está disponible ahora mismo." };
   const db = adminDb();
+  const { locale } = await getI18n();
   const { data: cached } = await db.from("ai_tips").select("body").eq("wod_id", wodId).eq("user_id", user.id).maybeSingle<{ body: string }>();
-  if (cached) return { body: cached.body };
+  // Se guarda con el idioma delante («[en] …»): si cambias el idioma de la app, se prepara de nuevo
+  const hit = cached && tipFor(cached.body, locale);
+  if (hit) return { body: hit };
   const { count } = await db.from("ai_tips").select("wod_id", { count: "exact", head: true }).eq("user_id", user.id).gte("created_at", new Date(Date.now() - 864e5).toISOString());
   if ((count ?? 0) >= 15) return { error: "Has pedido muchos consejos hoy. Vuelve mañana." };
   // Con el cliente del atleta: si no puede ver el WOD (otro box, borrador), no hay consejo
   const { data: wod } = await supabase.from("wods").select("*").eq("id", wodId).maybeSingle<Wod>();
   if (!wod) return { error: "WOD no encontrado." };
-  const { locale } = await getI18n();
   const body = await makeTip(db, wod, user.id, box.id, locale);
   if (!body) return { error: "No hemos podido preparar el consejo. Prueba en un momento." };
-  await db.from("ai_tips").upsert({ box_id: box.id, wod_id: wodId, user_id: user.id, body });
+  await db.from("ai_tips").upsert({ box_id: box.id, wod_id: wodId, user_id: user.id, body: `[${locale}] ${body}` });
   return { body };
 }
 

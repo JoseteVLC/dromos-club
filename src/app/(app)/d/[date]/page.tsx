@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AiTip } from "@/components/ai-tip";
+import { tipFor } from "@/lib/ai-tips";
 import { notFound, redirect } from "next/navigation";
 import { isCoachProfile, memberSince, requireUser } from "@/lib/supabase/server";
 import { addDays, dayHref, isISODate, todayISO } from "@/lib/dates";
@@ -28,7 +29,7 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
   // Atletas nuevos: no ven ni participan en la plani anterior a su alta
   const since = memberSince(profile);
   if (since && date < since) redirect(dayHref(since));
-  const { t } = await getI18n();
+  const { t, locale } = await getI18n();
   const today = todayISO();
 
   const streakP = myStreak(supabase, user.id);
@@ -152,7 +153,7 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
 
             <WodHeader wod={selected!} isCoach={isCoach} t={t} />
 
-            <AiTip key={`tip-${selected!.id}`} wodId={selected!.id} initial={tip?.body ?? null} />
+            <AiTip key={`tip-${selected!.id}`} wodId={selected!.id} initial={tip ? tipFor(tip.body, locale) : null} />
 
             <ResultForm key={selected!.id} wod={selected!} existing={mine} defaultDivision={profile?.division ?? undefined} />
 
