@@ -9,6 +9,8 @@ import { BENCH_CATEGORIES, RM_CATEGORIES, comparePR, formatPR, type Benchmark, t
 import { deleteBenchmark, deletePersonalRecord } from "@/app/actions";
 import { BenchmarkForm, PRForm } from "@/components/pr-form";
 import { ConfirmDelete } from "@/components/ui";
+import { PlateCalc } from "@/components/plate-calc";
+import { ProgressChart, type ProgressPoint } from "@/components/progress-chart";
 import type { Gender, Result } from "@/lib/types";
 
 /** 1RM estimado (fórmula de Epley); con 1RM devuelve el propio peso. */
@@ -86,6 +88,16 @@ export default async function BenchmarkPage({ params, searchParams }: PageProps<
   // Porcentajes de tu RM para programar series (1RM real o estimado con Epley si apuntaste 3RM, 5RM…)
   const bestAnyRM = isRM ? [...mine].sort((x, y) => epley(y) - epley(x))[0] : undefined;
   const oneRM = bestAnyRM ? epley(bestAnyRM) : null;
+  // Progreso: tus intentos en RX (con el mismo RM), para la gráfica
+  const metric = (r: PersonalRecord): number | null => {
+    if (b.score_type === "for_time") return r.finished !== false && r.time_seconds ? r.time_seconds : null;
+    if (b.score_type === "amrap") return r.rounds != null ? r.rounds + (r.reps ?? 0) / 100 : null;
+    return r.value != null ? Number(r.value) : null;
+  };
+  const progress: ProgressPoint[] = mine
+    .filter((r) => sameRM(r) && r.division === "rx")
+    .map((r) => ({ date: r.performed_on, v: metric(r), label: formatPR(b, r) }))
+    .filter((p): p is ProgressPoint => p.v != null);
   const fmtDate = (d: string) => new Date(d + "T12:00:00Z").toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
   const href = (o: { rm?: number; g?: string }) => {
     const u = new URLSearchParams();
@@ -141,24 +153,19 @@ export default async function BenchmarkPage({ params, searchParams }: PageProps<
       )}
 
       {oneRM != null && oneRM > 0 && (
-        <details className="card overflow-hidden" open>
-          <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 font-semibold">
+        <details className="space-y-2">
+          <summary className="card flex cursor-pointer list-none items-center justify-between px-4 py-3 font-semibold">
             <span>
-              {t("Porcentajes de tu 1RM")} · {round05(oneRM)} kg
+              🧮 {t("Porcentajes y discos")} · 1RM {round05(oneRM)} kg
               {(bestAnyRM?.rm ?? 1) > 1 && <span className="ml-1 text-xs font-normal text-muted">{t("(estimado desde tu {rm}RM)", { rm: bestAnyRM?.rm ?? 1 })}</span>}
             </span>
             <span className="text-muted">▾</span>
           </summary>
-          <div className="grid grid-cols-4 gap-px border-t border-line bg-line">
-            {[100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 40].map((pct) => (
-              <div key={pct} className="bg-card px-2 py-2 text-center">
-                <div className="text-xs text-muted">{pct}%</div>
-                <div className="font-semibold tabular-nums">{round05((oneRM * pct) / 100)}</div>
-              </div>
-            ))}
-          </div>
+          <PlateCalc oneRM={round05(oneRM)} />
         </details>
       )}
+
+      <ProgressChart points={progress} lowerIsBetter={b.score_type === "for_time"} locale={locale} title={`${t("Tu progreso")}${isRM ? ` · ${rm}RM` : ""}`} prLabel="PR" />
 
       <PRForm benchmark={b} today={todayISO()} />
 

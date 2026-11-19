@@ -19,6 +19,7 @@ Al abrir la app ves el entreno de hoy. Si el día tiene varias partes (A, B, C�
 
 - **Cambiar de día:** flechas a los lados de la fecha, desliza el dedo a izquierda o derecha, o toca la fecha para abrir el calendario.
 - **Tu semana:** la tira de días de arriba marca con ✓ los días en que ya metiste resultado.
+- **🔁 Ya hiciste este WOD:** si el WOD se repite (mismo nombre y mismo enunciado, o un benchmark como Fran), debajo te salen tus resultados anteriores con la fecha, hasta tres. Toca uno para ir a ese día.
 - **★ Benchmark:** los WODs con estrella son pruebas de referencia (Fran, Grace, 1RM…). Cuentan para tus PRs.
 - **Desde tu alta:** ves y participas en la plani a partir del día en que te diste de alta. Los días anteriores no aparecen.
 - **🔥 Calentamiento · ⏱️ Timer · 💡 Peso y escalado:** debajo del WOD tienes estos tres botones en una misma fila; el que pulses se abre justo debajo (y se cierra con ✕ o volviéndolo a pulsar).
@@ -84,7 +85,9 @@ En **Historial → 🏋️ Mis marcas** tienes el catálogo de benchmarks de Cro
 - **Apunta tu marca:** fecha, RX o Escalado (en WODs) o el RM (1RM, 3RM, 5RM… en levantamientos) y tu resultado. Antes de guardar un tiempo verás «Se guardará como 5:09» para comprobar que está bien.
 - **Corrige o borra:** en «Tu historial», debajo de cada marca, tienes ✏️ Editar y la papelera.
 - **Tu PR y tu percentil:** ves tu mejor marca, en qué porcentaje de la comunidad estás («Top 15 %», con la campana de Gauss a partir de 10 atletas) y el ranking de la comunidad por chicos y chicas.
-- **Tabla de porcentajes:** en los levantamientos, la app calcula tus kilos del 40 % al 100 % de tu 1RM para preparar los entrenos.
+- **📈 Tu progreso:** con dos marcas o más (en RX y el mismo RM), una gráfica enseña cómo has evolucionado. Los puntos rellenos son tus PR y la línea naranja, tu mejor marca en cada momento. En tiempos, subir en la gráfica es bajar el tiempo.
+- **🧮 Porcentajes y discos:** en los levantamientos, despliégalo y toca un % de tu 1RM (o escribe el peso). La app lo redondea a 2,5 kg y te dice qué discos poner a cada lado, con barra de 20, 15 o 10 kg. Si solo tienes un 3RM o un 5RM, estima tu 1RM.
+- **Calculadora suelta:** en Mis marcas, «🧮 Calculadora de % y discos» te deja elegir cualquiera de tus levantamientos, o escribir un peso sin tener marcas.
 - **WODs de la plani:** si un WOD se llama igual que un benchmark (por ejemplo «Fran»), tu resultado cuenta también aquí.
 
 ## Historial y PRs

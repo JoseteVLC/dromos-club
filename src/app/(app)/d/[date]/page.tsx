@@ -12,8 +12,8 @@ import { mondayOf } from "@/lib/week-parser";
 import { myStreak } from "@/lib/streak-data";
 import { StreakCard } from "@/components/streak-card";
 import { WEEK_GOAL } from "@/lib/streaks";
-import { formatTime } from "@/lib/scoring";
-import { SCORE_TYPES, type Division, type Gender, type Result, type Wod } from "@/lib/types";
+import { formatScore, formatTime } from "@/lib/scoring";
+import { DIVISIONS, SCORE_TYPES, type Division, type Gender, type Result, type Wod } from "@/lib/types";
 import { DayNav, SwipeDays } from "@/components/day-nav";
 import { ResultForm } from "@/components/result-form";
 import { Leaderboard } from "@/components/leaderboard";
@@ -56,6 +56,39 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
   const selected = wods.find((w) => w.id === sp.w) ?? wods[0] ?? null;
   // Todo lo del WOD elegido se pide a la vez (antes iba en cadena y la página tardaba más)
   type Row = Result & { reactions?: { user_id: string; emoji: string }[]; result_comments?: { count: number }[] };
+  // ¿Ya hiciste este WOD? Mismo título y tipo de score, y además mismo enunciado (o es un benchmark con nombre, como Fran)
+  type Prev = { id: string; wod_date: string; description: string; score_type: Wod["score_type"]; score_label: string | null };
+  const repeatP = (async () => {
+    if (!selected) return [] as { date: string; wodId: string; score: string; division: string }[];
+    const title = selected.title.replace(/[%_\\]/g, "").trim();
+    const [{ data: prev }, { data: bench }] = await Promise.all([
+      supabase
+        .from("wods")
+        .select("id, wod_date, description, score_type, score_label")
+        .ilike("title", title)
+        .eq("score_type", selected.score_type)
+        .eq("published", true)
+        .lt("wod_date", selected.wod_date)
+        .order("wod_date", { ascending: false })
+        .limit(30)
+        .returns<Prev[]>(),
+      supabase.from("benchmarks").select("id").ilike("name", title).limit(1),
+    ]);
+    const norm = (x: string) => x.toLowerCase().replace(/\s+/g, " ").trim();
+    const same = (prev ?? []).filter((w) => (bench ?? []).length > 0 || norm(w.description) === norm(selected.description));
+    if (!same.length) return [];
+    const { data: res } = await supabase
+      .from("results")
+      .select("*")
+      .eq("user_id", user.id)
+      .in("wod_id", same.map((w) => w.id))
+      .returns<Result[]>();
+    const byId = new Map(same.map((w) => [w.id, w]));
+    return (res ?? [])
+      .map((r) => ({ date: byId.get(r.wod_id)!.wod_date, wodId: r.wod_id, score: formatScore(byId.get(r.wod_id)!, r), division: r.division }))
+      .sort((x, y) => y.date.localeCompare(x.date))
+      .slice(0, 3);
+  })();
   const tipP = selected
     ? supabase.from("ai_tips").select("body").eq("wod_id", selected.id).eq("user_id", user.id).maybeSingle<{ body: string }>()
     : Promise.resolve({ data: null as { body: string } | null });
@@ -91,6 +124,7 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
     for (const x of rx ?? []) wcReactions.set(x.comment_id, [...(wcReactions.get(x.comment_id) ?? []), { user_id: x.user_id, emoji: x.emoji, name: x.profiles?.full_name ?? "" }]);
   }
   const { data: tip } = await tipP;
+  const repeats = await repeatP;
 
   let results: Result[] = [];
   let doneIds = new Set<string>();
@@ -201,6 +235,26 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
             )}
 
             <WodHeader wod={selected!} isCoach={isCoach} t={t} />
+
+            {repeats.length > 0 && (
+              <div className="card space-y-1 border-accent/40 p-4">
+                <p className="text-sm font-semibold">🔁 {t("Ya hiciste este WOD")}</p>
+                <ul className="space-y-0.5 text-sm">
+                  {repeats.map((r) => (
+                    <li key={r.wodId}>
+                      <Link href={dayHref(r.date, { w: r.wodId })} className="flex justify-between gap-3">
+                        <span className="text-muted">{new Date(r.date + "T12:00:00Z").toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })}</span>
+                        <span className="font-semibold tabular-nums">
+                          {r.score}
+                          <span className="ml-1 text-xs font-normal text-muted">{t(DIVISIONS.find((d) => d.value === r.division)?.label ?? r.division)}</span>
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-xs text-muted">{t("A ver si hoy lo mejoras.")}</p>
+              </div>
+            )}
 
             <WodTools key={`tools-${selected!.id}`} wod={selected!} initialTip={tip ? tipFor(tip.body, locale) : null} />
 

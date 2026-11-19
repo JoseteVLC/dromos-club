@@ -97,6 +97,13 @@ export default async function MarcasPage({ searchParams }: PageProps<"/marcas">)
         {t("Apunta tus marcas con fecha: benchmarks, héroes, RM de básicos y halterofilia… La mejor de cada uno es tu PR.")}{" "}
         {t("Llevas {n} de {total}.", { n: done, total: all.length })}
       </p>
+      <Link href="/marcas/calculadora" className="card flex items-center justify-between p-4">
+        <span>
+          <span className="block font-semibold">🧮 {t("Calculadora de % y discos")}</span>
+          <span className="text-xs text-muted">{t("El % de tu RM y qué discos poner a cada lado")}</span>
+        </span>
+        <span className="text-xl text-accent">→</span>
+      </Link>
 
       <form action="/marcas" className="flex gap-2">
         <input name="q" defaultValue={q} className="input" placeholder={t("Buscar (Fran, Murph, snatch…)")} />
