@@ -2,7 +2,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { askAi, parseJson } from "./ai";
 import { formatScore, formatTime } from "./scoring";
-import type { Gender, Result } from "./types";
+import type { Gender, Result, Wod } from "./types";
 import { es, rules, type Ctx, type Msg } from "./plausibility-rules";
 
 /**
@@ -51,4 +51,36 @@ export async function checkCandidate(db: SupabaseClient, wodId: string, userId: 
   if (!wod) return null;
   const others = (rows ?? []).filter((x) => !x.flag || x.flag_reviewed);
   return checkResult({ wod, r, gender: me?.gender ?? null, others }, t, locale);
+}
+
+type PRRow = { benchmark_id: string; rm: number | null; finished: boolean; time_seconds: number | null; rounds: number | null; reps: number | null; value: number | null; division: string; notes: string | null };
+
+/**
+ * Lo mismo para «Mis marcas»: récords mundiales y saltos enormes respecto a tu mejor marca anterior.
+ * (Aquí no hay resto del box con quien comparar.)
+ */
+export async function checkPersonalRecord(
+  db: SupabaseClient,
+  userId: string,
+  bench: { name: string; description: string | null; score_type: string },
+  row: PRRow,
+  editId: string,
+  t?: Tr,
+  locale?: string,
+): Promise<Check | null> {
+  if (row.division === "scaled") return null;
+  const [{ data: me }, { data: prev }] = await Promise.all([
+    db.from("profiles").select("gender").eq("id", userId).maybeSingle<{ gender: Gender | null }>(),
+    db.from("personal_records").select("id, rm, finished, time_seconds, rounds, reps, value").eq("user_id", userId).eq("benchmark_id", row.benchmark_id).neq("division", "scaled").returns<(PRRow & { id: string })[]>(),
+  ]);
+  // Su historial hace de «resto»: si mejora muchísimo de golpe, salta la duda
+  const history = (prev ?? []).filter((x) => x.id !== editId && (x.rm ?? null) === (row.rm ?? null));
+  const fake = (x: Partial<PRRow>) => ({ id: "", wod_id: "", user_id: userId, division: "rx", notes: null, ...x }) as unknown as Result;
+  const ctx = {
+    wod: { title: bench.name, description: bench.description ?? "", score_type: bench.score_type as Wod["score_type"], score_label: null, time_cap_seconds: null, is_benchmark: true },
+    r: fake(row),
+    gender: me?.gender ?? null,
+    others: history.length >= 1 ? [...history, ...history, ...history].map(fake) : [],
+  };
+  return checkResult(ctx, t, locale);
 }

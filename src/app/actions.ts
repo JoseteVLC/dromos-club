@@ -5,7 +5,7 @@ import { after } from "next/server";
 import { syncMedals } from "@/lib/achievements";
 import { allActiveIds, sendPush, staffIds } from "@/lib/push";
 import { wodsFromPhotos } from "@/lib/photo-wods";
-import { checkCandidate } from "@/lib/plausibility";
+import { checkCandidate, checkPersonalRecord } from "@/lib/plausibility";
 import { makeTip, tipFor } from "@/lib/ai-tips";
 import { hasAi } from "@/lib/ai";
 import { COMMENT_EMOJIS } from "@/lib/comment-reactions";
@@ -915,7 +915,7 @@ export async function setLanguage(lang: string) {
 export async function savePersonalRecord(_: ActionState, fd: FormData): Promise<ActionState> {
   const { supabase, user, box } = await requireUser();
   const benchmarkId = str(fd, "benchmark_id");
-  const { data: b } = await supabase.from("benchmarks").select("id, category, score_type").eq("id", benchmarkId).maybeSingle();
+  const { data: b } = await supabase.from("benchmarks").select("id, name, description, category, score_type").eq("id", benchmarkId).maybeSingle();
   if (!b) return { error: "Ese benchmark no existe." };
   const date = str(fd, "performed_on");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return { error: "Elige la fecha en que lo hiciste." };
@@ -971,6 +971,12 @@ export async function savePersonalRecord(_: ActionState, fd: FormData): Promise<
     }
   }
   const editId = str(fd, "id");
+  // Marca imposible: se pregunta antes de guardarla
+  if (hasAdminKey() && str(fd, "confirm") !== "1") {
+    const i18n = await getI18n();
+    const check = await checkPersonalRecord(adminDb(), user.id, b, row, editId, i18n.t, i18n.locale).catch(() => null);
+    if (check) return { confirm: check.reason };
+  }
   if (editId) {
     const { data: upd, error } = await supabase.from("personal_records").update(row).eq("id", editId).eq("user_id", user.id).select("id");
     if (error || !upd?.length) return { error: "No se pudo guardar el cambio." };

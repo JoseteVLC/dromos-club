@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { startTransition, useActionState, useRef, useState } from "react";
 import { saveBenchmark, savePersonalRecord } from "@/app/actions";
 import { BENCH_CATEGORIES, RM_CATEGORIES, RX_CATEGORIES, unitFor, type Benchmark, type PersonalRecord } from "@/lib/marcas";
 import { SCORE_TYPES, type ScoreType } from "@/lib/types";
@@ -10,7 +10,13 @@ import { useI18n } from "@/lib/i18n/client";
 
 /** Apuntar una marca: fecha, categoría (RX/escalado o RM según el tipo) y el score. */
 export function PRForm({ benchmark, today, record }: { benchmark: Benchmark; today: string; record?: PersonalRecord }) {
-  const [state, action] = useActionState(savePersonalRecord, undefined);
+  const [state, action, pending] = useActionState(savePersonalRecord, undefined);
+  // Se envía a mano para que el formulario no se vacíe si hay que confirmar algo
+  const last = useRef<FormData | null>(null);
+  const send = (fd: FormData) => {
+    last.current = fd;
+    startTransition(() => action(fd));
+  };
   const { t } = useI18n();
   const r = record;
   const [finished, setFinished] = useState<"yes" | "no">(r && !r.finished ? "no" : "yes");
@@ -24,7 +30,13 @@ export function PRForm({ benchmark, today, record }: { benchmark: Benchmark; tod
   const unit = unitFor(benchmark);
 
   return (
-    <form action={action} className={r ? "space-y-4 pt-3" : "card space-y-4 p-4"}>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        send(new FormData(e.currentTarget));
+      }}
+      className={r ? "space-y-4 pt-3" : "card space-y-4 p-4"}
+    >
       <input type="hidden" name="benchmark_id" value={benchmark.id} />
       {r && <input type="hidden" name="id" value={r.id} />}
       {!r && <h2 className="h-display text-2xl">{t("Apuntar marca")}</h2>}
@@ -111,8 +123,28 @@ export function PRForm({ benchmark, today, record }: { benchmark: Benchmark; tod
         <label className="label" htmlFor="notes">{t("Notas (opcional)")}</label>
         <input id="notes" name="notes" defaultValue={r?.notes ?? undefined} className="input" placeholder={t("Escalados, peso usado…")} />
       </div>
-      <FormMessage state={state} />
-      <SubmitButton className="w-full">{r ? t("Guardar cambios") : t("Guardar marca")}</SubmitButton>
+      {state?.confirm && !pending ? (
+        <div className="space-y-3 rounded-lg border border-amber-400/50 bg-amber-400/10 p-3 text-sm">
+          <p className="font-semibold">🤔 {t("¿Seguro que es así?")}</p>
+          <p>{state.confirm}</p>
+          <p className="text-muted">{t("Si te has equivocado, corrígelo arriba y vuelve a guardar.")}</p>
+          <button
+            type="button"
+            className="btn-ghost w-full py-2.5"
+            onClick={() => {
+              const fd = new FormData();
+              last.current?.forEach((v, k) => fd.append(k, v));
+              fd.set("confirm", "1");
+              send(fd);
+            }}
+          >
+            {t("Sí, está bien: guardar")}
+          </button>
+        </div>
+      ) : (
+        <FormMessage state={state} />
+      )}
+      <button disabled={pending} className="btn w-full">{pending ? t("Guardando…") : r ? t("Guardar cambios") : t("Guardar marca")}</button>
     </form>
   );
 }
