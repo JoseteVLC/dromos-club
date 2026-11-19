@@ -21,7 +21,8 @@ Al abrir la app ves el entreno de hoy. Si el día tiene varias partes (A, B, C�
 - **Tu semana:** la tira de días de arriba marca con ✓ los días en que ya metiste resultado.
 - **★ Benchmark:** los WODs con estrella son pruebas de referencia (Fran, Grace, 1RM…). Cuentan para tus PRs.
 - **Desde tu alta:** ves y participas en la plani a partir del día en que te diste de alta. Los días anteriores no aparecen.
-- **💡 Peso y escalado para ti:** pulsa el botón debajo del WOD y la IA mira el WOD y tus marcas (Mis marcas y tus cargas recientes) y te dice qué peso meter en cada movimiento, si te conviene escalar algo y una clave de estrategia. Si la plani pide un %, lo calcula con tu RM. Cuantas más marcas tengas apuntadas, mejor afina. El consejo se queda guardado en ese WOD.
+- **💡 Peso y escalado para ti:** pulsa el botón debajo del WOD y la app mira el WOD y tus marcas (Mis marcas y tus cargas recientes) y te dice qué peso meter en cada movimiento, si te conviene escalar algo y una clave de estrategia. Si la plani pide un %, lo calcula con tu RM. Cuantas más marcas tengas apuntadas, mejor afina. El consejo se queda guardado en ese WOD.
+- **«¿Seguro que es así?»:** si metes un resultado que parece imposible (más rápido que el récord mundial, un cero de más, minutos y segundos cambiados…), la app te lo pregunta antes de guardarlo. Corrígelo, o pulsa «Sí, está bien: guardar» si de verdad es así.
 
 ## Meter tu resultado
 

@@ -20,7 +20,7 @@ export function AiTip({ wodId, initial }: { wodId: string; initial: string | nul
           <button type="button" onClick={() => setOpen(false)} className="text-xs text-muted" aria-label={t("Cerrar")}>✕</button>
         </div>
         <p className="whitespace-pre-line text-sm leading-relaxed">{body}</p>
-        <p className="text-[11px] text-muted">{t("Sugerencia de la IA con tus marcas. Si algo no te cuadra, pregunta a tu coach.")}</p>
+        <p className="text-[11px] text-muted">{t("Calculado con tus marcas. Si algo no te cuadra, pregunta a tu coach.")}</p>
       </div>
     );
 
@@ -42,7 +42,7 @@ export function AiTip({ wodId, initial }: { wodId: string; initial: string | nul
         }}
         className="btn-ghost w-full py-3 text-sm"
       >
-        {pending ? t("Pensando…") : `💡 ${t("Peso y escalado para ti")}`}
+        {pending ? t("Calculando…") : `💡 ${t("Peso y escalado para ti")}`}
       </button>
       {error && <p className="text-center text-xs text-alert">{t(error)}</p>}
     </div>

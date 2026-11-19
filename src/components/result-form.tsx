@@ -1,21 +1,33 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { startTransition, useActionState, useRef, useState } from "react";
 import { saveResult } from "@/app/actions";
 import { formatTime } from "@/lib/scoring";
 import { DIVISIONS, SCORE_TYPES, type Division, type Result, type Wod } from "@/lib/types";
-import { FormMessage, Segmented, SubmitButton } from "./ui";
+import { FormMessage, Segmented } from "./ui";
 import { useI18n } from "@/lib/i18n/client";
 
 export function ResultForm({ wod, existing, defaultDivision }: { wod: Wod; existing: Result | null; defaultDivision?: Division }) {
-  const [state, action] = useActionState(saveResult, undefined);
+  const [state, action, pending] = useActionState(saveResult, undefined);
+  // Se envía a mano para que el formulario no se vacíe si hay que confirmar o corregir algo
+  const last = useRef<FormData | null>(null);
+  const send = (fd: FormData) => {
+    last.current = fd;
+    startTransition(() => action(fd));
+  };
   const { t } = useI18n();
   const [finished, setFinished] = useState<"yes" | "no">(existing && !existing.finished ? "no" : "yes");
   const [div, setDiv] = useState<Division>(existing?.division ?? defaultDivision ?? "rx");
   const unit = wod.score_label || SCORE_TYPES[wod.score_type].unit;
 
   return (
-    <form action={action} className="card space-y-4 p-4">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        send(new FormData(e.currentTarget));
+      }}
+      className="card space-y-4 p-4"
+    >
       <input type="hidden" name="wod_id" value={wod.id} />
       <h2 className="h-display text-2xl">{existing ? t("Tu resultado") : t("Mete tu resultado")}</h2>
 
@@ -146,8 +158,28 @@ export function ResultForm({ wod, existing, defaultDivision }: { wod: Wod; exist
         )}
       </div>
 
-      <FormMessage state={state} />
-      <SubmitButton className="w-full">{existing ? t("Actualizar") : t("Guardar resultado")}</SubmitButton>
+      {state?.confirm && !pending ? (
+        <div className="space-y-3 rounded-lg border border-amber-400/50 bg-amber-400/10 p-3 text-sm">
+          <p className="font-semibold">🤔 {t("¿Seguro que es así?")}</p>
+          <p>{state.confirm}</p>
+          <p className="text-muted">{t("Si te has equivocado, corrígelo arriba y vuelve a guardar.")}</p>
+          <button
+            type="button"
+            className="btn-ghost w-full py-2.5"
+            onClick={() => {
+              const fd = new FormData();
+              last.current?.forEach((v, k) => fd.append(k, v));
+              fd.set("confirm", "1");
+              send(fd);
+            }}
+          >
+            {t("Sí, está bien: guardar")}
+          </button>
+        </div>
+      ) : (
+        <FormMessage state={state} />
+      )}
+      <button disabled={pending} className="btn w-full">{pending ? t("Guardando…") : existing ? t("Actualizar") : t("Guardar resultado")}</button>
     </form>
   );
 }

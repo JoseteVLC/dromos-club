@@ -18,7 +18,7 @@ export function FlaggedResults({ rows, t }: { rows: FlaggedRow[]; t: T }) {
   return (
     <section className="space-y-3">
       <h2 className="h-display text-2xl">⚠️ {t("Resultados a revisar")} · {rows.length}</h2>
-      <p className="text-sm text-muted">{t("El detector cree que pueden ser un error al escribirlos. Revísalos antes de que cierre el WOD (2 días) para que las medallas vayan a quien toca.")}</p>
+      <p className="text-sm text-muted">{t("Resultados que superan un récord mundial y el atleta ha confirmado igualmente. Revísalos antes de que cierre el WOD (2 días): mientras tanto no cuentan para las medallas.")}</p>
       <ul className="card divide-y divide-line">
         {rows.map((r) => (
           <li key={r.id} className="space-y-2 p-4">

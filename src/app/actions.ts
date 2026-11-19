@@ -5,7 +5,7 @@ import { after } from "next/server";
 import { syncMedals } from "@/lib/achievements";
 import { allActiveIds, sendPush, staffIds } from "@/lib/push";
 import { wodsFromPhotos } from "@/lib/photo-wods";
-import { reviewSavedResult } from "@/lib/plausibility";
+import { checkCandidate } from "@/lib/plausibility";
 import { makeTip } from "@/lib/ai-tips";
 import { hasAi } from "@/lib/ai";
 import { COMMENT_EMOJIS } from "@/lib/comment-reactions";
@@ -17,12 +17,12 @@ import { siteUrl } from "@/lib/site";
 import { randomBytes } from "node:crypto";
 import { parseTime } from "@/lib/scoring";
 import { dayHref, isISODate } from "@/lib/dates";
-import { SCORE2_TYPES, SCORE_TYPES, type Division, type Score2Type, type ScoreType, type Wod } from "@/lib/types";
+import { SCORE2_TYPES, SCORE_TYPES, type Division, type Result, type Score2Type, type ScoreType, type Wod } from "@/lib/types";
 import { BRAND } from "@/lib/brand";
 import { getI18n } from "@/lib/i18n/server";
 
 /** Los textos van en español: el cliente los traduce (FormMessage) con `vars` para las partes variables. */
-export type ActionState = { error?: string; ok?: string; vars?: Record<string, string | number> } | undefined;
+export type ActionState = { error?: string; ok?: string; vars?: Record<string, string | number>; confirm?: string } | undefined;
 
 const str = (fd: FormData, k: string) => String(fd.get(k) ?? "").trim();
 const int = (fd: FormData, k: string) => {
@@ -259,24 +259,23 @@ export async function saveResult(_: ActionState, fd: FormData): Promise<ActionSt
     }
   }
 
+  // Si el resultado parece imposible, se lo preguntamos a quien lo mete antes de guardarlo
+  const check = hasAdminKey() ? await checkCandidate(adminDb(), wodId, user.id, { ...row, id: "" } as unknown as Result).catch(() => null) : null;
+  if (check && str(fd, "confirm") !== "1") return { confirm: check.reason };
+
   const { error } = await supabase.from("results").upsert(row, { onConflict: "wod_id,user_id" });
   if (error) return { error: error.message };
   revalidatePath("/", "layout");
   checkMedalsLater(supabase, user.id, box);
-  // Detector de resultados imposibles: se revisa después de responder, sin hacer esperar al atleta
+  // Si confirma algo imposible sin discusión (p. ej. por encima del récord mundial), queda para que lo mire el coach
+  // y no cuenta para medallas hasta entonces. Si lo ha corregido, se borra el aviso anterior.
   if (hasAdminKey())
     after(async () => {
-      const hit = await reviewSavedResult(adminDb(), wodId, user.id).catch(() => null);
-      if (!hit) return;
-      const staff = (await staffIds(box.id)).filter((id) => id !== user.id);
-      const { data: who } = await adminDb().from("profiles").select("full_name").eq("id", user.id).maybeSingle<{ full_name: string }>();
-      await sendPush(staff, "messages", {
-        title: `⚠️ Resultado a revisar · ${hit.wodTitle}`,
-        body: `${who?.full_name ?? "Un atleta"}: ${hit.reason}`.slice(0, 180),
-        url: "/coach",
-        tag: `flag-${wodId}-${user.id}`,
-        box: box.slug,
-      });
+      await adminDb()
+        .from("results")
+        .update({ flag: check?.hard ? `El atleta confirma: ${check.reason}` : null, flag_reviewed: false })
+        .eq("wod_id", wodId)
+        .eq("user_id", user.id);
     });
   return { ok: "¡Resultado guardado!" };
 }
@@ -289,10 +288,10 @@ export async function deleteResult(fd: FormData) {
   if (back.startsWith("/")) redirect(back);
 }
 
-/** Consejo de peso y escalado con IA para el WOD (se guarda: la segunda vez no vuelve a gastar). */
+/** Consejo de peso y escalado para el WOD (se guarda: la segunda vez no vuelve a gastar). */
 export async function getAiTip(wodId: string): Promise<{ body?: string; error?: string }> {
   const { supabase, user, box } = await requireUser();
-  if (!hasAdminKey() || !hasAi()) return { error: "El consejo con IA no está disponible ahora mismo." };
+  if (!hasAdminKey() || !hasAi()) return { error: "El consejo no está disponible ahora mismo." };
   const db = adminDb();
   const { data: cached } = await db.from("ai_tips").select("body").eq("wod_id", wodId).eq("user_id", user.id).maybeSingle<{ body: string }>();
   if (cached) return { body: cached.body };
@@ -303,7 +302,7 @@ export async function getAiTip(wodId: string): Promise<{ body?: string; error?: 
   if (!wod) return { error: "WOD no encontrado." };
   const { locale } = await getI18n();
   const body = await makeTip(db, wod, user.id, box.id, locale);
-  if (!body) return { error: "La IA no ha podido responder. Prueba en un momento." };
+  if (!body) return { error: "No hemos podido preparar el consejo. Prueba en un momento." };
   await db.from("ai_tips").upsert({ box_id: box.id, wod_id: wodId, user_id: user.id, body });
   return { body };
 }
