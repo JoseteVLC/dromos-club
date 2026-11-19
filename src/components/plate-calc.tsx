@@ -35,11 +35,27 @@ export function platesFor(total: number, bar: number) {
  * Calculadora de % y discos: eliges un % de tu 1RM (o escribes el peso) y te dice qué discos poner a cada lado.
  * Redondea a 2,5 kg (el menor salto con discos de 1,25).
  */
-export function PlateCalc({ oneRM, lifts }: { oneRM?: number | null; lifts?: { name: string; oneRM: number }[] }) {
+export function PlateCalc({
+  oneRM,
+  lifts,
+  initialLift,
+  initialPct,
+}: {
+  oneRM?: number | null;
+  lifts?: { name: string; oneRM: number }[];
+  /** Movimiento que sale en el WOD (índice en lifts), para tenerlo ya elegido */
+  initialLift?: number;
+  /** % que pide el WOD (p. ej. 90), para tenerlo ya marcado */
+  initialPct?: number;
+}) {
   const { t, locale } = useI18n();
-  const [rmIdx, setRmIdx] = useState(0);
-  const base = lifts?.length ? lifts[rmIdx]?.oneRM ?? null : oneRM ?? null;
-  const [pct, setPct] = useState<number | null>(base ? 75 : null);
+  const list = lifts ?? [];
+  // -1 = escribir tu RM a mano
+  const [rmIdx, setRmIdx] = useState(oneRM ? -2 : list.length ? (initialLift ?? 0) : -1);
+  const [rmTyped, setRmTyped] = useState("");
+  const typedRM = Number(rmTyped.replace(",", "."));
+  const base = rmIdx === -2 ? oneRM ?? null : rmIdx >= 0 ? list[rmIdx]?.oneRM ?? null : typedRM > 0 ? typedRM : null;
+  const [pct, setPct] = useState<number | null>(initialPct ?? 75);
   const [manual, setManual] = useState<string>("");
   const [bar, setBar] = useState(20);
 
@@ -51,9 +67,9 @@ export function PlateCalc({ oneRM, lifts }: { oneRM?: number | null; lifts?: { n
 
   return (
     <div className="card space-y-4 p-4">
-      {lifts && lifts.length > 0 && (
+      {(list.length > 0 || oneRM) && (
         <label className="block">
-          <span className="label">{t("Movimiento")}</span>
+          <span className="label">{t("Tu RM")}</span>
           <select
             className="input"
             value={rmIdx}
@@ -62,12 +78,20 @@ export function PlateCalc({ oneRM, lifts }: { oneRM?: number | null; lifts?: { n
               setManual("");
             }}
           >
-            {lifts.map((l, i) => (
+            {oneRM ? <option value={-2}>{t("Tu 1RM")} · {fmt(oneRM, locale)} kg</option> : null}
+            {list.map((l, i) => (
               <option key={l.name} value={i}>
                 {l.name} · 1RM {fmt(l.oneRM, locale)} kg
               </option>
             ))}
+            <option value={-1}>{t("Otro: escribo mi 1RM")}</option>
           </select>
+        </label>
+      )}
+      {rmIdx === -1 && (
+        <label className="block">
+          <span className="label">{t("Tu 1RM (kg)")}</span>
+          <input className="input" inputMode="decimal" placeholder="kg" value={rmTyped} onChange={(e) => setRmTyped(e.target.value.replace(/[^\d.,]/g, "").slice(0, 6))} />
         </label>
       )}
 
@@ -95,7 +119,7 @@ export function PlateCalc({ oneRM, lifts }: { oneRM?: number | null; lifts?: { n
 
       <div className="grid grid-cols-2 gap-3">
         <label className="block">
-          <span className="label">{base ? t("O escribe el peso") : t("Peso total")}</span>
+          <span className="label">{base ? t("O escribe el peso") : t("Peso en la barra")}</span>
           <input className="input" inputMode="decimal" placeholder="kg" value={manual} onChange={(e) => setManual(e.target.value.replace(/[^\d.,]/g, "").slice(0, 6))} />
         </label>
         <div>

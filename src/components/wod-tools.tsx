@@ -4,9 +4,12 @@ import { useState, useTransition } from "react";
 import { getAiTip, getWarmup } from "@/app/actions";
 import { useI18n } from "@/lib/i18n/client";
 import { WodTimer } from "@/components/wod-timer";
+import { PlateCalc } from "@/components/plate-calc";
+import { CalcIcon } from "@/components/icons";
+import type { Lift } from "@/lib/lifts";
 import type { Wod } from "@/lib/types";
 
-type Panel = "warm" | "tip" | null;
+type Panel = "warm" | "tip" | "calc" | null;
 type Fetcher = (wodId: string) => Promise<{ body?: string | null; error?: string | null }>;
 
 /** Texto que se pide una vez y se guarda (calentamiento o peso y escalado). */
@@ -32,9 +35,12 @@ function useLazyText(wodId: string, fetcher: Fetcher, initial: string | null = n
 export function WodTools({
   wod,
   initialTip,
+  calc,
 }: {
   wod: Pick<Wod, "id" | "title" | "description" | "score_type" | "time_cap_seconds">;
   initialTip: string | null;
+  /** Solo en WODs con pesos: tus RM y el movimiento y % que pide el WOD */
+  calc?: { lifts: Lift[]; initialLift?: number; initialPct?: number } | null;
 }) {
   const { t } = useI18n();
   const [panel, setPanel] = useState<Panel>(null);
@@ -42,7 +48,7 @@ export function WodTools({
   const warm = useLazyText(wod.id, getWarmup);
   const tip = useLazyText(wod.id, getAiTip, initialTip);
 
-  const toggle = (p: Exclude<Panel, null>, src: typeof warm) => {
+  const toggle = (p: Exclude<Panel, null | "calc">, src: typeof warm) => {
     if (panel === p) return setPanel(null);
     src.load(() => setPanel(p));
   };
@@ -65,6 +71,11 @@ export function WodTools({
         <button type="button" disabled={tip.pending} onClick={() => toggle("tip", tip)} className={btn(panel === "tip")}>
           {tip.pending ? t("Calculando…") : `💡 ${t("Peso y escalado")}`}
         </button>
+        {calc && (
+          <button type="button" onClick={() => setPanel(panel === "calc" ? null : "calc")} className={`${btn(panel === "calc")} inline-flex items-center justify-center gap-1`}>
+            <CalcIcon size={15} /> {t("Discos")}
+          </button>
+        )}
       </div>
 
       {error && !shown && <p className="text-center text-xs text-red-400">{t(error)}</p>}
@@ -83,6 +94,16 @@ export function WodTools({
               ? t("Después del calentamiento general. Ajusta los pesos a cómo te encuentres hoy.")
               : t("Calculado con tus marcas. Si algo no te cuadra, pregunta a tu coach.")}
           </p>
+        </div>
+      )}
+
+      {panel === "calc" && calc && (
+        <div className="space-y-1">
+          <div className="flex items-center justify-between px-1">
+            <p className="flex items-center gap-2 text-sm font-semibold text-accent"><CalcIcon size={16} /> {t("Calculadora de % y discos")}</p>
+            <button type="button" onClick={() => setPanel(null)} className="text-xs text-muted" aria-label={t("Cerrar")}>✕</button>
+          </div>
+          <PlateCalc lifts={calc.lifts} initialLift={calc.initialLift} initialPct={calc.initialPct} />
         </div>
       )}
 

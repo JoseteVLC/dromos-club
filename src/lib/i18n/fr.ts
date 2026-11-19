@@ -772,6 +772,14 @@ const d: Record<string, string> = {
   "Ya hiciste este WOD": "Tu as déjà fait ce WOD",
   "A ver si hoy lo mejoras.": "Voyons si tu fais mieux aujourd'hui.",
   "Los cierres no cuentan: en CrossFit no pesan.": "Les colliers ne comptent pas : en CrossFit ils ne pèsent rien.",
+  "Tu RM": "Ton RM",
+  "Tu 1RM": "Ton 1RM",
+  "Otro: escribo mi 1RM": "Autre : j'écris mon 1RM",
+  "Tu 1RM (kg)": "Ton 1RM (kg)",
+  "Peso en la barra": "Poids sur la barre",
+  "Discos": "Disques",
+  "Elige el movimiento o escribe tu 1RM, toca el % y te dice qué discos poner a cada lado.": "Choisis le mouvement ou écris ton 1RM, touche le % et il te dit quels disques mettre de chaque côté.",
+  "Escribe tu 1RM y toca el %, o escribe directamente el peso. Si apuntas tus RM en Mis marcas, saldrán aquí para elegirlos.": "Écris ton 1RM et touche le %, ou écris directement le poids. Si tu notes tes RM dans Mes records, ils apparaîtront ici.",
 };
 
 export default d;

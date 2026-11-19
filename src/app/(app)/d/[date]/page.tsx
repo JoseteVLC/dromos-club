@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { WodTools } from "@/components/wod-tools";
 import { RepeatIcon } from "@/components/icons";
+import { liftPreset, myLifts, wodHasLoad } from "@/lib/lifts";
 import { WodComments, type WodComment } from "@/components/wod-comments";
 import type { CommentReaction } from "@/lib/comment-reactions";
 import { staffIds } from "@/lib/push";
@@ -90,6 +91,7 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
       .sort((x, y) => y.date.localeCompare(x.date))
       .slice(0, 3);
   })();
+  const liftsP = selected && wodHasLoad(selected) ? myLifts(supabase, user.id) : Promise.resolve(null);
   const tipP = selected
     ? supabase.from("ai_tips").select("body").eq("wod_id", selected.id).eq("user_id", user.id).maybeSingle<{ body: string }>()
     : Promise.resolve({ data: null as { body: string } | null });
@@ -126,6 +128,8 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
   }
   const { data: tip } = await tipP;
   const repeats = await repeatP;
+  const lifts = await liftsP;
+  const calc = lifts && selected ? { lifts, ...liftPreset(selected, lifts) } : null;
 
   let results: Result[] = [];
   let doneIds = new Set<string>();
@@ -257,7 +261,7 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
               </div>
             )}
 
-            <WodTools key={`tools-${selected!.id}`} wod={selected!} initialTip={tip ? tipFor(tip.body, locale) : null} />
+            <WodTools key={`tools-${selected!.id}`} wod={selected!} initialTip={tip ? tipFor(tip.body, locale) : null} calc={calc} />
 
             <WodComments
               wodId={selected!.id}

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BarbellIcon } from "@/components/icons";
+import { CalcIcon } from "@/components/icons";
 import { isCoachProfile, requireUser } from "@/lib/supabase/server";
 import { getI18n } from "@/lib/i18n/server";
 import type { Result } from "@/lib/types";
@@ -100,7 +100,7 @@ export default async function MarcasPage({ searchParams }: PageProps<"/marcas">)
       </p>
       <Link href="/marcas/calculadora" className="card flex items-center justify-between p-4">
         <span>
-          <span className="flex items-center gap-2 font-semibold"><BarbellIcon className="text-accent" /> {t("Calculadora de % y discos")}</span>
+          <span className="flex items-center gap-2 font-semibold"><CalcIcon className="text-accent" /> {t("Calculadora de % y discos")}</span>
           <span className="text-xs text-muted">{t("El % de tu RM y qué discos poner a cada lado")}</span>
         </span>
         <span className="text-xl text-accent">→</span>

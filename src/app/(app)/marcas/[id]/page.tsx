@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BarbellIcon } from "@/components/icons";
+import { CalcIcon } from "@/components/icons";
 import { Avatar } from "@/components/avatar";
 import { MIN_FOR_PERCENTILE, PercentileCard } from "@/components/percentile-card";
 import { notFound } from "next/navigation";
@@ -157,7 +157,7 @@ export default async function BenchmarkPage({ params, searchParams }: PageProps<
         <details className="space-y-2">
           <summary className="card flex cursor-pointer list-none items-center justify-between px-4 py-3 font-semibold">
             <span className="flex flex-wrap items-center gap-2">
-              <BarbellIcon className="text-accent" /> {t("Porcentajes y discos")} · 1RM {round05(oneRM)} kg
+              <CalcIcon className="text-accent" /> {t("Porcentajes y discos")} · 1RM {round05(oneRM)} kg
               {(bestAnyRM?.rm ?? 1) > 1 && <span className="ml-1 text-xs font-normal text-muted">{t("(estimado desde tu {rm}RM)", { rm: bestAnyRM?.rm ?? 1 })}</span>}
             </span>
             <span className="text-muted">▾</span>

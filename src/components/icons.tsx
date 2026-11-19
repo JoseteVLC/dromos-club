@@ -35,3 +35,15 @@ export function RepeatIcon({ className = "", size = 18 }: P) {
     </svg>
   );
 }
+
+/** Disco con %: calculadora de porcentajes y discos. */
+export function CalcIcon({ className = "", size = 18 }: P) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
+      <circle cx="12" cy="12" r="9.5" />
+      <path d="M8.5 15.5l7-7" />
+      <circle cx="9" cy="9" r="1.4" />
+      <circle cx="15" cy="15" r="1.4" />
+    </svg>
+  );
+}
