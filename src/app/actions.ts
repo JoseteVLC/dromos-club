@@ -416,13 +416,16 @@ export async function moveWod(fd: FormData) {
   const dir = str(fd, "dir") === "up" ? -1 : 1;
   const { data: me } = await supabase.from("wods").select("id, part, wod_date").eq("id", id).maybeSingle<{ id: string; part: string; wod_date: string }>();
   if (!me) return;
-  const { data: day } = await supabase.from("wods").select("id, part").eq("wod_date", me.wod_date).order("part").returns<{ id: string; part: string }[]>();
-  const list = day ?? [];
+  const { data: day } = await supabase.from("wods").select("id, part").eq("wod_date", me.wod_date).order("part").order("created_at").returns<{ id: string; part: string }[]>();
+  const list = [...(day ?? [])];
   const i = list.findIndex((w) => w.id === id);
-  const other = list[i + dir];
-  if (i < 0 || !other) return;
-  await supabase.from("wods").update({ part: other.part }).eq("id", me.id);
-  await supabase.from("wods").update({ part: me.part }).eq("id", other.id);
+  if (i < 0 || !list[i + dir]) return;
+  // Se mueve en la lista y se vuelven a poner las letras A, B, C… en orden (así también se arreglan letras repetidas)
+  [list[i], list[i + dir]] = [list[i + dir], list[i]];
+  for (const [k, w] of list.entries()) {
+    const want = String.fromCharCode(65 + Math.min(k, 25));
+    if (w.part !== want) await supabase.from("wods").update({ part: want }).eq("id", w.id);
+  }
   revalidatePath("/", "layout");
   redirect(dayHref(me.wod_date, { w: me.id }));
 }
@@ -486,6 +489,17 @@ export async function createWodsBulk(_: ActionState, fd: FormData): Promise<Acti
       published: true,
       created_by: user.id,
     });
+  }
+
+  // Si ese día ya hay partes (A, B…), las nuevas van detrás (C, D…) en vez de repetir letra
+  const dates = [...new Set(rows.map((r) => r.wod_date))];
+  const { data: existing } = await supabase.from("wods").select("wod_date, part").in("wod_date", dates).returns<{ wod_date: string; part: string }[]>();
+  const used = new Map<string, Set<string>>();
+  for (const e of existing ?? []) used.set(e.wod_date, (used.get(e.wod_date) ?? new Set()).add(e.part));
+  for (const r of rows) {
+    const taken = used.get(r.wod_date) ?? new Set<string>();
+    if (taken.has(r.part)) r.part = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").find((l) => !taken.has(l)) ?? r.part;
+    used.set(r.wod_date, taken.add(r.part));
   }
 
   const { error } = await supabase.from("wods").insert(rows);
