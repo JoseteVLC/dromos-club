@@ -715,5 +715,6 @@ const d: Record<string, string> = {
   "Escribe tu duda…": "Napisz swoje pytanie…",
   "El calentamiento no está disponible ahora mismo.": "Rozgrzewka nie jest teraz dostępna.",
   "No hemos podido preparar el calentamiento. Prueba en un momento.": "Nie udało się przygotować rozgrzewki. Spróbuj za chwilę.",
+  "Peso y escalado": "Ciężar i skalowanie",
 };
 export default d;

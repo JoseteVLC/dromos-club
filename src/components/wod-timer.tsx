@@ -166,9 +166,19 @@ function Stepper({ label, value, onChange, step, min, max, fmt }: { label: strin
   );
 }
 
-export function WodTimer({ wod }: { wod: Pick<Wod, "id" | "title" | "description" | "score_type" | "time_cap_seconds"> }) {
+export function WodTimer({
+  wod,
+  open: openProp,
+  onOpenChange,
+}: {
+  wod: Pick<Wod, "id" | "title" | "description" | "score_type" | "time_cap_seconds">;
+  open?: boolean;
+  onOpenChange?: (v: boolean) => void;
+}) {
   const { t } = useI18n();
-  const [open, setOpen] = useState(false);
+  const [openSelf, setOpenSelf] = useState(false);
+  const open = openProp ?? openSelf;
+  const setOpen = onOpenChange ?? setOpenSelf;
   const [cfg, setCfg] = useState<Cfg>(() => guess(wod));
   const [running, setRunning] = useState(false);
   const [started, setStarted] = useState(false);
@@ -257,6 +267,7 @@ export function WodTimer({ wod }: { wod: Pick<Wod, "id" | "title" | "description
     close();
   };
 
+  if (!open && onOpenChange) return null;
   if (!open)
     return (
       <button type="button" onClick={() => setOpen(true)} className="btn-ghost w-full py-3 text-sm">

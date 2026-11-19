@@ -1,7 +1,5 @@
 import Link from "next/link";
-import { AiTip } from "@/components/ai-tip";
-import { WodTimer } from "@/components/wod-timer";
-import { WarmupButton } from "@/components/warmup-button";
+import { WodTools } from "@/components/wod-tools";
 import { WodComments, type WodComment } from "@/components/wod-comments";
 import type { CommentReaction } from "@/lib/comment-reactions";
 import { staffIds } from "@/lib/push";
@@ -199,11 +197,7 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
 
             <WodHeader wod={selected!} isCoach={isCoach} t={t} />
 
-            <WarmupButton key={`warm-${selected!.id}`} wodId={selected!.id} />
-
-            <WodTimer key={`timer-${selected!.id}`} wod={selected!} />
-
-            <AiTip key={`tip-${selected!.id}`} wodId={selected!.id} initial={tip ? tipFor(tip.body, locale) : null} />
+            <WodTools key={`tools-${selected!.id}`} wod={selected!} initialTip={tip ? tipFor(tip.body, locale) : null} />
 
             <WodComments
               wodId={selected!.id}
