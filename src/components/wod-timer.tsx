@@ -50,9 +50,10 @@ export function guess(wod: Pick<Wod, "title" | "description" | "score_type" | "t
 // Se usa <audio> con un pitido generado al vuelo (WAV): en iPhone, Web Audio se calla con el interruptor de silencio
 // y el audio «multimedia» no. Cada sonido se desbloquea con el primer toque en «Empezar».
 type Sound = "tick" | "go" | "end";
-const TONES: Record<Sound, [number, number]> = { tick: [880, 0.15], go: [1320, 0.45], end: [660, 1.2] };
+// [frecuencia, duración, fuerza de los armónicos]: los armónicos hacen que se oiga más fuerte sin saturar
+const TONES: Record<Sound, [number, number, number]> = { tick: [880, 0.32, 0.25], go: [1175, 1.1, 0.6], end: [1175, 1.6, 0.6] };
 
-function wav(freq: number, secs: number): string {
+function wav(freq: number, secs: number, harm: number): string {
   const rate = 22050;
   const n = Math.floor(rate * secs);
   const buf = new ArrayBuffer(44 + n * 2);
@@ -63,8 +64,10 @@ function wav(freq: number, secs: number): string {
   v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
   str(36, "data"); v.setUint32(40, n * 2, true);
   for (let k = 0; k < n; k++) {
-    const fade = Math.min(1, k / 200, (n - k) / 800); // sin chasquidos al empezar y acabar
-    v.setInt16(44 + k * 2, Math.sin((2 * Math.PI * freq * k) / rate) * 0.9 * fade * 32767, true);
+    const fade = Math.min(1, k / 150, (n - k) / 1500); // sin chasquidos al empezar y acabar
+    const w = (2 * Math.PI * freq * k) / rate;
+    const x = (Math.sin(w) + harm * Math.sin(2 * w) + harm * 0.6 * Math.sin(3 * w)) / (1 + harm * 1.6);
+    v.setInt16(44 + k * 2, x * 0.98 * fade * 32767, true);
   }
   return URL.createObjectURL(new Blob([buf], { type: "audio/wav" }));
 }
@@ -76,6 +79,7 @@ function unlockSounds() {
   unlocked = true;
   for (const k of Object.keys(TONES) as Sound[]) {
     const a = (sounds[k] ??= new Audio(wav(...TONES[k])));
+    a.volume = 1;
     a.muted = true;
     void a.play().then(() => {
       a.pause();
@@ -130,8 +134,8 @@ function beepAt(cfg: Cfg, sec: number): "go" | "tick" | "end" | null {
   if (sec < PREP) return sec >= PREP - 5 ? "tick" : null;
   if (sec === PREP) return "go";
   const s = sec - PREP;
-  if (cfg.mode === "fortime") return cfg.cap && s === cfg.cap ? "end" : cfg.cap && s >= cfg.cap - 3 && s < cfg.cap ? "tick" : null;
-  if (cfg.mode === "amrap") return s === cfg.amrap ? "end" : s >= cfg.amrap - 3 && s < cfg.amrap ? "tick" : null;
+  if (cfg.mode === "fortime") return cfg.cap && s === cfg.cap ? "end" : cfg.cap && s >= cfg.cap - 5 && s < cfg.cap ? "tick" : null;
+  if (cfg.mode === "amrap") return s === cfg.amrap ? "end" : s >= cfg.amrap - 5 && s < cfg.amrap ? "tick" : null;
   const len = cfg.work + cfg.rest;
   const total = len * cfg.rounds;
   if (s === total) return "end";
@@ -139,7 +143,8 @@ function beepAt(cfg: Cfg, sec: number): "go" | "tick" | "end" | null {
   const within = s % len;
   if (within === 0 || (cfg.rest && within === cfg.work)) return "go";
   const toNext = within < cfg.work ? cfg.work - within : len - within;
-  return toNext <= 3 ? "tick" : null;
+  const phase = within < cfg.work ? cfg.work : cfg.rest;
+  return toNext <= (phase >= 30 ? 5 : 3) ? "tick" : null;
 }
 
 /** Lo que el timer pasa al formulario de resultado («Usar en mi resultado»). */
