@@ -15,7 +15,6 @@ export function DayNav({ date, today, min, max, base = "d" }: { date: string; to
   const dayHref = hrefOf(base);
   const router = useRouter();
   const { t, locale } = useI18n();
-  const inputRef = useRef<HTMLInputElement>(null);
   const prev = addDays(date, -1);
   const next = addDays(date, 1);
   const canPrev = !min || prev >= min;
@@ -26,17 +25,6 @@ export function DayNav({ date, today, min, max, base = "d" }: { date: string; to
     if (canPrev) router.prefetch(dayHref(prev));
     if (canNext) router.prefetch(dayHref(next));
   }, [router, prev, next, canPrev, canNext, dayHref]);
-
-  const openPicker = () => {
-    const el = inputRef.current;
-    if (!el) return;
-    try {
-      el.showPicker();
-    } catch {
-      el.focus();
-      el.click();
-    }
-  };
 
   return (
     <div className="space-y-1">
@@ -50,26 +38,27 @@ export function DayNav({ date, today, min, max, base = "d" }: { date: string; to
             ‹
           </span>
         )}
-        <button
-          type="button"
-          onClick={openPicker}
-          className="relative flex h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-line"
-          aria-label={t("Elegir fecha")}
-        >
+        {/* La fecha entera es el selector: al tocarla se abre el calendario del móvil (iOS y Android) o del navegador */}
+        <label className="relative flex h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border border-line">
           <span className="h-display text-3xl">{dayLabel(date, today, t, locale)}</span>
           <CalendarIcon />
           <input
-            ref={inputRef}
             type="date"
             value={date}
             min={min ?? undefined}
             max={max ?? undefined}
+            onClick={(e) => {
+              try {
+                e.currentTarget.showPicker();
+              } catch {
+                /* sin showPicker: el propio campo abre el calendario */
+              }
+            }}
             onChange={(e) => e.target.value && router.push(dayHref(e.target.value))}
-            className="pointer-events-none absolute inset-0 opacity-0"
-            tabIndex={-1}
-            aria-hidden
+            className="absolute inset-0 h-full w-full cursor-pointer appearance-none opacity-0"
+            aria-label={t("Elegir fecha")}
           />
-        </button>
+        </label>
         {canNext ? (
           <Link href={dayHref(next)} className="btn-ghost h-11 w-11 text-xl" aria-label={t("Día siguiente")}>
             ›
