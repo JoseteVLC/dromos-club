@@ -810,5 +810,13 @@ const d: Record<string, string> = {
   "Solo tienes que elegir tu contraseña y ya estás dentro. Después, añádela a la pantalla de inicio del móvil para tenerla como una app.": "Just choose your password and you're in. Then add it to your phone's home screen to use it like an app.",
   "Si el botón no funciona, copia este enlace en el navegador:": "If the button doesn't work, copy this link into your browser:",
   "Te llega este email porque alguien de {brand} te ha invitado. Si no esperabas esta invitación, ignóralo.": "You're getting this email because someone at {brand} invited you. If you weren't expecting it, just ignore it.",
+  "{inviter} te ha invitado a {brand}, la app donde los atletas de la plani de TrainCult apuntan sus WODs y sus marcas y compiten en el ranking.": "{inviter} has invited you to {brand}, the app where TrainCult programming athletes log their WODs and records and compete on the leaderboard.",
+  "Te han invitado a {brand}, la app donde los atletas de la plani de TrainCult apuntan sus WODs y sus marcas y compiten en el ranking.": "You've been invited to {brand}, the app where TrainCult programming athletes log their WODs and records and compete on the leaderboard.",
+  "Un panel con quién entrena y quién se está descolgando.": "A dashboard showing who's training and who's dropping off.",
+  "Panel de la comunidad": "Community dashboard",
+  "Alma de la comunidad": "Heart of the community",
+  "{v} frente a una mediana de {med} en la comunidad (mejor: {best}).": "{v} against a median of {med} in the community (best: {best}).",
+  "{n} rondas frente a una mediana de {med} en la comunidad.": "{n} rounds against a median of {med} in the community.",
+  "Haz una foto a la pizarra, a la plani en papel o una captura de pantalla. La IA la lee y te prepara los WODs para revisar. Hasta 4 fotos a la vez.": "Take a photo of the whiteboard, the printed programming or a screenshot. It reads it and prepares the WODs for you to review. Up to 4 photos at once.",
 };
 export default d;

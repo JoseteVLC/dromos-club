@@ -54,16 +54,22 @@ export function inviteEmail(o: {
   link: string;
   role: "athlete" | "coach";
   inviter: string | null;
+  /** TrainCult: clientes de la plani (sin hablar de «box»). Dromos: un box. */
+  plani?: boolean;
   t: (k: string, v?: Record<string, string | number>) => string;
 }) {
   const { t } = o;
   const subject = t("{name}, te esperamos en {brand}", { name: o.name, brand: o.brand });
-  const intro = o.inviter
+  const intro = o.plani
+    ? o.inviter
+      ? t("{inviter} te ha invitado a {brand}, la app donde los atletas de la plani de TrainCult apuntan sus WODs y sus marcas y compiten en el ranking.", { inviter: o.inviter, brand: o.brand })
+      : t("Te han invitado a {brand}, la app donde los atletas de la plani de TrainCult apuntan sus WODs y sus marcas y compiten en el ranking.", { brand: o.brand })
+    : o.inviter
     ? t("{inviter} te ha invitado a {brand}, la app donde el box apunta sus WODs, sus marcas y compite en el ranking.", { inviter: o.inviter, brand: o.brand })
     : t("Te han invitado a {brand}, la app donde el box apunta sus WODs, sus marcas y compite en el ranking.", { brand: o.brand });
   const points =
     o.role === "coach"
-      ? [t("Publica la plani y ve los resultados de todos al momento."), t("Responde dudas del WOD y escribe a tus atletas."), t("Panel del box con quién entrena y quién se está descolgando.")]
+      ? [t("Publica la plani y ve los resultados de todos al momento."), t("Responde dudas del WOD y escribe a tus atletas."), o.plani ? t("Un panel con quién entrena y quién se está descolgando.") : t("Panel del box con quién entrena y quién se está descolgando.")]
       : [t("Mete tu resultado de cada WOD y mira dónde quedas en el ranking."), t("Guarda tus marcas, ve tu progreso y calcula pesos y discos."), t("Gana medallas, mantén la racha y pregunta tus dudas al coach.")];
   const cta = t("Crear mi cuenta");
   const header = o.logoUrl

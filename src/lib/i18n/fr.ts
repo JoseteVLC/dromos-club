@@ -810,6 +810,14 @@ const d: Record<string, string> = {
   "Solo tienes que elegir tu contraseña y ya estás dentro. Después, añádela a la pantalla de inicio del móvil para tenerla como una app.": "Choisis simplement ton mot de passe et c'est parti. Ensuite, ajoute-la à l'écran d'accueil de ton téléphone pour l'avoir comme une app.",
   "Si el botón no funciona, copia este enlace en el navegador:": "Si le bouton ne marche pas, copie ce lien dans ton navigateur :",
   "Te llega este email porque alguien de {brand} te ha invitado. Si no esperabas esta invitación, ignóralo.": "Tu reçois cet email parce que quelqu'un de {brand} t'a invité. Si tu ne t'y attendais pas, ignore-le.",
+  "{inviter} te ha invitado a {brand}, la app donde los atletas de la plani de TrainCult apuntan sus WODs y sus marcas y compiten en el ranking.": "{inviter} t'a invité sur {brand}, l'app où les athlètes de la programmation TrainCult notent leurs WODs et leurs records et se mesurent au classement.",
+  "Te han invitado a {brand}, la app donde los atletas de la plani de TrainCult apuntan sus WODs y sus marcas y compiten en el ranking.": "Tu as été invité sur {brand}, l'app où les athlètes de la programmation TrainCult notent leurs WODs et leurs records et se mesurent au classement.",
+  "Un panel con quién entrena y quién se está descolgando.": "Un tableau de bord : qui s'entraîne et qui décroche.",
+  "Panel de la comunidad": "Tableau de bord de la communauté",
+  "Alma de la comunidad": "L'âme de la communauté",
+  "{v} frente a una mediana de {med} en la comunidad (mejor: {best}).": "{v} face à une médiane de {med} dans la communauté (meilleur : {best}).",
+  "{n} rondas frente a una mediana de {med} en la comunidad.": "{n} tours face à une médiane de {med} dans la communauté.",
+  "Haz una foto a la pizarra, a la plani en papel o una captura de pantalla. La IA la lee y te prepara los WODs para revisar. Hasta 4 fotos a la vez.": "Prends en photo le tableau, la programmation papier ou une capture d'écran. Elle la lit et te prépare les WODs à vérifier. Jusqu'à 4 photos à la fois.",
 };
 
 export default d;

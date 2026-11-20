@@ -810,5 +810,13 @@ const d: Record<string, string> = {
   "Solo tienes que elegir tu contraseña y ya estás dentro. Después, añádela a la pantalla de inicio del móvil para tenerla como una app.": "Wystarczy wybrać hasło i jesteś w środku. Potem dodaj ją do ekranu głównego telefonu, żeby mieć ją jak aplikację.",
   "Si el botón no funciona, copia este enlace en el navegador:": "Jeśli przycisk nie działa, skopiuj ten link do przeglądarki:",
   "Te llega este email porque alguien de {brand} te ha invitado. Si no esperabas esta invitación, ignóralo.": "Dostajesz ten e-mail, bo ktoś z {brand} cię zaprosił. Jeśli się go nie spodziewałeś, zignoruj go.",
+  "{inviter} te ha invitado a {brand}, la app donde los atletas de la plani de TrainCult apuntan sus WODs y sus marcas y compiten en el ranking.": "{inviter} zaprasza cię do {brand}, aplikacji, w której sportowcy planu TrainCult zapisują WOD-y i rekordy i rywalizują w rankingu.",
+  "Te han invitado a {brand}, la app donde los atletas de la plani de TrainCult apuntan sus WODs y sus marcas y compiten en el ranking.": "Zaproszono cię do {brand}, aplikacji, w której sportowcy planu TrainCult zapisują WOD-y i rekordy i rywalizują w rankingu.",
+  "Un panel con quién entrena y quién se está descolgando.": "Panel: kto trenuje, a kto odpuszcza.",
+  "Panel de la comunidad": "Panel społeczności",
+  "Alma de la comunidad": "Dusza społeczności",
+  "{v} frente a una mediana de {med} en la comunidad (mejor: {best}).": "{v} wobec mediany {med} w społeczności (najlepszy: {best}).",
+  "{n} rondas frente a una mediana de {med} en la comunidad.": "{n} rund wobec mediany {med} w społeczności.",
+  "Haz una foto a la pizarra, a la plani en papel o una captura de pantalla. La IA la lee y te prepara los WODs para revisar. Hasta 4 fotos a la vez.": "Zrób zdjęcie tablicy, wydrukowanego planu lub zrzut ekranu. Odczyta je i przygotuje WOD-y do sprawdzenia. Do 4 zdjęć naraz.",
 };
 export default d;
