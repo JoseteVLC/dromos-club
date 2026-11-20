@@ -131,7 +131,7 @@ function cheer(n: number) {
 function Flame({ lit }: { lit: boolean }) {
   return (
     <div className={lit ? "" : "opacity-40 grayscale"}>
-      <Icon name="flame" size={26} tile />
+      <Icon name="flame" size={34} tile />
     </div>
   );
 }
