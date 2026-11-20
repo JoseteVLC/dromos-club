@@ -15,6 +15,7 @@ import { redirect } from "next/navigation";
 import { createClient, isCoachProfile, memberSince, requireAdmin, requireCoach, requireUser } from "@/lib/supabase/server";
 import { adminDb, hasAdminKey } from "@/lib/supabase/admin";
 import { siteUrl } from "@/lib/site";
+import { inviteEmail, sendEmail } from "@/lib/email";
 import { randomBytes } from "node:crypto";
 import { formatScore, parseTime } from "@/lib/scoring";
 import { dayHref, isISODate } from "@/lib/dates";
@@ -740,6 +741,38 @@ export async function createInvitation(_: InviteState, fd: FormData): Promise<In
   if (error) return { error: "No se ha podido crear la invitación: {msg}", vars: { msg: error.message } } as InviteState;
   revalidatePath("/admin");
   return { ok: "Invitación creada.", link: `${await siteUrl()}/invitacion/${token}`, name: first_name, email };
+}
+
+/** Envía la invitación por email (con Resend), con un email de bienvenida y el enlace para crear la cuenta. */
+export async function sendInviteEmail(token: string): Promise<{ ok?: string; error?: string; vars?: Record<string, string> }> {
+  const { box, profile } = await requireAdmin();
+  const { t } = await getI18n();
+  const { data: inv } = await adminDb()
+    .from("invitations")
+    .select("email, first_name, role, accepted_at")
+    .eq("token", token).eq("box_id", box.id)
+    .maybeSingle<{ email: string; first_name: string; role: "athlete" | "coach"; accepted_at: string | null }>();
+  if (!inv) return { error: "No encuentro esa invitación." };
+  if (inv.accepted_at) return { error: "Esa invitación ya se ha usado." };
+  const site = await siteUrl();
+  const link = `${site}/invitacion/${token}`;
+  const accent = /^#[0-9a-f]{6}$/i.test(box.accent ?? "") ? box.accent! : "#c8f135";
+  const fg = luminance(accent) > 0.5 ? "#0c0d10" : "#ffffff";
+  const logo = box.logo_url && /^https?:\/\//.test(box.logo_url) ? box.logo_url : null;
+  const mail = inviteEmail({ brand: box.name, accent, accentFg: fg, logoUrl: logo, name: inv.first_name, link, role: inv.role, inviter: profile?.full_name ?? null, t });
+  const err = await sendEmail({ to: inv.email, ...mail, replyTo: null });
+  if (err) return { error: "No se ha podido enviar el email: {msg}", vars: { msg: err } };
+  return { ok: "Email enviado a {email}", vars: { email: inv.email } };
+}
+
+/** Luminosidad relativa de un color hex (para elegir texto negro o blanco encima). */
+function luminance(hex: string) {
+  const n = parseInt(hex.slice(1), 16);
+  const c = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => {
+    const x = v / 255;
+    return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
 }
 
 export async function deleteInvitation(fd: FormData) {

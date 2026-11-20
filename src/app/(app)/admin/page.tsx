@@ -157,7 +157,7 @@ export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
                     <ConfirmDelete />
                   </form>
                 </div>
-                <ShareInvite name={i.first_name} email={i.email} link={`${base}/invitacion/${i.token}`} />
+                <ShareInvite name={i.first_name} email={i.email} link={`${base}/invitacion/${i.token}`} token={i.token} />
               </li>
             ))}
           </ul>

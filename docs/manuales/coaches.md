@@ -101,7 +101,7 @@ La forma más fácil de que entre todo el box. En **Admin → Unirse con QR** ti
 Además del QR, puedes invitar a alguien concreto. Todo se hace en **Admin**.
 
 1. **Invitar:** en «Invitar a alguien» pon nombre, apellidos, email y rol (Atleta, Coach o Admin) y pulsa **Crear invitación**. Si esa persona ya tiene cuenta en Dromos Club (por ejemplo, de otro box), entra en tu box directamente, sin enlace.
-2. **Enviar:** copia el enlace o ábrelo por email y mándaselo por WhatsApp o correo. Con ese enlace la persona crea su contraseña y entra.
+2. **Enviar:** tienes tres botones. **Copiar enlace**; **WhatsApp**, que abre directamente la app de WhatsApp para elegir a la persona con el mensaje y el enlace ya escritos; y **Enviar por email**, que le manda desde la app un email de bienvenida con un botón «Crear mi cuenta». Con ese enlace la persona crea su contraseña y entra.
 3. **Pendientes:** las invitaciones que aún nadie ha usado salen en «Invitaciones pendientes».
 
 En **Personas** ves a todo el mundo, con su estado y la fecha de su último resultado, y puedes buscar por nombre o email.
