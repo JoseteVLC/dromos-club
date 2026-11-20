@@ -203,15 +203,15 @@ async function StreakRanking({ gender }: { gender: Gender | "all" }) {
                     {me && <span className="ml-1 text-xs text-accent">{t("(tú)")}</span>}
                   </Link>
                   <div className="text-xs text-muted">
-                    {t("Récord")} {s.best} {s.best === 1 ? t("semana") : t("semanas")} · {s.total === 1 ? t("1 día en total") : t("{n} días en total", { n: s.total })}
+                    {t("Récord")} {s.bestDays} · {t("{n} sem. de 5 días", { n: s.current })} · {s.total === 1 ? t("1 día en total") : t("{n} días en total", { n: s.total })}
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className={`h-display text-2xl tabular-nums ${s.current === 0 ? "text-muted" : ""}`}>
-                    {s.current > 0 && "🔥"}
-                    {s.current}
+                  <div className={`h-display text-2xl tabular-nums ${s.days === 0 ? "text-muted" : ""}`}>
+                    {s.days > 0 && "🔥"}
+                    {s.days}
                   </div>
-                  <div className="text-[10px] uppercase tracking-wider text-muted">{t("semanas")}</div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted">{t("seguidos")}</div>
                 </div>
               </li>
             );
@@ -219,7 +219,7 @@ async function StreakRanking({ gender }: { gender: Gender | "all" }) {
         </ol>
       )}
       <p className="text-xs leading-relaxed text-muted">
-        {t("Cuenta las semanas seguidas en las que has entrenado al menos 5 días (los que quieras, de lunes a domingo). Si una semana tiene menos días de plani, basta con hacerlos todos. La semana en curso no rompe la racha hasta que acaba.")}
+        {t("Cuenta los días de WOD seguidos en los que has metido tu resultado: los días sin WOD no rompen la racha y hoy no cuenta como fallo hasta que acaba. Debajo, tus semanas seguidas de 5 días entrenados (los que quieras, de lunes a domingo).")}
       </p>
     </div>
   );

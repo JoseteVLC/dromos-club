@@ -73,7 +73,7 @@ En el menú **Ranking** tienes cuatro pestañas. Puntos y Leaderboards se ven po
 | Pestaña | Qué mide |
 | --- | --- |
 | Puntos | En cada WOD sumas 1 punto por participar y 1 más por cada atleta que queda por detrás de ti. Escalado suma 1 punto |
-| Constancia | Semanas seguidas entrenando al menos 5 días (los que quieras, de lunes a domingo), tu récord y el total de días. Si una semana tiene menos días de plani (festivos), basta con hacerlos todos |
+| Constancia | Días de plani seguidos con resultado metido (los días sin WOD no rompen la racha), tu récord, tus semanas seguidas de 5 días y el total |
 | Leaderboards | Todos los WODs del periodo, con quién va primero y tu posición. Toca uno para entrar en su clasificación |
 | Medallas | Tus medallas: las conseguidas y lo que te falta para las demás (ver «Medallas») |
 
@@ -133,7 +133,7 @@ Si quieres, puedes marcar **«Mostrar mi box»** y **«Mostrar mi edad»** para 
 
 ### Tu ficha pública
 
-Cualquier atleta puede abrirla tocando tu foto o tu nombre. Muestra tu foto, nombre, lo que hayas hecho público, tus entrenos totales, tus semanas seguidas y tu récord de semanas, tus medallas y tus mejores marcas. Para ver cómo te ven los demás: Perfil → «👀 Ver mi perfil público».
+Cualquier atleta puede abrirla tocando tu foto o tu nombre. Muestra tu foto, nombre, lo que hayas hecho público, tus entrenos totales, tus días seguidos y tus semanas de 5 días, tus medallas y tus mejores marcas. Para ver cómo te ven los demás: Perfil → «👀 Ver mi perfil público».
 
 ## Medallas
 
@@ -174,7 +174,7 @@ Se desbloquean solas al guardar tus resultados y tus marcas, y una vez ganadas *
 
 **Retos del mes.** Además de las 20 permanentes, cada mes o en eventos como el Open habrá retos especiales que solo se pueden ganar en ese periodo. Quedarán en tu perfil como recuerdo.
 
-**Cómo cuentan.** Un entreno es un día de plani con resultado metido. La racha cuenta **semanas seguidas con al menos 5 días entrenados**: en la tarjeta de arriba ves cuántos llevas esta semana («3 de 5 días») y la semana en curso no rompe la racha hasta que acaba. Las medallas Semana de fuego e Imparable siguen contando días de plani seguidos. Un PR es cada vez que mejoras tu mejor marca en un benchmark (en RX). El podio y la victoria se calculan dentro de tu categoría (Elite o RX) y tu sexo.
+**Cómo cuentan.** Un entreno es un día de plani con resultado metido. Hay dos rachas. La principal son los **días seguidos**: días de plani seguidos con resultado (los días sin WOD no la rompen y hoy no cuenta como fallo hasta que acaba). Debajo están las **semanas de 5 días**: semanas seguidas entrenando al menos 5 días, los que quieras de lunes a domingo, con una barra de cómo vas esta semana; si una semana tiene menos días de plani, basta con hacerlos todos. Un PR es cada vez que mejoras tu mejor marca en un benchmark (en RX). El podio y la victoria se calculan dentro de tu categoría (Elite o RX) y tu sexo.
 
 **Cuándo se ganan Podio, Campeón y Dinastía.** Cada WOD tiene **2 días de margen** para meter el resultado: el del lunes se puede meter hasta el miércoles a las 23:59. Hasta entonces la clasificación es provisional (lo verás encima del ranking). Al cerrar, la app reparte las medallas con la clasificación final y te avisa si has ganado alguna. Si alguien mete su resultado después del cierre, sale en el ranking con la etiqueta «fuera de plazo», pero no gana ni quita medallas.
 
@@ -202,7 +202,7 @@ Con la app instalada en el móvil te llegan avisos como los de cualquier app, au
 | Comentarios y reacciones | Alguien comenta o reacciona a tu resultado o a un comentario tuyo, o contesta donde has comentado |
 | Medallas | Desbloqueas una medalla |
 | Mensajes del equipo | Un coach te escribe o el equipo publica un anuncio |
-| Recordatorios de entreno | A última hora de la tarde, si no entrenar hoy te haría perder la racha de la semana (ya no llegarías a 5 días) o si llevas varios días sin meter resultado |
+| Recordatorios de entreno | A última hora de la tarde, si no entrenar hoy te haría perder la racha de días o la de semanas de 5 días, o si llevas varios días sin meter resultado |
 | Resumen semanal | El domingo por la tarde: tus entrenos de la semana, tu puesto en el ranking (y si has subido), tus PRs, tus medallas nuevas y lo que te falta para la siguiente |
 
 Si usas la app en varios móviles, actívalos en cada uno. Para dejar de recibirlos en un móvil: **Desactivar en este móvil**. Si bloqueaste el permiso sin querer, actívalo en los ajustes del móvil para Dromos.

@@ -780,6 +780,13 @@ const d: Record<string, string> = {
   "Discos": "Disques",
   "Elige el movimiento o escribe tu 1RM, toca el % y te dice qué discos poner a cada lado.": "Choisis le mouvement ou écris ton 1RM, touche le % et il te dit quels disques mettre de chaque côté.",
   "Escribe tu 1RM y toca el %, o escribe directamente el peso. Si apuntas tus RM en Mis marcas, saldrán aquí para elegirlos.": "Écris ton 1RM et touche le %, ou écris directement le poids. Si tu notes tes RM dans Mes records, ils apparaîtront ici.",
+  "Semanas de 5 días": "Semaines de 5 jours",
+  "seguida": "d'affilée",
+  "récord": "record",
+  "esta semana {n} de {g}": "cette semaine {n} sur {g}",
+  "{n} sem. de 5 días": "{n} sem. de 5 jours",
+  "Cuenta los días de WOD seguidos en los que has metido tu resultado: los días sin WOD no rompen la racha y hoy no cuenta como fallo hasta que acaba. Debajo, tus semanas seguidas de 5 días entrenados (los que quieras, de lunes a domingo).": "Compte les jours de WOD d'affilée où tu as saisi ton résultat : les jours sans WOD ne cassent pas la série et aujourd'hui ne compte pas comme raté avant la fin de la journée. En dessous, tes semaines d'affilée avec 5 jours d'entraînement (ceux que tu veux, du lundi au dimanche).",
+  "semanas de 5 días": "semaines de 5 jours",
 };
 
 export default d;

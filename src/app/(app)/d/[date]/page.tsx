@@ -183,6 +183,8 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
         <DayNav date={date} today={today} min={since} />
 
         <StreakCard
+          days={streak.stats.days}
+          bestDays={streak.stats.bestDays}
           current={streak.stats.current}
           best={streak.stats.best}
           week={week}

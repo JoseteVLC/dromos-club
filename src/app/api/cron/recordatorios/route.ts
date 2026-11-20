@@ -9,7 +9,8 @@ import { boxStats } from "@/lib/box-stats";
 
 /**
  * Recordatorios diarios (Vercel Cron, a última hora de la tarde). Solo a quien tiene push y los recordatorios activados:
- *  · Racha en peligro: lleva 1+ semanas seguidas y, si no entrena hoy, ya no llega a los 5 días de esta semana.
+ *  · Racha en peligro: lleva 1+ semanas seguidas y, si no entrena hoy, ya no llega a los 5 días de esta semana;
+ *    o lleva 3+ días seguidos, hoy hay plani y aún no ha metido resultado.
  *  · Lunes: aviso al equipo de cuántos atletas están en riesgo de dejarlo (panel del box).
  *  · Te echamos de menos: lleva 3+ días de plani sin meter resultado (como mucho un aviso cada 4 días).
  *  · Primer resultado: se dio de alta hace 2+ días y aún no ha metido ninguno (una sola vez).
@@ -119,6 +120,12 @@ export async function GET(req: Request) {
       msg = {
         title: `🔥 ${st.current} ${st.current === 1 ? "semana" : "semanas"} seguidas${name ? `, ${name}` : ""}`,
         body: `Te ${need === 1 ? "queda 1 día" : `quedan ${need} días`} para cumplir esta semana en ${m.boxes.name}. Mete el resultado de hoy y no pierdas la racha.`,
+        url: "/",
+      };
+    } else if (todayHasWod && !mine.has(today) && st.days >= 3 && hoursSince > 20) {
+      msg = {
+        title: `🔥 ${st.days} días seguidos${name ? `, ${name}` : ""}`,
+        body: "Hoy hay WOD y aún no has metido tu resultado. No rompas la racha.",
         url: "/",
       };
     } else if (!ever.has(`${m.box_id}|${p.id}`)) {

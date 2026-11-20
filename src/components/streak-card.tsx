@@ -6,15 +6,21 @@ import { useI18n } from "@/lib/i18n/client";
 
 type DayDot = { date: string; label: string; status: "done" | "missed" | "pending" | "rest"; isToday: boolean; selected: boolean };
 
-const SEEN_KEY = "tc-streak-weeks-seen";
+const SEEN_KEY = "tc-streak-seen";
 
 export function StreakCard({
+  days,
+  bestDays,
   current,
   best,
   week,
   goal,
   hint,
 }: {
+  /** Días seguidos y su récord */
+  days: number;
+  bestDays: number;
+  /** Semanas seguidas de 5 días y su récord */
   current: number;
   best: number;
   week: DayDot[];
@@ -31,33 +37,36 @@ export function StreakCard({
     const id = requestAnimationFrame(() => {
       try {
         const seen = Number(localStorage.getItem(SEEN_KEY) ?? "-1");
-        if (seen >= 0 && current > seen) setParty({ n: current, record: current >= best && current > 1 });
-        localStorage.setItem(SEEN_KEY, String(current));
+        if (seen >= 0 && days > seen) setParty({ n: days, record: days >= bestDays && days > 1 });
+        localStorage.setItem(SEEN_KEY, String(days));
       } catch {}
     });
     return () => cancelAnimationFrame(id);
-  }, [current, best]);
+  }, [days, bestDays]);
 
   return (
     <>
       <div className="card space-y-3 p-4">
         <div className="flex items-center gap-3">
-          <Flame lit={current > 0} />
+          <Flame lit={days > 0} />
           <div className="flex-1">
             <div className="h-display text-3xl">
-              {current} {current === 1 ? t("semana") : t("semanas")} <span className="text-muted">{t("seguidas")}</span>
+              {days} {days === 1 ? t("día") : t("días")} <span className="text-muted">{t("seguidos")}</span>
             </div>
             <div className="text-xs text-muted">
-              {t("Récord")}: <b className="text-fg">{best}</b> · <Link href="/ranking?p=racha" className="text-accent">{t("Ver constancia →")}</Link>
+              {t("Récord")}: <b className="text-fg">{bestDays}</b> · <Link href="/ranking?p=racha" className="text-accent">{t("Ver constancia →")}</Link>
             </div>
           </div>
         </div>
 
         <div className="space-y-1">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-muted">{t("Esta semana")}</span>
+            <span className="text-muted">
+              {t("Semanas de 5 días")}: <b className="text-fg">{current}</b> {current === 1 ? t("seguida") : t("seguidas")}
+              {best > current ? <span> · {t("récord")} {best}</span> : null}
+            </span>
             <b className={doneWeek >= goal ? "text-accent" : "text-fg"}>
-              {doneWeek >= goal ? `✓ ${t("Semana cumplida")}` : t("{n} de {g} días", { n: doneWeek, g: goal })}
+              {doneWeek >= goal ? `✓ ${t("Semana cumplida")}` : t("esta semana {n} de {g}", { n: doneWeek, g: goal })}
             </b>
           </div>
           <div className="h-1.5 overflow-hidden rounded-full bg-line">
@@ -100,7 +109,7 @@ export function StreakCard({
             🔥
           </div>
           <div className="h-display text-7xl text-accent">{party.n}</div>
-          <div className="h-display text-3xl">{party.n === 1 ? t("¡Primera semana cumplida!") : t("semanas seguidas")}</div>
+          <div className="h-display text-3xl">{party.n === 1 ? t("¡Primer día!") : t("días seguidos")}</div>
           {party.record && <div className="rounded-full bg-accent px-4 py-1 font-display text-lg font-bold uppercase text-accent-fg">{t("¡Nuevo récord!")}</div>}
           <p className="max-w-xs text-sm text-muted">{t(cheer(party.n))}</p>
           <span className="mt-4 text-xs text-muted">{t("Toca para seguir")}</span>
@@ -111,8 +120,8 @@ export function StreakCard({
 }
 
 function cheer(n: number) {
-  if (n === 1) return "Cinco días esta semana. A por la siguiente.";
-  if (n < 4) return "Esto va cogiendo forma. No la rompas.";
+  if (n === 1) return "Empieza la racha. Mañana, otra.";
+  if (n < 5) return "Esto va cogiendo forma. No la rompas.";
   if (n < 10) return "Constancia de la buena. Cada día suma.";
   if (n < 20) return "Eso ya no es suerte, es disciplina.";
   return "Nivel culto. Sigue así.";
