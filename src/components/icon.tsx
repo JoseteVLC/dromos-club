@@ -5,6 +5,8 @@ import { useId } from "react";
  * tile = dentro de una tarjeta oscura con relieve (cabeceras y secciones destacadas).
  */
 const PATHS = {
+  "wod": "<path d=\"M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829z\" /> <path d=\"m2.5 21.5 1.4-1.4\" /> <path d=\"m20.1 3.9 1.4-1.4\" /> <path d=\"M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829z\" /> <path d=\"m9.6 14.4 4.8-4.8\" />",
+  "clipboard": "<rect width=\"8\" height=\"4\" x=\"8\" y=\"2\" rx=\"1\" ry=\"1\" /> <path d=\"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2\" /> <path d=\"M12 11h4\" /> <path d=\"M12 16h4\" /> <path d=\"M8 11h.01\" /> <path d=\"M8 16h.01\" />",
   "flame": "<path d=\"M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4\" />",
   "timer": "<line x1=\"10\" x2=\"14\" y1=\"2\" y2=\"2\" /> <line x1=\"12\" x2=\"15\" y1=\"14\" y2=\"11\" /> <circle cx=\"12\" cy=\"14\" r=\"8\" />",
   "tip": "<path d=\"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5\" /> <path d=\"M9 18h6\" /> <path d=\"M10 22h4\" />",
@@ -49,13 +51,32 @@ const PATHS = {
 
 export type IconName = keyof typeof PATHS;
 
-const COLORS: Record<IconName, string[]> = {"flame": ["#ffd35a", "#ff8a2a", "#ff3d2e"], "timer": ["#ffffff", "#b8bcc6"], "tip": ["#fff3a3", "#ffcf3f", "#f59e0b"], "question": ["#7cc4ff", "#3b82f6"], "mail": ["#8be9ff", "#22b8cf"], "bell": ["#ffe58a", "#f5b301"], "medal": ["#fff0a8", "#f4c430", "#c98a00"], "trophy": ["#fff0a8", "#f4c430", "#c98a00"], "chart": ["#9cf27a", "#22c55e"], "alert": ["#ffd27a", "#ff8a1f"], "repeat": ["#9cf27a", "#22c55e"], "trend": ["#9cf27a", "#22c55e"], "pin": ["#ff7b6b", "#e0302a"], "camera": ["#d6b4ff", "#8b5cf6"], "gift": ["#ffa3bf", "#f43f5e"], "lock": ["#ffffff", "#b8bcc6"], "calendar": ["#ffffff", "#b8bcc6"], "pencil": ["#ffffff", "#b8bcc6"], "plus": ["#9cf27a", "#22c55e"], "eye": ["#ffffff", "#b8bcc6"], "book": ["#7cc4ff", "#3b82f6"], "phone": ["#8be9ff", "#22b8cf"], "mappin": ["#ff7b6b", "#e0302a"], "list": ["#d6b4ff", "#8b5cf6"], "comment": ["#7cc4ff", "#3b82f6"], "flag": ["#9cf27a", "#22c55e"], "hourglass": ["#ffd27a", "#ff8a1f"], "help": ["#7cc4ff", "#3b82f6"], "user": ["#d6b4ff", "#8b5cf6"], "users": ["#d6b4ff", "#8b5cf6"], "megaphone": ["#ff7b6b", "#e0302a"], "dumbbell": ["#ffffff", "#b8bcc6"], "weight": ["#fff0a8", "#f4c430", "#c98a00"], "shield": ["#7cc4ff", "#3b82f6"], "heart": ["#ffa3bf", "#f43f5e"], "biceps": ["#ffd35a", "#ff8a2a", "#ff3d2e"], "sparkles": ["#d6b4ff", "#8b5cf6"], "activity": ["#ffa3bf", "#f43f5e"], "person": ["#8be9ff", "#22b8cf"], "plates": ["#ff7b6b", "#e0302a"]};
+const COLORS: Record<IconName, string[]> = {"wod": ["#ffd35a", "#ff8a2a", "#ff3d2e"], "clipboard": ["#8be9ff", "#22b8cf"], "flame": ["#ffd35a", "#ff8a2a", "#ff3d2e"], "timer": ["#ffffff", "#b8bcc6"], "tip": ["#fff3a3", "#ffcf3f", "#f59e0b"], "question": ["#7cc4ff", "#3b82f6"], "mail": ["#8be9ff", "#22b8cf"], "bell": ["#ffe58a", "#f5b301"], "medal": ["#fff0a8", "#f4c430", "#c98a00"], "trophy": ["#fff0a8", "#f4c430", "#c98a00"], "chart": ["#9cf27a", "#22c55e"], "alert": ["#ffd27a", "#ff8a1f"], "repeat": ["#9cf27a", "#22c55e"], "trend": ["#9cf27a", "#22c55e"], "pin": ["#ff7b6b", "#e0302a"], "camera": ["#d6b4ff", "#8b5cf6"], "gift": ["#ffa3bf", "#f43f5e"], "lock": ["#ffffff", "#b8bcc6"], "calendar": ["#ffffff", "#b8bcc6"], "pencil": ["#ffffff", "#b8bcc6"], "plus": ["#9cf27a", "#22c55e"], "eye": ["#ffffff", "#b8bcc6"], "book": ["#7cc4ff", "#3b82f6"], "phone": ["#8be9ff", "#22b8cf"], "mappin": ["#ff7b6b", "#e0302a"], "list": ["#d6b4ff", "#8b5cf6"], "comment": ["#7cc4ff", "#3b82f6"], "flag": ["#9cf27a", "#22c55e"], "hourglass": ["#ffd27a", "#ff8a1f"], "help": ["#7cc4ff", "#3b82f6"], "user": ["#d6b4ff", "#8b5cf6"], "users": ["#d6b4ff", "#8b5cf6"], "megaphone": ["#ff7b6b", "#e0302a"], "dumbbell": ["#ffffff", "#b8bcc6"], "weight": ["#fff0a8", "#f4c430", "#c98a00"], "shield": ["#7cc4ff", "#3b82f6"], "heart": ["#ffa3bf", "#f43f5e"], "biceps": ["#ffd35a", "#ff8a2a", "#ff3d2e"], "sparkles": ["#d6b4ff", "#8b5cf6"], "activity": ["#ffa3bf", "#f43f5e"], "person": ["#8be9ff", "#22b8cf"], "plates": ["#ff7b6b", "#e0302a"]};
 
 /** Iconos con forma cerrada: llevan además un relleno suave */
 const FILLED = new Set<IconName>(["alert", "bell", "book", "calendar", "comment", "flag", "flame", "gift", "heart", "lock", "mail", "mappin", "medal", "megaphone", "phone", "pin", "plates", "question", "shield", "trophy"] as IconName[]);
 
-export function Icon({ name, size = 18, tile = false, className = "" }: { name: IconName; size?: number; tile?: boolean; className?: string }) {
+export function Icon({
+  name,
+  size = 18,
+  tile = false,
+  mono = false,
+  className = "",
+}: {
+  name: IconName;
+  size?: number;
+  tile?: boolean;
+  /** Sin color: un solo tono (el del texto), p. ej. pestañas inactivas */
+  mono?: boolean;
+  className?: string;
+}) {
   const id = useId().replace(/:/g, "");
+  if (mono)
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden className={`inline-block shrink-0 ${className}`}>
+        <g fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" dangerouslySetInnerHTML={{ __html: PATHS[name] }} />
+      </svg>
+    );
   const cols = COLORS[name];
   const glow = cols[Math.floor(cols.length / 2)];
   const solid = name === "plates";

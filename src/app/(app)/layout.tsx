@@ -7,6 +7,7 @@ import { NoticeBanner } from "@/components/notice-banner";
 import { UnreadBadge } from "@/components/unread-badge";
 import { PushPrompt } from "@/components/push-prompt";
 import { BRAND } from "@/lib/brand";
+import { Icon } from "@/components/icon";
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const { supabase, user, profile, box } = await requireUser();
@@ -51,16 +52,11 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
             </Link>
           )}
           <Link href="/mensajes" className="relative flex h-11 w-11 items-center justify-center rounded-full text-fg active:bg-line" aria-label={t("Mensajes")}>
-            <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="5" width="18" height="14" rx="2" />
-              <path d="m3 7 9 6 9-6" />
-            </svg>
+            <Icon name="mail" size={26} />
             <UnreadBadge count={msgCount} latest={msgLatest} prefix="/mensajes" />
           </Link>
           <Link href="/avisos" className="relative flex h-11 w-11 items-center justify-center rounded-full text-fg active:bg-line" aria-label={t("Avisos")}>
-            <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z" />
-            </svg>
+            <Icon name="bell" size={26} />
             <UnreadBadge count={unread} latest={latest} />
           </Link>
         </div>
