@@ -125,7 +125,7 @@ export default async function MarcasPage({ searchParams }: PageProps<"/marcas">)
             return (
               <details key={c.value} open={sp.c === c.value} className="card group overflow-hidden">
                 <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-4">
-                  <span className="text-2xl">{c.emoji}</span>
+                  <Icon name={c.icon} size={20} tile />
                   <span className="h-display flex-1 text-2xl">{t(c.label)}</span>
                   <span className="text-xs text-muted">
                     {doneHere}/{items.length}

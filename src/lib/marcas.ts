@@ -1,16 +1,18 @@
 import { compareScore, formatScore } from "./scoring";
 import type { Profile, Result, ScoreType } from "./types";
+import type { IconName } from "@/components/icon";
 
 export type BenchCategory = "girls" | "heroes" | "classics" | "lifts" | "olympic" | "gymnastics" | "endurance";
 
-export const BENCH_CATEGORIES: { value: BenchCategory; label: string; emoji: string }[] = [
-  { value: "girls", label: "Girls", emoji: "👩" },
-  { value: "heroes", label: "Héroes", emoji: "🎖️" },
-  { value: "classics", label: "Clásicos", emoji: "🔥" },
-  { value: "lifts", label: "Básicos", emoji: "🏋️" },
-  { value: "olympic", label: "Halterofilia", emoji: "🥇" },
-  { value: "gymnastics", label: "Gimnásticos", emoji: "🤸" },
-  { value: "endurance", label: "Cardio", emoji: "🚣" },
+/** emoji: para los desplegables (texto); icon: icono a color de la app */
+export const BENCH_CATEGORIES: { value: BenchCategory; label: string; emoji: string; icon: IconName }[] = [
+  { value: "girls", label: "Girls", emoji: "👩", icon: "sparkles" },
+  { value: "heroes", label: "Héroes", emoji: "🎖️", icon: "shield" },
+  { value: "classics", label: "Clásicos", emoji: "🔥", icon: "flame" },
+  { value: "lifts", label: "Básicos", emoji: "🏋️", icon: "dumbbell" },
+  { value: "olympic", label: "Halterofilia", emoji: "🥇", icon: "weight" },
+  { value: "gymnastics", label: "Gimnásticos", emoji: "🤸", icon: "person" },
+  { value: "endurance", label: "Cardio", emoji: "🚣", icon: "heart" },
 ];
 
 /** Categorías de levantamientos: se apuntan como RM (1RM, 3RM, 5RM…). */

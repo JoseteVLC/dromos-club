@@ -112,7 +112,7 @@ export default async function BenchmarkPage({ params, searchParams }: PageProps<
 
   return (
     <div className="space-y-5">
-      <Link href={`/marcas?c=${b.category}`} className="text-sm text-muted">← {cat ? `${cat.emoji} ${t(cat.label)}` : t("Mis marcas")}</Link>
+      <Link href={`/marcas?c=${b.category}`} className="text-sm text-muted">← {cat ? <><Icon name={cat.icon} size={14} /> {t(cat.label)}</> : t("Mis marcas")}</Link>
       <div>
         <h1 className="h-title text-5xl">{b.name}</h1>
         {b.description && <p className="mt-2 whitespace-pre-line text-muted">{b.description}</p>}
