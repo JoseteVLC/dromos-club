@@ -848,5 +848,11 @@ const d: Record<string, string> = {
   "Apuntar resultado ›": "Wpisz wynik ›",
   "Ver ›": "Zobacz ›",
   "{n} partes": "{n} części",
+  "¿Borrar toda la semana? Se borran {n} partes y los resultados que haya apuntados. No se puede deshacer.": "Usunąć cały tydzień? Zostanie usuniętych {n} części i wpisane wyniki. Nie da się tego cofnąć.",
+  "¿Borrar todo el día? Se borran {n} partes y los resultados que haya apuntados. No se puede deshacer.": "Usunąć cały dzień? Zostanie usuniętych {n} części i wpisane wyniki. Nie da się tego cofnąć.",
+  "Sí, borrar": "Tak, usuń",
+  "Cancelar": "Anuluj",
+  "Borrar este día": "Usuń ten dzień",
+  "Borrar esta semana": "Usuń ten tydzień",
 };
 export default d;

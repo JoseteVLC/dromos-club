@@ -61,6 +61,8 @@ Abre el día del WOD y pulsa **Editar**, junto a su título. Desde ahí cambias 
 - **Borrar una parte** renombra sola las que quedan ese día: si borras la A, la B pasa a A y la C a B. Los resultados de las demás partes no se pierden.
 - **Borrar un WOD** borra también sus resultados. No tiene vuelta atrás.
 
+**Borrar un día o una semana entera:** en la pestaña **Día**, abajo del todo, tienes **Borrar este día** y **Borrar esta semana** (de lunes a domingo de la fecha que estás viendo). Te pide confirmación y te dice cuántas partes se borran; con ellas se van los resultados apuntados, y no se puede deshacer.
+
 ## Mensajes y anuncios
 
 El sobre ✉️ de arriba abre la **bandeja común del equipo**: todos los coaches y admins ven las mismas conversaciones, cualquiera puede contestar y el atleta ve el nombre de quien le escribe. El número del sobre son los mensajes de atletas sin leer; al abrir una conversación queda leída para todo el equipo.

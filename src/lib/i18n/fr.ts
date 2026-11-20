@@ -848,6 +848,12 @@ const d: Record<string, string> = {
   "Apuntar resultado ›": "Noter le résultat ›",
   "Ver ›": "Voir ›",
   "{n} partes": "{n} parties",
+  "¿Borrar toda la semana? Se borran {n} partes y los resultados que haya apuntados. No se puede deshacer.": "Supprimer toute la semaine ? {n} parties et les résultats notés seront supprimés. Impossible d'annuler.",
+  "¿Borrar todo el día? Se borran {n} partes y los resultados que haya apuntados. No se puede deshacer.": "Supprimer toute la journée ? {n} parties et les résultats notés seront supprimés. Impossible d'annuler.",
+  "Sí, borrar": "Oui, supprimer",
+  "Cancelar": "Annuler",
+  "Borrar este día": "Supprimer ce jour",
+  "Borrar esta semana": "Supprimer cette semaine",
 };
 
 export default d;

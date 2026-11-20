@@ -494,6 +494,23 @@ export async function deleteWod(fd: FormData) {
   redirect(dayHref(str(fd, "wod_date")));
 }
 
+/** Coach: borra todas las partes entre dos fechas (un día o una semana). Los resultados se van con ellas. */
+export async function deleteWodsRange(fd: FormData) {
+  const { supabase, box } = await requireCoach();
+  const from = str(fd, "from");
+  const to = str(fd, "to");
+  if (!isISODate(from) || !isISODate(to) || to < from) return;
+  await supabase
+    .from("wods")
+    .delete()
+    .eq("box_id", box.id)
+    .gte("wod_date", from)
+    .lte("wod_date", to);
+  revalidatePath("/", "layout");
+  const back = str(fd, "back");
+  redirect(back.startsWith("/") ? back : dayHref(from));
+}
+
 export async function createWodsBulk(_: ActionState, fd: FormData): Promise<ActionState> {
   const { supabase, user } = await requireCoach();
   let items: {

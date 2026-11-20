@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { memberSince, planHorizon, requireUser } from "@/lib/supabase/server";
+import { isCoachProfile, memberSince, planHorizon, requireUser } from "@/lib/supabase/server";
 import { addDays, dayHref, fullDayHref, isISODate, todayISO } from "@/lib/dates";
 import { mondayOf } from "@/lib/week-parser";
 import { myStreak } from "@/lib/streak-data";
@@ -11,12 +11,14 @@ import { SCORE_TYPES, type Result, type Wod } from "@/lib/types";
 import { DayNav, SwipeDays } from "@/components/day-nav";
 import { toggleDone } from "@/app/actions";
 import { getI18n } from "@/lib/i18n/server";
+import { DeleteDays } from "@/components/delete-days";
 
 /** Día completo: todas las partes del día en orden, con su enunciado. Al pulsar una entras a apuntar el resultado. */
 export default async function FullDayPage({ params }: PageProps<"/dia/[date]">) {
   const { date } = await params;
   if (!isISODate(date)) notFound();
   const { supabase, user, profile } = await requireUser();
+  const isCoach = isCoachProfile(profile);
   const since = memberSince(profile);
   if (since && date < since) redirect(fullDayHref(since));
   const horizon = planHorizon(profile, todayISO());
@@ -42,6 +44,10 @@ export default async function FullDayPage({ params }: PageProps<"/dia/[date]">) 
     const status = streak.done.has(d) ? "done" : !planDays.has(d) ? "rest" : d < today ? "missed" : "pending";
     return { date: d, label, status: status as "done" | "missed" | "pending" | "rest", isToday: d === today, selected: d === date };
   });
+  // Coach: cuántas partes hay en toda la semana (con borradores) para poder borrarla entera
+  const { count: weekCount } = isCoach
+    ? await supabase.from("wods").select("id", { count: "exact", head: true }).gte("wod_date", monday).lte("wod_date", addDays(monday, 6))
+    : { count: 0 };
   const done = wods.filter((w) => myResult.has(w.id)).length;
   const canLog = date <= today;
 
@@ -111,6 +117,10 @@ export default async function FullDayPage({ params }: PageProps<"/dia/[date]">) 
               })}
             </ol>
           </>
+        )}
+
+        {isCoach && (
+          <DeleteDays date={date} monday={monday} sunday={addDays(monday, 6)} dayCount={wods.length} weekCount={weekCount ?? 0} />
         )}
       </div>
     </SwipeDays>
