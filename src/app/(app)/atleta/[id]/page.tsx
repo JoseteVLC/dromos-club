@@ -72,13 +72,18 @@ export default async function AtletaPage({ params }: { params: Promise<{ id: str
           </Link>
         )}
         {!me && isCoachProfile(profile) && (
-          <Link href={`/mensajes/${id}`} className="chip">
-            <Icon name="mail" size={16} /> {t("Enviar mensaje")}
-          </Link>
+          <div className="flex flex-wrap justify-center gap-2">
+            <Link href={`/coach/atleta/${id}`} className="chip chip-on">
+              <Icon name="chart" size={16} /> {t("Ficha completa")}
+            </Link>
+            <Link href={`/mensajes/${id}`} className="chip">
+              <Icon name="mail" size={16} /> {t("Enviar mensaje")}
+            </Link>
+          </div>
         )}
       </div>
 
-      <div className="grid grid-cols-3 gap-2 text-center">
+      {!box.competition && <div className="grid grid-cols-3 gap-2 text-center">
         {[
           { v: stats.total, l: t("entrenos") },
           { v: stats.days, l: t("días seguidos") },
@@ -89,9 +94,9 @@ export default async function AtletaPage({ params }: { params: Promise<{ id: str
             <div className="text-xs text-muted">{x.l}</div>
           </div>
         ))}
-      </div>
+      </div>}
 
-      <section className="space-y-2">
+      {!box.competition && <section className="space-y-2">
         <div className="flex items-baseline justify-between">
           <h2 className="h-display text-2xl">{t("Medallas")}</h2>
           <span className="text-sm text-muted">
@@ -106,7 +111,7 @@ export default async function AtletaPage({ params }: { params: Promise<{ id: str
             </li>
           ))}
         </ul>
-      </section>
+      </section>}
 
       {bests.length > 0 && (
         <section className="space-y-2">

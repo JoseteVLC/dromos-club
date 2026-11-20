@@ -17,7 +17,7 @@ import { DeleteDays } from "@/components/delete-days";
 export default async function FullDayPage({ params }: PageProps<"/dia/[date]">) {
   const { date } = await params;
   if (!isISODate(date)) notFound();
-  const { supabase, user, profile } = await requireUser();
+  const { supabase, user, profile, box } = await requireUser();
   const isCoach = isCoachProfile(profile);
   const since = memberSince(profile);
   if (since && date < since) redirect(fullDayHref(since));
@@ -56,14 +56,14 @@ export default async function FullDayPage({ params }: PageProps<"/dia/[date]">) 
       <div className="space-y-5">
         <DayNav date={date} today={today} min={since} max={horizon} base="dia" />
 
-        <StreakCard
+        {!box.competition && <StreakCard
           days={streak.stats.days}
           bestDays={streak.stats.bestDays}
           current={streak.stats.current}
           best={streak.stats.best}
           week={week}
           goal={Math.min(WEEK_GOAL, Math.max(1, planDays.size))}
-        />
+        />}
 
         {wods.length === 0 ? (
           <div className="card space-y-2 p-8 text-center">

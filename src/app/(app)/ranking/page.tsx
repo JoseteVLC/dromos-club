@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Avatar } from "@/components/avatar";
 import { memberSince, requireUser } from "@/lib/supabase/server";
@@ -54,7 +55,8 @@ async function resultsBetween(supabase: Awaited<ReturnType<typeof requireUser>>[
 
 /** Lista de los leaderboards de cada WOD del periodo, por fecha; cada uno lleva a su leaderboard. */
 async function WodBoards({ period, refDate }: { period: Period; refDate: string }) {
-  const { supabase, user, profile } = await requireUser();
+  const { supabase, user, profile, box } = await requireUser();
+  if (box.competition) redirect("/");
   const since = memberSince(profile);
   const { t, locale } = await getI18n();
   const today = todayISO();

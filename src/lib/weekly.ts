@@ -49,7 +49,7 @@ export async function sendWeeklySummaries(db: SupabaseClient, today: string, use
   const prevStart = addDays(start, -7);
   const [{ data: people }, { data: mems }] = await Promise.all([
     db.from("profiles").select("id, first_name, full_name").in("id", userIds).eq("active", true).eq("notify_weekly", true),
-    db.from("box_members").select("user_id, box_id, boxes!inner(slug, name)").in("user_id", userIds).eq("active", true).eq("pending", false).returns<Member[]>(),
+    db.from("box_members").select("user_id, box_id, boxes!inner(slug, name)").eq("boxes.competition", false).in("user_id", userIds).eq("active", true).eq("pending", false).returns<Member[]>(),
   ]);
   const person = new Map((people ?? []).map((p) => [p.id as string, p]));
   const byBox = new Map<string, Member[]>();

@@ -1030,7 +1030,7 @@ export async function updateBox(_: ActionState, fd: FormData): Promise<ActionSta
   const { box } = await requireAdmin();
   const name = str(fd, "box_name").slice(0, 60);
   if (name.length < 2) return { error: "Pon el nombre del box." };
-  const { error } = await adminDb().from("boxes").update({ name, rewards_enabled: fd.get("rewards") === "on" }).eq("id", box.id);
+  const { error } = await adminDb().from("boxes").update({ name, rewards_enabled: fd.get("rewards") === "on", competition: fd.get("competition") === "on" }).eq("id", box.id);
   if (error) return { error: "No se han podido guardar los cambios." };
   revalidatePath("/", "layout");
   return { ok: "Guardado." };

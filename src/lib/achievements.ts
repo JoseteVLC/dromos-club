@@ -218,6 +218,9 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
  * Devuelve las medallas guardadas del atleta (código → fecha).
  */
 export async function syncMedals(supabase: SupabaseClient, userId: string, box: { id: string; slug: string }) {
+  // Modo competición: sin medallas
+  const { data: bx } = await supabase.from("boxes").select("competition").eq("id", box.id).maybeSingle<{ competition: boolean }>();
+  if (bx?.competition) return { progress: [] as MedalProgress[], owned: new Map<string, string>() };
   const progress = await computeMedals(supabase, userId, box.id);
   const { data: have } = await supabase.from("user_achievements").select("code, unlocked_on").eq("user_id", userId).eq("box_id", box.id);
   const owned = new Map((have ?? []).map((h) => [h.code as string, h.unlocked_on as string]));

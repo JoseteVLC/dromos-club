@@ -120,6 +120,13 @@ Cada atleta rellena en su perfil una parte pública (foto, sobre ti, Instagram) 
 
 En **Admin → Descargar datos de atletas (CSV)** tienes a todo el mundo en un archivo que se abre directamente en Excel: nombre, email, teléfono, edad, género, nivel, box, dirección, talla, Instagram, rol, si está activo, medallas y fecha de alta. Trátalo como información confidencial.
 
+## Modo competición (admins)
+
+Para un box de atletas que compiten. Se activa en **Admin → Ajustes del box → Modo competición**. Con él activado:
+- Los atletas no ven constancia ni rachas, medallas, puntos ni la pestaña Ranking, y no reciben recordatorios de racha ni el resumen semanal. En el leaderboard de cada WOD no salen los avisos de cierre ni de medallas.
+- Siguen teniendo la plani (WODs y Día), sus resultados, el leaderboard de cada parte, sus marcas, el historial, la calculadora y los consejos.
+- El equipo lo sigue todo desde el **Panel del box** y la **ficha completa** de cada atleta.
+
 ## Medallas y premios (admins)
 
 Hay 20 medallas que los atletas desbloquean solos al entrenar, batir PRs y completar benchmarks (el detalle está en el manual de atletas). Cuatro llevan **premio 🎁**: Imparable (30 días seguidos), Centurión (100 entrenos), Leyenda (250) e Inmortal (500).
@@ -143,6 +150,7 @@ Para ver quién está activo:
 - **Admin → Personas:** fecha del último resultado de cada uno. Quien lleva semanas sin meter nada es alguien a quien escribir.
 - **Ranking → Constancia:** días seguidos entrenando, con las semanas de 5 días debajo.
 - **📊 Panel del box** (Coach → Panel del box): atletas activos esta semana y comparación con la anterior, % del total, resultados de la semana, altas en 30 días, gráfica de activos de las últimas 8 semanas, asistencia media por día de la semana, los WODs más hechos y la lista **⚠️ En riesgo de dejarlo**.
+- **Atletas** (en el Panel del box): cada atleta con el % de la plani que ha hecho esta semana y en las últimas 4. Tocando uno entras a su **ficha completa** (también desde su perfil, botón **Ficha completa**): % de la plani hecha, días entrenados, partes con marca y de técnica, días desde el último entreno y constancia; calendario día a día (verde: todo hecho, ámbar: una parte, rojo: sin hacer); barras semana a semana; % por día de la semana; todos los entrenos con cada parte hecha o no, su marca, categoría y notas; y la evolución de sus marcas. Arriba eliges el periodo: 4 semanas, 3 meses, 6 meses, 1 año o todo.
 - **Ranking → Leaderboards:** cuántos resultados tiene cada WOD de la semana.
 
 A los atletas con los avisos activados les llega cada tarde un **recordatorio automático** si están a punto de perder la racha o llevan varios días sin meter resultado.

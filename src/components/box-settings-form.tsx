@@ -5,7 +5,7 @@ import { updateBox } from "@/app/actions";
 import { FormMessage } from "./ui";
 import { useI18n } from "@/lib/i18n/client";
 
-export function BoxSettingsForm({ name, rewards, url }: { name: string; rewards: boolean; url: string }) {
+export function BoxSettingsForm({ name, rewards, competition, url }: { name: string; rewards: boolean; competition: boolean; url: string }) {
   const [state, action, pending] = useActionState(updateBox, undefined);
   const { t } = useI18n();
   return (
@@ -24,6 +24,13 @@ export function BoxSettingsForm({ name, rewards, url }: { name: string; rewards:
         <span>
           <span className="font-semibold">{t("Premios por medallas")}</span>
           <span className="block text-xs text-muted">{t("Imparable, Centurión, Leyenda e Inmortal llevan un premio de tu box. Verás aquí quién lo ha ganado y sus datos de envío.")}</span>
+        </span>
+      </label>
+      <label className="flex items-start gap-3 text-sm">
+        <input type="checkbox" name="competition" defaultChecked={competition} className="mt-1 h-5 w-5 accent-[var(--accent)]" />
+        <span>
+          <span className="font-semibold">{t("Modo competición")}</span>
+          <span className="block text-xs text-muted">{t("Para equipos de atletas que compiten: sin constancia, medallas, puntos ni ranking, y sin recordatorios de racha. Los atletas solo ven la plani, sus resultados y sus marcas; el equipo tiene la ficha completa de cada uno.")}</span>
         </span>
       </label>
       <button disabled={pending} className="btn">{pending ? "…" : t("Guardar")}</button>

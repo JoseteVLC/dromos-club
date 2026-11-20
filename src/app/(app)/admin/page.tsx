@@ -129,7 +129,7 @@ export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
 
       <section className="space-y-3">
         <h2 className="h-display text-xl">{t("Tu box")}</h2>
-        <BoxSettingsForm name={box.name} rewards={box.rewards_enabled} url={boxUrl(box.slug, base)} />
+        <BoxSettingsForm name={box.name} rewards={box.rewards_enabled} competition={box.competition} url={boxUrl(box.slug, base)} />
       </section>
 
       <AdminJoin svg={svg} url={qrUrl} mode={box.join_mode} requests={requests} t={t} locale={locale} />

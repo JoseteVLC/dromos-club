@@ -81,7 +81,7 @@ export default async function PanelPage() {
               <li key={p.id} className="flex items-center gap-3 px-4 py-3">
                 <Avatar name={p.name} url={p.avatar_url} size={34} />
                 <div className="min-w-0 flex-1">
-                  <Link href={`/atleta/${p.id}`} className="block truncate font-semibold">{p.name === "Sin nombre" ? t("Sin nombre") : p.name}</Link>
+                  <Link href={`/coach/atleta/${p.id}`} className="block truncate font-semibold">{p.name === "Sin nombre" ? t("Sin nombre") : p.name}</Link>
                   <div className="text-xs text-muted">
                     {p.never ? t("Alta hace {n} días, aún sin resultados", { n: p.days }) : t("{n} días sin entrenar · último: {d}", { n: p.days, d: fmtWeek(p.lastDone!) })}
                   </div>
@@ -89,6 +89,37 @@ export default async function PanelPage() {
                 <Link href={`/mensajes/${p.id}`} className="chip inline-flex shrink-0 items-center gap-1.5"><Icon name="mail" size={14} /> {t("Escribir")}</Link>
               </li>
             ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="h-display flex items-center gap-3 text-2xl"><Icon name="clipboard" size={20} tile /> {t("Atletas")} · {s.athletes.length}</h2>
+        <p className="text-sm text-muted">{t("Qué parte de la plani ha hecho cada uno, esta semana y en las últimas 4. Toca un atleta para ver su ficha completa.")}</p>
+        {s.athletes.length === 0 ? (
+          <p className="card p-6 text-center text-muted">{t("Aún no hay atletas en el box.")}</p>
+        ) : (
+          <ul className="card divide-y divide-line">
+            {s.athletes.map((p) => {
+              const pc = (x: { done: number; planned: number }) => (x.planned ? Math.round((x.done / x.planned) * 100) : null);
+              const m = pc(p.month);
+              const w = pc(p.week);
+              return (
+                <li key={p.id}>
+                  <Link href={`/coach/atleta/${p.id}`} className="flex items-center gap-3 px-4 py-3">
+                    <Avatar name={p.name} url={p.avatar_url} size={34} />
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate font-semibold">{p.name === "Sin nombre" ? t("Sin nombre") : p.name}</div>
+                      <div className="text-xs text-muted">{p.lastDone ? t("Último entreno: {d}", { d: fmtWeek(p.lastDone) }) : t("Aún sin resultados")}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className={`h-display text-xl tabular-nums ${m != null && m < 50 ? "text-alert" : ""}`}>{m == null ? "–" : `${m}%`}</div>
+                      <div className="text-[10px] uppercase text-muted">{t("4 sem.")} · {t("esta: {p}", { p: w == null ? "–" : `${w}%` })}</div>
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>

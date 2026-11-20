@@ -74,7 +74,7 @@ export const requireUser = cache(async () => {
       .single<Profile>(),
     supabase
       .from("box_members")
-      .select("role, active, pending, joined_at, boxes!inner(id, slug, name, logo_url, accent, rewards_enabled, status, join_code, join_mode)")
+      .select("role, active, pending, joined_at, boxes!inner(id, slug, name, logo_url, accent, rewards_enabled, competition, status, join_code, join_mode)")
       .eq("user_id", user.id)
       .eq("boxes.slug", slug)
       .maybeSingle<MemberRow>(),

@@ -132,6 +132,8 @@ export type Box = {
   logo_url: string | null;
   accent: string | null;
   rewards_enabled: boolean;
+  /** Modo competición: atletas que compiten, sin gamificación (constancia, medallas, puntos, ranking ni recordatorios de racha). */
+  competition: boolean;
   status: "trial" | "active" | "paused";
   join_code: string;
   join_mode: "approval" | "open";

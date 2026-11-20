@@ -75,7 +75,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
         medals={fresh.filter((n) => n.kind === "medal").length}
       />
       <main className="flex-1 px-4 pb-28 pt-4">{children}</main>
-      <BottomNav isCoach={isCoach} />
+      <BottomNav isCoach={isCoach} competition={box.competition} />
     </div>
   );
 }

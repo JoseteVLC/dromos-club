@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { requireUser } from "@/lib/supabase/server";
 import { getI18n } from "@/lib/i18n/server";
@@ -9,6 +10,7 @@ import { RankingTabs } from "@/components/ranking-tabs";
 export default async function MedallasPage({ searchParams }: PageProps<"/medallas">) {
   const fromRanking = (await searchParams).desde === "ranking";
   const { supabase, user, box } = await requireUser();
+  if (box.competition) redirect("/perfil");
   const { t, locale } = await getI18n();
   const { progress, owned } = await syncMedals(supabase, user.id, box);
   const prog = new Map(progress.map((p) => [p.code, p]));

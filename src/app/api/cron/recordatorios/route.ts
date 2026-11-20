@@ -72,10 +72,10 @@ export async function GET(req: Request) {
     return NextResponse.json({ weekly, medalUsers, riskBoxes });
   }
 
-  type Mem = { user_id: string; box_id: string; joined_at: string; boxes: { slug: string; name: string } };
+  type Mem = { user_id: string; box_id: string; joined_at: string; boxes: { slug: string; name: string; competition: boolean } };
   const [{ data: people }, { data: mems }, { data: wods }, { data: res }] = await Promise.all([
     db.from("profiles").select("id, first_name, full_name, last_reminder_at").in("id", ids).eq("active", true).eq("notify_reminders", true),
-    db.from("box_members").select("user_id, box_id, joined_at, boxes!inner(slug, name)").in("user_id", ids).eq("active", true).returns<Mem[]>(),
+    db.from("box_members").select("user_id, box_id, joined_at, boxes!inner(slug, name, competition)").in("user_id", ids).eq("active", true).returns<Mem[]>(),
     db.from("wods").select("box_id, wod_date").eq("published", true).gte("wod_date", since).lte("wod_date", weekEnd),
     db.from("results").select("user_id, box_id, wods!inner(wod_date)").in("user_id", ids).gte("wods.wod_date", since).returns<{ user_id: string; box_id: string; wods: { wod_date: string } }[]>(),
   ]);
@@ -98,7 +98,7 @@ export async function GET(req: Request) {
   // Como mucho un recordatorio por persona y día, aunque esté en varios boxes
   for (const m of mems ?? []) {
     const p = person.get(m.user_id);
-    if (!p || reminded.has(p.id)) continue;
+    if (!p || reminded.has(p.id) || m.boxes.competition) continue;
     const allDays = daysOf.get(m.box_id) ?? [];
     const days = allDays.filter((d) => d <= today);
     const weekPlan = allDays.filter((d) => d >= weekStart);

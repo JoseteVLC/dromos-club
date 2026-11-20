@@ -18,10 +18,14 @@ export type BoxStats = {
   byWeekday: { label: number; avg: number }[]; // 0 = lunes; media de atletas por día (últimas 4 semanas)
   topWods: { id: string; title: string; part: string; date: string; n: number }[];
   atRisk: RiskPerson[];
+  /** Todos los atletas: % de la plani hecha esta semana y en las últimas 4 (desde su alta) */
+  athletes: AthleteRow[];
 };
 
+export type AthleteRow = { id: string; name: string; avatar_url: string | null; lastDone: string | null; week: { done: number; planned: number }; month: { done: number; planned: number } };
+
 type Member = { id: string; name: string; avatar_url: string | null; joined: string };
-type Row = { user_id: string; wods: { id: string; title: string; part: string; wod_date: string } };
+type Row = { user_id: string; wod_id: string; wods: { id: string; title: string; part: string; wod_date: string } };
 
 const daysBetween = (a: string, b: string) => Math.round((Date.parse(b + "T12:00:00Z") - Date.parse(a + "T12:00:00Z")) / 864e5);
 
@@ -52,7 +56,7 @@ async function resultsSince(db: SupabaseClient, since: string, boxId: string): P
   for (let from = 0; ; from += 1000) {
     const { data } = await db
       .from("results")
-      .select("user_id, wods!inner(id, title, part, wod_date)")
+      .select("user_id, wod_id, wods!inner(id, title, part, wod_date)")
       .eq("box_id", boxId)
       .gte("wods.wod_date", since)
       .order("id")
@@ -67,7 +71,12 @@ async function resultsSince(db: SupabaseClient, since: string, boxId: string): P
 /** Números del box para el panel de coaches y dueños, y la lista de quién está en riesgo de dejarlo. */
 export async function boxStats(db: SupabaseClient, today: string, boxId: string): Promise<BoxStats> {
   const since = addDays(weekOf(today), -7 * 7); // 8 semanas con la actual
-  const [people, rows] = await Promise.all([members(db, boxId), resultsSince(db, addDays(today, -RISK_MAX_DAYS - 7), boxId)]);
+  const from28 = addDays(today, -27);
+  const [people, rows, { data: plan }] = await Promise.all([
+    members(db, boxId),
+    resultsSince(db, addDays(today, -RISK_MAX_DAYS - 7), boxId),
+    db.from("wods").select("id, wod_date").eq("box_id", boxId).eq("published", true).gte("wod_date", [from28, weekOf(today)].sort()[0]).lte("wod_date", today).limit(2000),
+  ]);
   const ids = new Set(people.map((p) => p.id));
   const mine = rows.filter((r) => ids.has(r.user_id));
 
@@ -138,7 +147,28 @@ export async function boxStats(db: SupabaseClient, today: string, boxId: string)
   }
   atRisk.sort((a, b) => Number(a.never) - Number(b.never) || b.days - a.days);
 
+  // Cada atleta: partes hechas / partes de la plani (esta semana y últimas 4), contando solo desde su alta
+  const wk = weekOf(today);
+  const doneBy = new Map<string, Set<string>>();
+  for (const r of mine) {
+    if (!doneBy.has(r.user_id)) doneBy.set(r.user_id, new Set());
+    doneBy.get(r.user_id)!.add(r.wod_id);
+  }
+  const athletes: AthleteRow[] = people
+    .map((p) => {
+      const joined = p.joined.slice(0, 10);
+      const dn = doneBy.get(p.id) ?? new Set<string>();
+      const count = (from: string) => {
+        const list = (plan ?? []).filter((w) => w.wod_date >= from && w.wod_date >= joined);
+        return { planned: list.length, done: list.filter((w) => dn.has(w.id as string)).length };
+      };
+      const set = daysBy.get(p.id);
+      return { id: p.id, name: p.name, avatar_url: p.avatar_url, lastDone: set ? [...set].sort().at(-1)! : null, week: count(wk), month: count(from28) };
+    })
+    .sort((a, b) => a.name.localeCompare(b.name, "es"));
+
   return {
+    athletes,
     members: people.length,
     activeThisWeek: activeIn(thisWeek),
     activeLastWeek: activeIn(addDays(thisWeek, -7)),

@@ -184,7 +184,7 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
       <div className="space-y-5">
         <DayNav date={date} today={today} min={since} max={horizon} />
 
-        <StreakCard
+        {!box.competition && <StreakCard
           days={streak.stats.days}
           bestDays={streak.stats.bestDays}
           current={streak.stats.current}
@@ -192,7 +192,7 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
           week={week}
           goal={Math.min(WEEK_GOAL, Math.max(1, planDays.size))}
           hint={pendingToday ? t("Mete tu resultado y el día cuenta para la racha.") : undefined}
-        />
+        />}
 
         {wods.length === 0 ? (
           <div className="card space-y-2 p-8 text-center">
@@ -293,6 +293,7 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
               isCoach={isCoach}
               reactions={reactions}
               comments={commentCounts}
+              competition={box.competition}
               gender={gender}
               division={division}
               score={selected!.score2_type ? score : 1}

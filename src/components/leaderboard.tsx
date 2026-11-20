@@ -28,6 +28,7 @@ export async function Leaderboard({
   href,
   reactions = {},
   comments = {},
+  competition = false,
 }: {
   wod: Wod;
   results: Result[];
@@ -41,6 +42,8 @@ export async function Leaderboard({
   href: (g: string, d: string, s: 1 | 2) => string;
   reactions?: Record<string, ReactionSummary>;
   comments?: Record<string, number>;
+  /** Modo competición: sin avisos de medallas ni «fuera de plazo» */
+  competition?: boolean;
 }) {
   const ranked = rankResults(wod, results, { gender, division, score });
   const { t, locale } = await getI18n();
@@ -96,13 +99,13 @@ export async function Leaderboard({
         ))}
       </div>
 
-      <p className="text-xs text-muted">
+      {!competition && <p className="text-xs text-muted">
         {closed
           ? t("🔒 Clasificación cerrada: las medallas de podio ya están repartidas.")
           : t("⏳ Clasificación provisional hasta el {day} a las 23:59. Lo que se meta después sale aquí, pero no cuenta para medallas.", {
               day: longDate(closeDay(wod.wod_date), locale),
             })}
-      </p>
+      </p>}
 
       {(() => {
         // Tu posición y percentil (solo lo ves tú), dentro del filtro elegido
@@ -142,7 +145,7 @@ export async function Leaderboard({
                   <div className="flex items-center gap-2 text-xs text-muted">
                     <span className="rounded bg-line px-1.5 py-0.5 font-semibold uppercase">{r.division}</span>
                     {r.profiles?.gender && <span>{r.profiles.gender === "M" ? "♂" : "♀"}</span>}
-                    {!inTime(wod.wod_date, byId.get(r.id)?.created_at) && (
+                    {!competition && !inTime(wod.wod_date, byId.get(r.id)?.created_at) && (
                       <span className="shrink-0 rounded border border-line px-1 py-0.5" title={t("Metido después del cierre: no cuenta para medallas")}>
                         {t("fuera de plazo")}
                       </span>

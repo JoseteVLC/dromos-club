@@ -58,7 +58,7 @@ export default async function PerfilPage({ searchParams }: PageProps<"/perfil">)
         <span className="text-accent">→</span>
       </Link>
 
-      <Link href="/medallas" className="card flex items-center gap-3 p-4">
+      {!box.competition && <Link href="/medallas" className="card flex items-center gap-3 p-4">
         <div className="flex -space-x-3">
           {MEDALS.filter((m) => ownedMedals.has(m.code))
             .slice(-4)
@@ -72,7 +72,7 @@ export default async function PerfilPage({ searchParams }: PageProps<"/perfil">)
           <div className="text-xs text-muted">{t("{a} de {b} desbloqueadas", { a: ownedMedals.size, b: MEDALS.length })}</div>
         </div>
         <span className="text-accent">→</span>
-      </Link>
+      </Link>}
 
       <section className="space-y-2">
         <h2 className="h-display text-xl">{t("Idioma")}</h2>
