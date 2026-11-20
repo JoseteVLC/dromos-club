@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { CalcIcon } from "@/components/icons";
 import { Avatar } from "@/components/avatar";
 import { MIN_FOR_PERCENTILE, PercentileCard } from "@/components/percentile-card";
 import { notFound } from "next/navigation";
@@ -13,6 +12,7 @@ import { ConfirmDelete } from "@/components/ui";
 import { PlateCalc } from "@/components/plate-calc";
 import { ProgressChart, type ProgressPoint } from "@/components/progress-chart";
 import type { Gender, Result } from "@/lib/types";
+import { Icon } from "@/components/icon";
 
 /** 1RM estimado (fórmula de Epley); con 1RM devuelve el propio peso. */
 function epley(r: PersonalRecord) {
@@ -136,7 +136,7 @@ export default async function BenchmarkPage({ params, searchParams }: PageProps<
         {myBest && (
           <div className="text-right text-sm text-muted">
             {myBest.division === "scaled" && <div>{t("Escalado")}</div>}
-            📅 {fmtDate(myBest.performed_on)}
+            <Icon name="calendar" size={14} /> {fmtDate(myBest.performed_on)}
           </div>
         )}
       </div>
@@ -157,7 +157,7 @@ export default async function BenchmarkPage({ params, searchParams }: PageProps<
         <details className="space-y-2">
           <summary className="card flex cursor-pointer list-none items-center justify-between px-4 py-3 font-semibold">
             <span className="flex flex-wrap items-center gap-2">
-              <CalcIcon className="text-accent" /> {t("Porcentajes y discos")} · 1RM {round05(oneRM)} kg
+              <Icon name="plates" size={20} /> {t("Porcentajes y discos")} · 1RM {round05(oneRM)} kg
               {(bestAnyRM?.rm ?? 1) > 1 && <span className="ml-1 text-xs font-normal text-muted">{t("(estimado desde tu {rm}RM)", { rm: bestAnyRM?.rm ?? 1 })}</span>}
             </span>
             <span className="text-muted">▾</span>
@@ -204,7 +204,7 @@ export default async function BenchmarkPage({ params, searchParams }: PageProps<
                </div>
                 {!fromWodHref.has(r.id) && (
                   <details className="group">
-                    <summary className="mt-1 cursor-pointer list-none text-xs text-muted underline">✏️ {t("Editar")}</summary>
+                    <summary className="mt-1 cursor-pointer list-none text-xs text-muted underline"><Icon name="pencil" size={12} /> {t("Editar")}</summary>
                     <PRForm benchmark={b} today={todayISO()} record={r} />
                   </details>
                 )}
@@ -257,7 +257,7 @@ export default async function BenchmarkPage({ params, searchParams }: PageProps<
 
       {isCoachProfile(profile) && (
         <details className="space-y-3">
-          <summary className="cursor-pointer text-sm font-semibold text-muted">{t("✏️ Editar este benchmark (coaches)")}</summary>
+          <summary className="cursor-pointer text-sm font-semibold text-muted"><span className="inline-flex items-center gap-1.5"><Icon name="pencil" size={14} /> {t("Editar este benchmark (coaches)")}</span></summary>
           <BenchmarkForm benchmark={b} />
           <form action={deleteBenchmark} className="text-right">
             <input type="hidden" name="id" value={b.id} />

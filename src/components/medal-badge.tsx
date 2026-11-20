@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { MedalDef } from "@/lib/medals";
+import { Icon } from "@/components/icon";
 
 /**
  * Medallas dibujadas en SVG: cada una con su forma, sus colores y un icono que cuenta lo que significa.
@@ -338,8 +339,8 @@ export function MedalBadge({ medal, unlocked, size = 76 }: { medal: MedalDef; un
           </g>
         )}
       </svg>
-      {!unlocked && <span className="absolute -bottom-0.5 -right-0.5 rounded-full border border-line bg-card px-1 text-[11px]">🔒</span>}
-      {unlocked && medal.reward && <span className="absolute -right-1 -top-1 text-sm">🎁</span>}
+      {!unlocked && <span className="absolute -bottom-0.5 -right-0.5 rounded-full border border-line bg-card px-1 text-[11px]"><Icon name="lock" size={11} /></span>}
+      {unlocked && medal.reward && <span className="absolute -right-1 -top-1"><Icon name="gift" size={15} /></span>}
     </div>
   );
 }

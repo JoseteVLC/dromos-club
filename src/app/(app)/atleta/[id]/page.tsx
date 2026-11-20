@@ -8,6 +8,7 @@ import { MEDALS } from "@/lib/medals";
 import { RM_CATEGORIES, bestPR, formatPR, type Benchmark, type PersonalRecord } from "@/lib/marcas";
 import { Avatar } from "@/components/avatar";
 import { MedalBadge } from "@/components/medal-badge";
+import { Icon } from "@/components/icon";
 
 type Pub = { id: string; full_name: string; avatar_url: string | null; bio: string | null; instagram: string | null; gender: string | null; division: string | null; box: string | null; age: number | null };
 
@@ -55,7 +56,7 @@ export default async function AtletaPage({ params }: { params: Promise<{ id: str
           <h1 className="h-title text-4xl">{pub.full_name || t("Sin nombre")}</h1>
           <div className="mt-1 flex flex-wrap justify-center gap-x-3 gap-y-1 text-sm text-muted">
             {pub.division && pub.division !== "scaled" && <span className="rounded bg-line px-1.5 py-0.5 text-xs font-semibold uppercase">{pub.division}</span>}
-            {pub.box && <span>📍 {pub.box}</span>}
+            {pub.box && <span className="inline-flex items-center gap-1"><Icon name="mappin" size={13} /> {pub.box}</span>}
             {pub.age != null && <span>{t("{n} años", { n: pub.age })}</span>}
             {pub.instagram && (
               <a href={`https://instagram.com/${pub.instagram}`} target="_blank" rel="noopener noreferrer" className="text-accent">
@@ -72,7 +73,7 @@ export default async function AtletaPage({ params }: { params: Promise<{ id: str
         )}
         {!me && isCoachProfile(profile) && (
           <Link href={`/mensajes/${id}`} className="chip">
-            ✉️ {t("Enviar mensaje")}
+            <Icon name="mail" size={16} /> {t("Enviar mensaje")}
           </Link>
         )}
       </div>

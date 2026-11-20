@@ -5,6 +5,7 @@ import { ConfirmDelete } from "./ui";
 import { formatScore } from "@/lib/scoring";
 import type { Result, ScoreType } from "@/lib/types";
 import type { T } from "@/lib/i18n/core";
+import { Icon } from "@/components/icon";
 
 export type FlaggedRecord = Result & {
   rm: number | null;
@@ -19,7 +20,7 @@ export function FlaggedRecords({ rows, t }: { rows: FlaggedRecord[]; t: T }) {
   if (!rows.length) return null;
   return (
     <section className="space-y-3">
-      <h2 className="h-display text-2xl">⚠️ {t("Marcas a revisar")} · {rows.length}</h2>
+      <h2 className="h-display flex items-center gap-3 text-2xl"><Icon name="alert" size={20} tile /> {t("Marcas a revisar")} · {rows.length}</h2>
       <p className="text-sm text-muted">{t("Marcas personales imposibles que el atleta ha confirmado igualmente. Si no son reales, bórralas.")}</p>
       <ul className="card divide-y divide-line">
         {rows.map((r) => (

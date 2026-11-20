@@ -9,6 +9,7 @@ import { ConfirmDelete } from "./ui";
 import { getI18n } from "@/lib/i18n/server";
 import { closeDay, inTime, isClosed } from "@/lib/closing";
 import { longDate } from "@/lib/dates";
+import { Icon } from "@/components/icon";
 
 const GENDERS: { value: Gender | "all"; label: string }[] = [
   { value: "all", label: "Absoluto" },
@@ -148,7 +149,7 @@ export async function Leaderboard({
                     )}
                     {isCoach && byId.get(r.id)?.flag && !byId.get(r.id)?.flag_reviewed && (
                       <Link href="/coach" className="shrink-0 rounded border border-alert/60 px-1 py-0.5 text-alert" title={byId.get(r.id)?.flag ?? ""}>
-                        ⚠️ {t("revisar")}
+                        <Icon name="alert" size={13} /> {t("revisar")}
                       </Link>
                     )}
                     {other(r.id) && <span className="shrink-0 font-semibold text-fg/80">{other(r.id)}</span>}
@@ -161,7 +162,7 @@ export async function Leaderboard({
                       className={`flex h-10 min-w-10 items-center justify-center gap-1 rounded-full border px-3 text-base ${comments[r.id] ? "border-accent/60 text-fg" : "border-line text-muted"}`}
                       aria-label={t("Comentarios")}
                     >
-                      💬{comments[r.id] ? <span className="tabular-nums">{comments[r.id]}</span> : null}
+                      <Icon name="comment" size={15} />{comments[r.id] ? <span className="tabular-nums">{comments[r.id]}</span> : null}
                     </Link>
                   </div>
                 </div>
@@ -204,7 +205,7 @@ export async function Leaderboard({
                         className={`flex h-10 min-w-10 items-center justify-center gap-1 rounded-full border px-3 text-base ${comments[r.id] ? "border-accent/60 text-fg" : "border-line text-muted"}`}
                         aria-label={t("Comentarios")}
                       >
-                        💬{comments[r.id] ? <span className="tabular-nums">{comments[r.id]}</span> : null}
+                        <Icon name="comment" size={15} />{comments[r.id] ? <span className="tabular-nums">{comments[r.id]}</span> : null}
                       </Link>
                     </div>
                   </div>

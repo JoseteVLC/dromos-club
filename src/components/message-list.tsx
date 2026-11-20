@@ -1,5 +1,6 @@
 import { Avatar } from "./avatar";
 import { deleteMessage } from "@/app/actions";
+import { Icon } from "@/components/icon";
 
 export type Msg = {
   id: string;
@@ -28,7 +29,7 @@ export function MessageList({ items, me, locale, t, staffView }: { items: Msg[];
           return (
             <li key={m.id} className="rounded-xl border border-accent/40 bg-accent/10 p-3">
               <div className="mb-1 flex items-center justify-between gap-2 text-xs">
-                <span className="font-semibold text-accent">📣 {t("Anuncio")} · {m.sender?.full_name}</span>
+                <span className="inline-flex items-center gap-1.5 font-semibold text-accent"><Icon name="megaphone" size={15} /> {t("Anuncio")} · {m.sender?.full_name}</span>
                 <span className="text-muted">{fmt(m.created_at)}</span>
               </div>
               <p className="whitespace-pre-wrap text-[15px]">{m.body}</p>

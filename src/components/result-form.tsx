@@ -8,6 +8,7 @@ import { formatTime } from "@/lib/scoring";
 import { DIVISIONS, SCORE_TYPES, wodDivisions, type Division, type Result, type Wod } from "@/lib/types";
 import { FormMessage, Segmented } from "./ui";
 import { useI18n } from "@/lib/i18n/client";
+import { Icon } from "@/components/icon";
 
 export function ResultForm({ wod, existing, defaultDivision }: { wod: Wod; existing: Result | null; defaultDivision?: Division }) {
   const [state, action, pending] = useActionState(saveResult, undefined);
@@ -201,12 +202,12 @@ export function ResultForm({ wod, existing, defaultDivision }: { wod: Wod; exist
 
       {fromTimer && !state && (
         <p className="rounded-lg border border-accent/40 bg-accent/10 px-3 py-2 text-sm">
-          ⏱️ {t("Del timer: {v}. Revísalo (puedes cambiarlo) y guarda.", { v: fromTimer })}
+          <Icon name="timer" size={15} /> {t("Del timer: {v}. Revísalo (puedes cambiarlo) y guarda.", { v: fromTimer })}
         </p>
       )}
       {state?.confirm && !pending ? (
         <div className="space-y-3 rounded-lg border border-amber-400/50 bg-amber-400/10 p-3 text-sm">
-          <p className="font-semibold">🤔 {t("¿Seguro que es así?")}</p>
+          <p className="flex items-center gap-2 font-semibold"><Icon name="help" /> {t("¿Seguro que es así?")}</p>
           <p>{state.confirm}</p>
           <p className="text-muted">{t("Si te has equivocado, corrígelo arriba y vuelve a guardar.")}</p>
           <button

@@ -8,6 +8,7 @@ import { getI18n } from "@/lib/i18n/server";
 import { todayISO } from "@/lib/dates";
 import { RM_CATEGORIES, asResult, formatPR, type Benchmark, type PersonalRecord } from "@/lib/marcas";
 import type { ScoreType } from "@/lib/types";
+import { Icon } from "@/components/icon";
 
 type MyResult = Result & { wods: Wod };
 
@@ -150,7 +151,7 @@ export default async function HistorialPage({ searchParams }: PageProps<"/histor
                     {attempts > 1 && ` · ${t("{n} veces", { n: attempts })}`}
                   </div>
                   <div className="mt-0.5 text-xs text-muted">
-                    📅 {new Date(best.date + "T12:00:00Z").toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })}
+                    <Icon name="calendar" size={13} /> {new Date(best.date + "T12:00:00Z").toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })}
                     {(() => {
                       const months = Math.floor((Date.parse(today) - Date.parse(best.date)) / (30.44 * 86400000));
                       if (months < 1) return null;
@@ -211,7 +212,7 @@ export default async function HistorialPage({ searchParams }: PageProps<"/histor
                             <div className="w-14 shrink-0 text-xs text-muted">{dayLabel(m.performed_on, today, t, locale)}</div>
                             <div className="min-w-0 flex-1">
                               <div className="truncate font-semibold">
-                                <span className="mr-1">🏋️</span>
+                                <Icon name="dumbbell" size={14} className="mr-1" />
                                 {bm.name}
                                 {rm && <span className="ml-1 text-xs text-muted">{rm}RM</span>}
                               </div>

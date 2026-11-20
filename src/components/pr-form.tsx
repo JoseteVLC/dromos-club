@@ -8,6 +8,7 @@ import { SCORE_TYPES, type ScoreType } from "@/lib/types";
 import { FormMessage, Segmented, SubmitButton } from "./ui";
 import { DateInput } from "./date-input";
 import { useI18n } from "@/lib/i18n/client";
+import { Icon } from "@/components/icon";
 
 /** Apuntar una marca: fecha, categoría (RX/escalado o RM según el tipo) y el score. */
 export function PRForm({ benchmark, today, record }: { benchmark: Benchmark; today: string; record?: PersonalRecord }) {
@@ -126,7 +127,7 @@ export function PRForm({ benchmark, today, record }: { benchmark: Benchmark; tod
       </div>
       {state?.confirm && !pending ? (
         <div className="space-y-3 rounded-lg border border-amber-400/50 bg-amber-400/10 p-3 text-sm">
-          <p className="font-semibold">🤔 {t("¿Seguro que es así?")}</p>
+          <p className="flex items-center gap-2 font-semibold"><Icon name="help" /> {t("¿Seguro que es así?")}</p>
           <p>{state.confirm}</p>
           <p className="text-muted">{t("Si te has equivocado, corrígelo arriba y vuelve a guardar.")}</p>
           <button

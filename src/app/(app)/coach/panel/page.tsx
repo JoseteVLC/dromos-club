@@ -5,6 +5,7 @@ import { adminDb, hasAdminKey } from "@/lib/supabase/admin";
 import { boxStats, RISK_DAYS } from "@/lib/box-stats";
 import { todayISO, dayHref } from "@/lib/dates";
 import { Avatar } from "@/components/avatar";
+import { Icon } from "@/components/icon";
 
 /** Panel del box para coaches y dueños: actividad, asistencia y quién está dejando de venir. */
 export default async function PanelPage() {
@@ -36,7 +37,7 @@ export default async function PanelPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="h-display text-2xl">{t("Atletas activos por semana")}</h2>
+        <h2 className="h-display flex items-center gap-3 text-2xl"><Icon name="users" size={20} tile /> {t("Atletas activos por semana")}</h2>
         <div className="card p-4">
           <div className="flex h-36 items-end gap-2">
             {s.weekly.map((w, i) => (
@@ -52,7 +53,7 @@ export default async function PanelPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="h-display text-2xl">{t("Asistencia por día")}</h2>
+        <h2 className="h-display flex items-center gap-3 text-2xl"><Icon name="calendar" size={20} tile /> {t("Asistencia por día")}</h2>
         <div className="card p-4">
           <div className="flex h-28 items-end gap-2">
             {s.byWeekday.map((d) => (
@@ -68,7 +69,7 @@ export default async function PanelPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="h-display text-2xl">⚠️ {t("En riesgo de dejarlo")} · {s.atRisk.length}</h2>
+        <h2 className="h-display flex items-center gap-3 text-2xl"><Icon name="alert" size={20} tile /> {t("En riesgo de dejarlo")} · {s.atRisk.length}</h2>
         <p className="text-sm text-muted">
           {t("Llevan {n} días o más sin meter ningún resultado, o se dieron de alta hace una semana y aún no han empezado. A ellos les llega un recordatorio automático; un mensaje vuestro suele funcionar mejor.", { n: RISK_DAYS })}
         </p>
@@ -85,7 +86,7 @@ export default async function PanelPage() {
                     {p.never ? t("Alta hace {n} días, aún sin resultados", { n: p.days }) : t("{n} días sin entrenar · último: {d}", { n: p.days, d: fmtWeek(p.lastDone!) })}
                   </div>
                 </div>
-                <Link href={`/mensajes/${p.id}`} className="chip shrink-0">✉️ {t("Escribir")}</Link>
+                <Link href={`/mensajes/${p.id}`} className="chip inline-flex shrink-0 items-center gap-1.5"><Icon name="mail" size={14} /> {t("Escribir")}</Link>
               </li>
             ))}
           </ul>
@@ -93,7 +94,7 @@ export default async function PanelPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="h-display text-2xl">{t("WODs más hechos")}</h2>
+        <h2 className="h-display flex items-center gap-3 text-2xl"><Icon name="trophy" size={20} tile /> {t("WODs más hechos")}</h2>
         {s.topWods.length === 0 ? (
           <p className="card p-6 text-center text-muted">{t("Aún no hay resultados en los últimos 30 días.")}</p>
         ) : (

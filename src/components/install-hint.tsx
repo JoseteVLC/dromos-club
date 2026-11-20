@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useI18n } from "@/lib/i18n/client";
+import { Icon } from "@/components/icon";
 
 type BIPEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
 type Platform = "ios" | "android" | "desktop" | "installed";
@@ -64,7 +65,7 @@ function Steps({ platform, inApp, canPrompt, install }: { platform: Platform; in
     <div className="space-y-2 text-sm text-muted">
       {inApp && (
         <p className="rounded-xl bg-accent/10 px-3 py-2 text-fg">
-          ⚠️ {t("La tienes abierta dentro de otra app (WhatsApp, Instagram…). Ábrela primero en {browser}: menú ⋯ → «Abrir en el navegador».", { browser: platform === "ios" ? "Safari" : "Chrome" })}
+          <Icon name="alert" size={14} /> {t("La tienes abierta dentro de otra app (WhatsApp, Instagram…). Ábrela primero en {browser}: menú ⋯ → «Abrir en el navegador».", { browser: platform === "ios" ? "Safari" : "Chrome" })}
         </p>
       )}
       {platform === "ios" && (

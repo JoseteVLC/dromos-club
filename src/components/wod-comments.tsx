@@ -6,6 +6,7 @@ import { ReactableBubble } from "./comment-reactions";
 import { DudasDetails, WodCommentForm } from "./wod-comment-form";
 import type { CommentReaction } from "@/lib/comment-reactions";
 import type { T } from "@/lib/i18n/core";
+import { Icon } from "@/components/icon";
 
 export type WodComment = {
   id: string;
@@ -66,7 +67,7 @@ export function WodComments({
                   <span className="flex items-center gap-1.5 font-semibold">
                     {own ? t("Tú") : c.profiles?.full_name || t("Sin nombre")}
                     {coach && <span className="rounded bg-accent px-1.5 py-0.5 text-[10px] font-bold uppercase text-bg">Coach</span>}
-                    {c.pinned && <span className="text-accent">📌 {t("Fijada")}</span>}
+                    {c.pinned && <span className="inline-flex items-center gap-1 text-accent"><Icon name="pin" size={13} /> {t("Fijada")}</span>}
                   </span>
                   <span className="text-muted">
                     {new Date(c.created_at).toLocaleString(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid" })}
@@ -78,7 +79,7 @@ export function WodComments({
                     {isCoach && (
                       <form action={pinWodComment}>
                         <input type="hidden" name="id" value={c.id} />
-                        <button className="underline">{c.pinned ? t("Soltar") : `📌 ${t("Fijar")}`}</button>
+                        <button className="underline">{c.pinned ? t("Soltar") : <span className="inline-flex items-center gap-1"><Icon name="pin" size={13} /> {t("Fijar")}</span>}</button>
                       </form>
                     )}
                     <form action={deleteWodComment}>

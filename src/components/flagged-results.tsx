@@ -6,6 +6,7 @@ import { formatScore } from "@/lib/scoring";
 import { dayHref } from "@/lib/dates";
 import type { Result, Wod } from "@/lib/types";
 import type { T } from "@/lib/i18n/core";
+import { Icon } from "@/components/icon";
 
 export type FlaggedRow = Result & {
   wods: Pick<Wod, "id" | "title" | "part" | "wod_date" | "score_type" | "score_label">;
@@ -17,7 +18,7 @@ export function FlaggedResults({ rows, t }: { rows: FlaggedRow[]; t: T }) {
   if (!rows.length) return null;
   return (
     <section className="space-y-3">
-      <h2 className="h-display text-2xl">⚠️ {t("Resultados a revisar")} · {rows.length}</h2>
+      <h2 className="h-display flex items-center gap-3 text-2xl"><Icon name="alert" size={20} tile /> {t("Resultados a revisar")} · {rows.length}</h2>
       <p className="text-sm text-muted">{t("Resultados que superan un récord mundial y el atleta ha confirmado igualmente. Revísalos antes de que cierre el WOD (2 días): mientras tanto no cuentan para las medallas.")}</p>
       <ul className="card divide-y divide-line">
         {rows.map((r) => (

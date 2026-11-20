@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef, type ReactNode } from "react";
 import { addWodComment } from "@/app/actions";
 import { FormMessage } from "./ui";
 import { useI18n } from "@/lib/i18n/client";
+import { Icon } from "@/components/icon";
 
 /** Sección plegable; se abre sola si llegas desde un aviso (…#dudas). */
 export function DudasDetails({ count, label, children }: { count: number; label: string; children: ReactNode }) {
@@ -17,7 +18,7 @@ export function DudasDetails({ count, label, children }: { count: number; label:
   return (
     <details id="dudas" ref={ref} className="card group p-4" data-noswipe>
       <summary className="flex cursor-pointer list-none items-center justify-between gap-2 font-semibold">
-        <span>💬 {label}{count ? ` · ${count}` : ""}</span>
+        <span className="inline-flex items-center gap-2"><Icon name="question" size={20} tile /> {label}{count ? ` · ${count}` : ""}</span>
         <span className="text-muted transition group-open:rotate-180">⌄</span>
       </summary>
       <div className="mt-4 space-y-4">{children}</div>

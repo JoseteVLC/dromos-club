@@ -14,6 +14,7 @@ import { daysAgoISO } from "@/lib/dates";
 import { AdminJoin, type JoinRequest } from "@/components/admin-join";
 import { AdminInactive } from "@/components/admin-inactive";
 import { joinUrl, qrSvg } from "@/lib/qr";
+import { Icon } from "@/components/icon";
 
 type Person = {
   id: string;
@@ -167,7 +168,7 @@ export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
       {box.rewards_enabled && (
       <section className="space-y-3">
         <div className="flex items-baseline justify-between gap-3">
-          <h2 className="h-display text-xl">🎁 {t("Premios de medallas")} · {pendingAwards.length}</h2>
+          <h2 className="h-display flex items-center gap-2 text-xl"><Icon name="gift" size={18} tile /> {t("Premios de medallas")} · {pendingAwards.length}</h2>
           <a href="/admin/atletas.csv" className="text-xs text-muted underline">{t("Descargar datos de atletas (CSV)")}</a>
         </div>
         {awards.length === 0 ? (

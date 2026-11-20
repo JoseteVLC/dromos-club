@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Wod } from "@/lib/types";
 import { useI18n } from "@/lib/i18n/client";
+import { Icon } from "@/components/icon";
 
 /**
  * Timer del WOD: For Time (hacia arriba, con time cap opcional), AMRAP (hacia abajo) e intervalos
@@ -271,7 +272,7 @@ export function WodTimer({
   if (!open)
     return (
       <button type="button" onClick={() => setOpen(true)} className="btn-ghost w-full py-3 text-sm">
-        ⏱️ {t("Timer")}
+        <Icon name="timer" size={16} /> {t("Timer")}
       </button>
     );
 
@@ -403,7 +404,7 @@ export function WodTimer({
             <button type="button" onClick={start} className="btn-ghost py-5 text-lg">▶ {t("Seguir")}</button>
           )}
           {cfg.mode === "fortime" && elapsed >= PREP ? (
-            <button type="button" onClick={finish} className="btn py-5 text-lg">🏁 {t("Terminar")}</button>
+            <button type="button" onClick={finish} className="btn py-5 text-lg"><Icon name="flag" size={20} /> {t("Terminar")}</button>
           ) : (
             <button type="button" onClick={reset} className="btn-ghost py-5 text-lg">↺ {t("Reiniciar")}</button>
           )}

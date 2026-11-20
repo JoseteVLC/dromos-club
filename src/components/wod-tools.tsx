@@ -5,9 +5,9 @@ import { getAiTip, getWarmup } from "@/app/actions";
 import { useI18n } from "@/lib/i18n/client";
 import { WodTimer } from "@/components/wod-timer";
 import { PlateCalc } from "@/components/plate-calc";
-import { CalcIcon } from "@/components/icons";
 import type { Lift } from "@/lib/lifts";
 import type { Wod } from "@/lib/types";
+import { Icon } from "@/components/icon";
 
 type Panel = "warm" | "tip" | "calc" | null;
 type Fetcher = (wodId: string) => Promise<{ body?: string | null; error?: string | null }>;
@@ -54,7 +54,7 @@ export function WodTools({
   };
 
   const btn = (on: boolean) =>
-    `btn-ghost flex-1 px-2 py-2 text-xs leading-tight ${on ? "border-accent text-accent" : ""}`;
+    `btn-ghost inline-flex flex-1 items-center justify-center gap-1 px-2 py-2 text-xs leading-tight ${on ? "border-accent text-accent" : ""}`;
 
   const shown = panel === "warm" ? warm : panel === "tip" ? tip : null;
   const error = warm.error ?? tip.error;
@@ -63,17 +63,17 @@ export function WodTools({
     <div className="space-y-2">
       <div className="flex gap-2">
         <button type="button" disabled={warm.pending} onClick={() => toggle("warm", warm)} className={btn(panel === "warm")}>
-          {warm.pending ? t("Preparando…") : `🔥 ${t("Calentamiento")}`}
+          {warm.pending ? t("Preparando…") : <><Icon name="flame" size={15} /> {t("Calentamiento")}</>}
         </button>
         <button type="button" onClick={() => setTimer(true)} className={btn(false)}>
-          ⏱️ {t("Timer")}
+          <Icon name="timer" size={15} /> {t("Timer")}
         </button>
         <button type="button" disabled={tip.pending} onClick={() => toggle("tip", tip)} className={btn(panel === "tip")}>
-          {tip.pending ? t("Calculando…") : `💡 ${t("Peso y escalado")}`}
+          {tip.pending ? t("Calculando…") : <><Icon name="tip" size={15} /> {t("Peso y escalado")}</>}
         </button>
         {calc && (
           <button type="button" onClick={() => setPanel(panel === "calc" ? null : "calc")} className={`${btn(panel === "calc")} inline-flex items-center justify-center gap-1`}>
-            <CalcIcon size={15} /> {t("Discos")}
+            <Icon name="plates" size={15} /> {t("Discos")}
           </button>
         )}
       </div>
@@ -83,8 +83,8 @@ export function WodTools({
       {shown?.body && (
         <div className="card space-y-2 border-accent/40 p-4">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-accent">
-              {panel === "warm" ? `🔥 ${t("Calentamiento para este WOD")}` : `💡 ${t("Peso y escalado para ti")}`}
+            <p className="flex items-center gap-2 text-sm font-semibold text-accent">
+              {panel === "warm" ? <><Icon name="flame" /> {t("Calentamiento para este WOD")}</> : <><Icon name="tip" /> {t("Peso y escalado para ti")}</>}
             </p>
             <button type="button" onClick={() => setPanel(null)} className="text-xs text-muted" aria-label={t("Cerrar")}>✕</button>
           </div>
@@ -100,7 +100,7 @@ export function WodTools({
       {panel === "calc" && calc && (
         <div className="space-y-1">
           <div className="flex items-center justify-between px-1">
-            <p className="flex items-center gap-2 text-sm font-semibold text-accent"><CalcIcon size={16} /> {t("Calculadora de % y discos")}</p>
+            <p className="flex items-center gap-2 text-sm font-semibold text-accent"><Icon name="plates" size={16} /> {t("Calculadora de % y discos")}</p>
             <button type="button" onClick={() => setPanel(null)} className="text-xs text-muted" aria-label={t("Cerrar")}>✕</button>
           </div>
           <PlateCalc lifts={calc.lifts} initialLift={calc.initialLift} initialPct={calc.initialPct} />

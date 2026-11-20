@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { isIOS, isStandalone, pushSupported } from "./push-settings";
 import { useI18n } from "@/lib/i18n/client";
+import { Icon } from "@/components/icon";
 
 /** Cartel que invita a instalar la app / activar avisos. Se puede cerrar (vuelve a salir a los 7 días). */
 export function PushPrompt() {
@@ -37,7 +38,7 @@ export function PushPrompt() {
   };
   return (
     <div className="mx-4 mt-3 flex items-center gap-3 rounded-lg border border-accent/50 bg-accent/10 px-3 py-2.5 text-sm">
-      <span className="text-lg">🔔</span>
+      <Icon name="bell" size={22} />
       <Link href="/perfil#avisos" className="flex-1">
         {kind === "install" ? (
           <>

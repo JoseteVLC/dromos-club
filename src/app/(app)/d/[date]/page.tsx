@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { WodTools } from "@/components/wod-tools";
-import { RepeatIcon } from "@/components/icons";
 import { liftPreset, myLifts, wodHasLoad } from "@/lib/lifts";
 import { WodComments, type WodComment } from "@/components/wod-comments";
 import type { CommentReaction } from "@/lib/comment-reactions";
@@ -22,6 +21,7 @@ import { Leaderboard } from "@/components/leaderboard";
 import type { ReactionSummary } from "@/components/reactions";
 import { getI18n } from "@/lib/i18n/server";
 import type { T } from "@/lib/i18n/core";
+import { Icon } from "@/components/icon";
 
 export default async function DayPage({ params, searchParams }: PageProps<"/d/[date]">) {
   const { date } = await params;
@@ -245,7 +245,7 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
 
             {repeats.length > 0 && (
               <div className="card space-y-1 border-accent/40 p-4">
-                <p className="flex items-center gap-2 text-sm font-semibold"><RepeatIcon className="text-accent" /> {t("Ya hiciste este WOD")}</p>
+                <p className="flex items-center gap-2 text-sm font-semibold"><Icon name="repeat" /> {t("Ya hiciste este WOD")}</p>
                 <ul className="space-y-0.5 text-sm">
                   {repeats.map((r) => (
                     <li key={r.wodId}>

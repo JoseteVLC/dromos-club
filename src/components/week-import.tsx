@@ -8,6 +8,7 @@ import { parseWeek, type ParsedPart } from "@/lib/week-parser";
 import { SCORE_TYPES, type ScoreType } from "@/lib/types";
 import { useI18n } from "@/lib/i18n/client";
 import { FormMessage, SubmitButton } from "./ui";
+import { Icon } from "@/components/icon";
 
 export function WeekImport({ defaultMonday, today }: { defaultMonday: string; today: string }) {
   const [monday, setMonday] = useState(defaultMonday);
@@ -103,7 +104,7 @@ export function WeekImport({ defaultMonday, today }: { defaultMonday: string; to
   return (
     <div className="space-y-4">
       <div className="card space-y-3 border-accent/40 p-4">
-        <h2 className="h-display text-xl">📷 {t("Desde una foto")}</h2>
+        <h2 className="h-display flex items-center gap-2 text-xl"><Icon name="camera" size={18} tile /> {t("Desde una foto")}</h2>
         <p className="text-xs text-muted">
           {t("Haz una foto a la pizarra del box, a la plani en papel o una captura de pantalla. La IA la lee y te prepara los WODs para revisar. Hasta 4 fotos a la vez.")}
         </p>
@@ -112,11 +113,11 @@ export function WeekImport({ defaultMonday, today }: { defaultMonday: string; to
           <DateInput id="photo-date" value={photoDate} onChange={setPhotoDate} />
         </div>
         <label className={`btn flex w-full cursor-pointer items-center justify-center gap-2 ${photoBusy ? "pointer-events-none opacity-60" : ""}`}>
-          {photoBusy ? t("Leyendo…") : `📷 ${t("Hacer foto o elegir imagen")}`}
+          {photoBusy ? t("Leyendo…") : <span className="inline-flex items-center gap-2"><Icon name="camera" size={16} /> {t("Hacer foto o elegir imagen")}</span>}
           <input type="file" accept="image/*" multiple className="hidden" disabled={photoBusy} onChange={(e) => onPhotos(e.target.files)} />
         </label>
         {photoMsg && <p className="text-sm text-muted">{photoMsg}</p>}
-        {notes && <p className="rounded-lg border border-yellow-500/50 bg-yellow-500/10 p-2 text-sm text-yellow-200">⚠️ {notes}</p>}
+        {notes && <p className="rounded-lg border border-yellow-500/50 bg-yellow-500/10 p-2 text-sm text-yellow-200"><Icon name="alert" size={14} /> {notes}</p>}
       </div>
 
       <div className="card space-y-4 p-4">

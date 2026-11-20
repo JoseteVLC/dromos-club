@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { CalcIcon } from "@/components/icons";
 import { requireUser } from "@/lib/supabase/server";
 import { getI18n } from "@/lib/i18n/server";
 import { myLifts } from "@/lib/lifts";
 import { HistoryTabs } from "@/components/history-tabs";
 import { PlateCalc } from "@/components/plate-calc";
+import { Icon } from "@/components/icon";
 
 /** Calculadora de % y discos con tus 1RM de básicos y halterofilia. */
 export default async function CalculadoraPage() {
@@ -17,7 +17,7 @@ export default async function CalculadoraPage() {
       <h1 className="h-title text-5xl">{t("Historial")}</h1>
       <HistoryTabs active="marcas" t={t} />
       <Link href="/marcas?c=lifts" className="text-sm text-muted">← {t("Mis marcas")}</Link>
-      <h2 className="h-display flex items-center gap-2 text-3xl"><CalcIcon size={28} className="text-accent" /> {t("Calculadora de % y discos")}</h2>
+      <h2 className="h-display flex items-center gap-2 text-3xl"><Icon name="plates" size={22} tile /> {t("Calculadora de % y discos")}</h2>
       <p className="text-sm text-muted">
         {lifts.length
           ? t("Elige el movimiento o escribe tu 1RM, toca el % y te dice qué discos poner a cada lado.")

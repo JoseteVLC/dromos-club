@@ -818,5 +818,10 @@ const d: Record<string, string> = {
   "{v} frente a una mediana de {med} en la comunidad (mejor: {best}).": "{v} against a median of {med} in the community (best: {best}).",
   "{n} rondas frente a una mediana de {med} en la comunidad.": "{n} rounds against a median of {med} in the community.",
   "Haz una foto a la pizarra, a la plani en papel o una captura de pantalla. La IA la lee y te prepara los WODs para revisar. Hasta 4 fotos a la vez.": "Take a photo of the whiteboard, the printed programming or a screenshot. It reads it and prepares the WODs for you to review. Up to 4 photos at once.",
+  "Resultados": "Results",
+  "Manual de uso": "User guide",
+  "Editar este benchmark (coaches)": "Edit this benchmark (coaches)",
+  "Añadir un benchmark al catálogo (coaches)": "Add a benchmark to the catalogue (coaches)",
+  "Foto de la pizarra, Word de la plani o texto copiado": "Whiteboard photo, plan Word file or pasted text",
 };
 export default d;

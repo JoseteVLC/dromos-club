@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { CalcIcon } from "@/components/icons";
 import { isCoachProfile, requireUser } from "@/lib/supabase/server";
 import { getI18n } from "@/lib/i18n/server";
 import type { Result } from "@/lib/types";
 import { BENCH_CATEGORIES, RM_CATEGORIES, bestPR, formatPR, type BenchCategory, type Benchmark, type PersonalRecord } from "@/lib/marcas";
 import { HistoryTabs } from "@/components/history-tabs";
 import { BenchmarkForm } from "@/components/pr-form";
+import { Icon } from "@/components/icon";
 
 export default async function MarcasPage({ searchParams }: PageProps<"/marcas">) {
   const sp = await searchParams;
@@ -100,7 +100,7 @@ export default async function MarcasPage({ searchParams }: PageProps<"/marcas">)
       </p>
       <Link href="/marcas/calculadora" className="card flex items-center justify-between p-4">
         <span>
-          <span className="flex items-center gap-2 font-semibold"><CalcIcon className="text-accent" /> {t("Calculadora de % y discos")}</span>
+          <span className="flex items-center gap-2 font-semibold"><Icon name="plates" size={20} tile /> {t("Calculadora de % y discos")}</span>
           <span className="text-xs text-muted">{t("El % de tu RM y qué discos poner a cada lado")}</span>
         </span>
         <span className="text-xl text-accent">→</span>
@@ -143,7 +143,7 @@ export default async function MarcasPage({ searchParams }: PageProps<"/marcas">)
 
       {isCoach && (
         <details className="space-y-3">
-          <summary className="cursor-pointer text-sm font-semibold text-muted">{t("➕ Añadir un benchmark al catálogo (coaches)")}</summary>
+          <summary className="cursor-pointer text-sm font-semibold text-muted"><span className="inline-flex items-center gap-1.5"><Icon name="plus" size={14} /> {t("Añadir un benchmark al catálogo (coaches)")}</span></summary>
           <BenchmarkForm defaultCategory={cat} />
         </details>
       )}

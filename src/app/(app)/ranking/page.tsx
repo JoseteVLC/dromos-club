@@ -9,6 +9,7 @@ import { streakStandings } from "@/lib/streak-data";
 import type { Gender, Result, Wod } from "@/lib/types";
 import { getI18n } from "@/lib/i18n/server";
 import { RankingTabs } from "@/components/ranking-tabs";
+import { Icon } from "@/components/icon";
 
 type Period = "week" | "month" | "year";
 
@@ -137,7 +138,7 @@ async function WodBoards({ period, refDate }: { period: Period; refDate: string 
                             </div>
                             <div className="truncate text-xs text-muted">
                               {res.length === 1 ? t("1 resultado") : t("{n} resultados", { n: res.length })}
-                              {top && ` · 🥇 ${top.profiles?.full_name || t("Sin nombre")} ${top.display}`}
+                              {top && <> · <Icon name="medal" size={13} /> {top.profiles?.full_name || t("Sin nombre")} {top.display}</>}
                             </div>
                           </div>
                           <div className="text-right text-xs">
@@ -208,7 +209,7 @@ async function StreakRanking({ gender }: { gender: Gender | "all" }) {
                 </div>
                 <div className="text-right">
                   <div className={`h-display text-2xl tabular-nums ${s.days === 0 ? "text-muted" : ""}`}>
-                    {s.days > 0 && "🔥"}
+                    {s.days > 0 && <Icon name="flame" size={20} className="mr-0.5" />}
                     {s.days}
                   </div>
                   <div className="text-[10px] uppercase tracking-wider text-muted">{t("seguidos")}</div>

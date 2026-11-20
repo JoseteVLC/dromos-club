@@ -4,6 +4,7 @@ import { getI18n } from "@/lib/i18n/server";
 import { getNotices } from "@/lib/notifications";
 import { MEDAL_BY_CODE } from "@/lib/medals";
 import { MedalBadge } from "@/components/medal-badge";
+import { Icon } from "@/components/icon";
 
 
 export default async function AvisosPage() {
@@ -33,7 +34,7 @@ export default async function AvisosPage() {
                     <div className="min-w-0 flex-1 space-y-1">
                       <div className="text-sm">
                         {t("¡Medalla desbloqueada!")} <b>{t(m.name)}</b>
-                        {m.reward && <span className="ml-1">🎁</span>}
+                        {m.reward && <Icon name="gift" size={14} className="ml-1" />}
                       </div>
                       <div className="text-xs text-muted">
                         {t(m.desc)}
@@ -49,7 +50,7 @@ export default async function AvisosPage() {
               return (
                 <li key={n.id}>
                   <Link href={`/wod/${n.wodId}#dudas`} className={`flex gap-3 p-4 ${isNew ? "bg-accent/10" : ""}`}>
-                    <span className="text-xl">{n.kind === "wcomment" ? "❓" : n.emoji}</span>
+                    {n.kind === "wcomment" ? <Icon name="question" size={20} /> : <span className="text-xl">{n.emoji}</span>}
                     <div className="min-w-0 flex-1 space-y-1">
                       <div className="text-sm">
                         <b>{n.who || t("Alguien")}</b>{" "}
@@ -69,7 +70,7 @@ export default async function AvisosPage() {
             return (
               <li key={n.id}>
                 <Link href={`/r/${n.resultId}`} className={`flex gap-3 p-4 ${isNew ? "bg-accent/10" : ""}`}>
-                  <span className="text-xl">{n.kind === "comment" ? "💬" : n.emoji}</span>
+                  {n.kind === "comment" ? <Icon name="comment" size={20} /> : <span className="text-xl">{n.emoji}</span>}
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="text-sm">
                       <b>{n.who || t("Alguien")}</b>{" "}

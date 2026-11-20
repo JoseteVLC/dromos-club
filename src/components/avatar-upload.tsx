@@ -5,6 +5,7 @@ import { removeAvatar, uploadAvatar } from "@/app/actions";
 import { Avatar } from "./avatar";
 import { FormMessage } from "./ui";
 import { useI18n } from "@/lib/i18n/client";
+import { Icon } from "@/components/icon";
 
 /** Recorta la foto a un cuadrado de 400 px y la comprime a JPEG antes de subirla (≈30–60 KB). */
 async function squareJpeg(file: File, size = 400): Promise<Blob> {
@@ -56,7 +57,7 @@ export function AvatarUpload({ name, url }: { name: string; url: string | null }
     <div className="flex items-center gap-4">
       <button type="button" onClick={() => input.current?.click()} className="relative" aria-label={t("Cambiar foto")}>
         <Avatar name={name} url={shown} size={84} className={busy ? "opacity-50" : ""} />
-        <span className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border border-line bg-card text-sm">📷</span>
+        <span className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border border-line bg-card text-sm"><Icon name="camera" size={14} /></span>
       </button>
       <div className="space-y-1 text-sm">
         <button type="button" onClick={() => input.current?.click()} className="font-semibold text-accent">

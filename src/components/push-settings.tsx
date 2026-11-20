@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { deletePushSubscription, savePushSubscription, sendTestPush, updateNotifyPrefs } from "@/app/actions";
 import { useI18n } from "@/lib/i18n/client";
+import { Icon } from "@/components/icon";
 
 // Clave pública VAPID (no es secreta; la privada está solo en Vercel)
 const KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || "BKsMIOjeT5-Y5CJaprXtor1mdsSbICz_kp9aW0YqqZg8h8t8oMDy5iQJ4kM-E-YtYVZamacJouUIdnYT_PLCmDA";
@@ -86,7 +87,7 @@ export function PushSettings({ prefs }: { prefs: Prefs }) {
   return (
     <section id="avisos" className="card space-y-4 p-4">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="h-display text-xl">🔔 {t("Notificaciones")}</h2>
+        <h2 className="h-display flex items-center gap-2 text-xl"><Icon name="bell" size={18} tile /> {t("Notificaciones")}</h2>
         {state === "on" && <span className="text-xs font-semibold text-accent">● {t("Activadas en este móvil")}</span>}
       </div>
 

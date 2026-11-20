@@ -5,6 +5,7 @@ import { MessageList, type Msg } from "@/components/message-list";
 import { MessageForm } from "@/components/message-form";
 import { Avatar } from "@/components/avatar";
 import { AthletePicker } from "@/components/athlete-picker";
+import { Icon } from "@/components/icon";
 
 const SEL = "id, thread_user_id, sender_id, body, created_at, sender:profiles!messages_sender_id_fkey(full_name, avatar_url)";
 
@@ -70,7 +71,7 @@ export default async function MensajesPage({ searchParams }: { searchParams: Pro
       </div>
 
       <details className="card p-4">
-        <summary className="cursor-pointer list-none font-semibold">📣 {t("Enviar un anuncio a toda la comunidad")}</summary>
+        <summary className="flex cursor-pointer list-none items-center gap-2 font-semibold"><Icon name="megaphone" size={18} /> {t("Enviar un anuncio a toda la comunidad")}</summary>
         <div className="mt-3 space-y-3">
           <p className="text-xs text-muted">{t("Le llega a todos los atletas en Mensajes y como notificación a quien tenga los avisos activados.")}</p>
           <MessageForm announce placeholder={t("Ej.: Este sábado no hay plani por el evento. ¡Nos vemos el lunes!")} />
@@ -84,7 +85,7 @@ export default async function MensajesPage({ searchParams }: { searchParams: Pro
       </details>
 
       <section className="space-y-2">
-        <h2 className="h-display text-xl">✉️ {t("Escribir a un atleta")}</h2>
+        <h2 className="h-display flex items-center gap-2 text-xl"><Icon name="mail" size={18} tile /> {t("Escribir a un atleta")}</h2>
         <AthletePicker people={(people ?? []).map((p) => ({ id: p.id as string, name: (p.full_name as string) || t("Sin nombre") }))} />
       </section>
 

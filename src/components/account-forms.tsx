@@ -6,6 +6,7 @@ import { acceptInvitation, updatePassword, updateProfile } from "@/app/actions";
 import { DIVISIONS, type Division, type Gender, type Profile } from "@/lib/types";
 import { FormMessage, Segmented, SubmitButton } from "./ui";
 import { useI18n } from "@/lib/i18n/client";
+import { Icon } from "@/components/icon";
 
 export const GENDER_OPTS = [
   { value: "M" as Gender, label: "Chico" },
@@ -84,7 +85,7 @@ export function PersonalForm({ profile }: { profile: Profile | null }) {
       </div>
 
       <fieldset className="space-y-4 rounded-xl border border-line p-3">
-        <legend className="px-1 text-sm font-semibold">🔒 {t("Datos privados")}</legend>
+        <legend className="inline-flex items-center gap-1.5 px-1 text-sm font-semibold"><Icon name="lock" size={14} /> {t("Datos privados")}</legend>
         <p className="-mt-1 text-xs text-muted">{t("Solo los ve el equipo de tu box (para enviarte algún regalo, premios de medallas, rankings por edad…). Ningún atleta puede verlos.")}</p>
         <div>
           <label className="label" htmlFor="box">{t("¿En qué box entrenas?")}</label>

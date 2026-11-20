@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useI18n } from "@/lib/i18n/client";
+import { Icon } from "@/components/icon";
 
 type DayDot = { date: string; label: string; status: "done" | "missed" | "pending" | "rest"; isToday: boolean; selected: boolean };
 
@@ -129,8 +130,8 @@ function cheer(n: number) {
 
 function Flame({ lit }: { lit: boolean }) {
   return (
-    <div className={`flex h-12 w-12 items-center justify-center rounded-full text-3xl ${lit ? "bg-accent/15" : "bg-line grayscale"}`}>
-      🔥
+    <div className={lit ? "" : "opacity-40 grayscale"}>
+      <Icon name="flame" size={26} tile />
     </div>
   );
 }

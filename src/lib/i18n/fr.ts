@@ -818,6 +818,11 @@ const d: Record<string, string> = {
   "{v} frente a una mediana de {med} en la comunidad (mejor: {best}).": "{v} face à une médiane de {med} dans la communauté (meilleur : {best}).",
   "{n} rondas frente a una mediana de {med} en la comunidad.": "{n} tours face à une médiane de {med} dans la communauté.",
   "Haz una foto a la pizarra, a la plani en papel o una captura de pantalla. La IA la lee y te prepara los WODs para revisar. Hasta 4 fotos a la vez.": "Prends en photo le tableau, la programmation papier ou une capture d'écran. Elle la lit et te prépare les WODs à vérifier. Jusqu'à 4 photos à la fois.",
+  "Resultados": "Résultats",
+  "Manual de uso": "Guide d'utilisation",
+  "Editar este benchmark (coaches)": "Modifier ce benchmark (coachs)",
+  "Añadir un benchmark al catálogo (coaches)": "Ajouter un benchmark au catalogue (coachs)",
+  "Foto de la pizarra, Word de la plani o texto copiado": "Photo du tableau, fichier Word du plan ou texte collé",
 };
 
 export default d;

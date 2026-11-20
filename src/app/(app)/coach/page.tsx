@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Icon } from "@/components/icon";
 import { getI18n } from "@/lib/i18n/server";
 import { requireCoach } from "@/lib/supabase/server";
 import { SCORE_TYPES, type Wod } from "@/lib/types";
@@ -53,7 +54,7 @@ export default async function CoachPage({ searchParams }: PageProps<"/coach">) {
       <FlaggedRecords rows={flaggedPrs} t={t} />
       <Link href="/coach/panel" className="card flex items-center justify-between border-accent/60 p-4">
         <span>
-          <span className="h-display block text-2xl">📊 {t("Panel del box")}</span>
+          <span className="h-display flex items-center gap-3 text-2xl"><Icon name="chart" size={20} tile /> {t("Panel del box")}</span>
           <span className="text-sm text-muted">{t("Activos por semana, asistencia, WODs más hechos y quién está dejando de venir")}</span>
         </span>
         <span className="text-2xl text-accent">→</span>
@@ -61,7 +62,7 @@ export default async function CoachPage({ searchParams }: PageProps<"/coach">) {
       <Link href="/coach/semana" className="card flex items-center justify-between border-accent/60 p-4">
         <span>
           <span className="h-display block text-2xl">{t("Importar WODs")}</span>
-          <span className="text-sm text-muted">{t("📷 Foto de la pizarra, Word de la plani o texto copiado")}</span>
+          <span className="text-sm text-muted"><span className="inline-flex items-center gap-1.5"><Icon name="camera" size={14} /> {t("Foto de la pizarra, Word de la plani o texto copiado")}</span></span>
         </span>
         <span className="text-2xl text-accent">→</span>
       </Link>

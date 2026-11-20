@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n/client";
+import { Icon } from "@/components/icon";
 
 /**
  * Campo de fecha que siempre se lee en formato europeo (lun, 16 nov 2026),
@@ -36,7 +37,7 @@ export function DateInput({
       {/* Lo que se ve: la fecha en formato europeo */}
       <div className="input flex w-full items-center justify-between gap-2 text-left" aria-hidden>
         <span className={v ? "" : "text-muted"}>{label}</span>
-        <span>📅</span>
+        <Icon name="calendar" size={16} />
       </div>
       {/* Encima, transparente, el selector nativo: al tocarlo se abre el calendario del móvil (iPhone y Android) */}
       <input

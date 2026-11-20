@@ -13,6 +13,7 @@ import { leaveBox, logout } from "@/app/actions";
 import { ConfirmDelete } from "@/components/ui";
 import { getI18n } from "@/lib/i18n/server";
 import { LangSwitcher } from "@/components/lang-switcher";
+import { Icon } from "@/components/icon";
 
 export default async function PerfilPage({ searchParams }: PageProps<"/perfil">) {
   const sp = await searchParams;
@@ -49,7 +50,7 @@ export default async function PerfilPage({ searchParams }: PageProps<"/perfil">)
       <PushSettings prefs={prefs ?? { notify_social: true, notify_medals: true, notify_messages: true, notify_reminders: true, notify_weekly: true }} />
 
       <Link href="/mensajes" className="card flex items-center gap-3 p-4">
-        <span className="text-2xl">✉️</span>
+        <Icon name="mail" size={22} tile />
         <div className="flex-1">
           <div className="font-semibold">{t("Mensajes con el equipo")}</div>
           <div className="text-xs text-muted">{t("¿Dudas con la plani o tus resultados? Escríbenos.")}</div>
@@ -67,7 +68,7 @@ export default async function PerfilPage({ searchParams }: PageProps<"/perfil">)
           {ownedMedals.size === 0 && <MedalBadge medal={MEDALS[0]} unlocked={false} size={40} />}
         </div>
         <div className="flex-1">
-          <div className="font-semibold">🏅 {t("Medallas")}</div>
+          <div className="flex items-center gap-2 font-semibold"><Icon name="medal" size={18} /> {t("Medallas")}</div>
           <div className="text-xs text-muted">{t("{a} de {b} desbloqueadas", { a: ownedMedals.size, b: MEDALS.length })}</div>
         </div>
         <span className="text-accent">→</span>
@@ -86,18 +87,18 @@ export default async function PerfilPage({ searchParams }: PageProps<"/perfil">)
         </div>
         <PersonalForm profile={me} />
         <Link href={`/atleta/${user.id}`} className="block text-center text-sm text-muted underline">
-          👀 {t("Ver mi perfil público")}
+          <Icon name="eye" size={16} /> {t("Ver mi perfil público")}
         </Link>
       </section>
 
       <section className="space-y-2">
-        <h2 className="h-display text-xl">{t("📲 Instala la app")}</h2>
+        <h2 className="h-display flex items-center gap-2 text-xl"><Icon name="phone" size={18} tile /> {t("Instala la app")}</h2>
         <p className="text-sm text-muted">{t("Es una app web: la añades a la pantalla de inicio y se abre como una app normal, con el icono TC.")}</p>
         <InstallHelp />
       </section>
 
       <section className="space-y-2">
-        <h2 className="h-display text-xl">{t("📘 Manual de uso")}</h2>
+        <h2 className="h-display flex items-center gap-2 text-xl"><Icon name="book" size={18} tile /> {t("Manual de uso")}</h2>
         <Link href="/ayuda" className="card flex items-center justify-between p-4 font-semibold">
           {t("Cómo funciona la app")} <span className="text-accent">→</span>
         </Link>
