@@ -838,6 +838,16 @@ const d: Record<string, string> = {
   "Ideas": "Idées",
   "Ideas para este bloque": "Idées pour ce bloc",
   "Elige las que encajen con tu nivel. Si tienes dudas, pregunta a tu coach.": "Choisis celles qui correspondent à ton niveau. En cas de doute, demande à ton coach.",
+  "Día": "Jour",
+  "Día completo": "Journée complète",
+  "{done} de {total} hechas": "{done} sur {total} faites",
+  "Sin hacer": "Pas fait",
+  "Desmarcar": "Annuler",
+  "Marcar hecho": "Marquer fait",
+  "Ver ranking ›": "Voir le classement ›",
+  "Apuntar resultado ›": "Noter le résultat ›",
+  "Ver ›": "Voir ›",
+  "{n} partes": "{n} parties",
 };
 
 export default d;

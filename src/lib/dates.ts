@@ -43,6 +43,11 @@ export function longDate(iso: string, locale = "es-ES"): string {
   });
 }
 
+/** Pantalla «Día completo»: todas las partes del día seguidas. */
+export function fullDayHref(iso: string): string {
+  return `/dia/${iso}`;
+}
+
 export function dayHref(iso: string, extra?: Record<string, string | undefined>): string {
   const q = new URLSearchParams();
   for (const [k, v] of Object.entries(extra ?? {})) if (v) q.set(k, v);

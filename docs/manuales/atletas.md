@@ -29,6 +29,13 @@ Al abrir la app ves el entreno de hoy. Si el día tiene varias partes (A, B, C�
 - **💡 Peso y escalado para ti:** pulsa «Peso y escalado» y la app mira el WOD y tus marcas (Mis marcas y tus cargas recientes) y te dice qué peso meter en cada movimiento, si te conviene escalar algo y una clave de estrategia. Si la plani pide un %, lo calcula con tu RM. Cuantas más marcas tengas apuntadas, mejor afina. El consejo se queda guardado en ese WOD. En las partes de técnica, skills o calentamiento (las de «Hecho») el botón se llama **Ideas** y te propone ejercicios y progresiones para ese bloque.
 - **«¿Seguro que es así?»:** si metes un resultado que parece imposible (más rápido que el récord mundial, un cero de más, minutos y segundos cambiados…), la app te lo pregunta antes de guardarlo. Corrígelo, o pulsa «Sí, está bien: guardar» si de verdad es así.
 
+## Día completo
+
+En el menú de abajo, **Día** te enseña todas las partes del día seguidas y en orden (calentamiento, técnica, fuerza, metcon…), cada una con su enunciado completo y si ya la has hecho. Arriba tienes tu constancia, y con las flechas o deslizando cambias de día.
+
+- Las partes de técnica, skills o calentamiento (las de «Hecho») se marcan ahí mismo con **Marcar hecho**; si te equivocas, **Desmarcar**.
+- Pulsa cualquier otra parte para entrar a apuntar tu resultado y ver su leaderboard. Desde ahí, **‹ Día completo** te devuelve a la vista del día.
+
 ## Meter tu resultado
 
 Baja hasta «Mete tu resultado», elige tu categoría, escribe tu marca y pulsa **Guardar resultado**. Puedes cambiarlo cuando quieras volviendo al mismo WOD.

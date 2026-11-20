@@ -304,6 +304,30 @@ export async function saveResult(_: ActionState, fd: FormData): Promise<ActionSt
   return { ok: "¡Resultado guardado!" };
 }
 
+/** Partes «Hecho» (calentamiento, técnica…): marcar o desmarcar de un toque desde el día completo. */
+export async function toggleDone(fd: FormData) {
+  const { supabase, user, profile, box } = await requireUser();
+  const wodId = str(fd, "wod_id");
+  const { data: wod } = await supabase.from("wods").select("*").eq("id", wodId).maybeSingle<Wod>();
+  if (!wod || wod.score_type !== "check") return;
+  const since = memberSince(profile);
+  if (since && wod.wod_date < since) return;
+  const { data: had } = await supabase.from("results").select("id").eq("wod_id", wodId).eq("user_id", user.id).maybeSingle();
+  if (had) await supabase.from("results").delete().eq("id", had.id);
+  else {
+    const allowed: Division[] = wodDivisions(wod).filter((d) => d !== "scaled");
+    const division = allowed.includes(profile?.division as Division) ? (profile!.division as Division) : (allowed[0] ?? "rx");
+    await supabase.from("results").upsert(
+      { wod_id: wodId, user_id: user.id, division, finished: true, updated_at: new Date().toISOString() },
+      { onConflict: "wod_id,user_id" },
+    );
+    checkMedalsLater(supabase, user.id, box);
+  }
+  revalidatePath("/", "layout");
+  const back = str(fd, "back");
+  if (back.startsWith("/")) redirect(back);
+}
+
 export async function deleteResult(fd: FormData) {
   const { supabase } = await requireUser();
   await supabase.from("results").delete().eq("id", str(fd, "id"));

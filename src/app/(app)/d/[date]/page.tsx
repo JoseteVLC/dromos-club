@@ -8,7 +8,7 @@ import { moveWod } from "@/app/actions";
 import { tipFor } from "@/lib/ai-tips";
 import { notFound, redirect } from "next/navigation";
 import { isCoachProfile, memberSince, planHorizon, requireUser } from "@/lib/supabase/server";
-import { addDays, dayHref, isISODate, todayISO } from "@/lib/dates";
+import { addDays, dayHref, fullDayHref, isISODate, todayISO } from "@/lib/dates";
 import { mondayOf } from "@/lib/week-parser";
 import { myStreak } from "@/lib/streak-data";
 import { StreakCard } from "@/components/streak-card";
@@ -201,6 +201,11 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
           </div>
         ) : (
           <>
+            <Link href={fullDayHref(date)} className="flex items-center gap-1 text-sm font-semibold text-accent">
+              <span aria-hidden>‹</span> {t("Día completo")}
+              <span className="font-normal text-muted">· {t("{n} partes", { n: wods.length })}</span>
+            </Link>
+
             {wods.length > 1 && (
               <nav className="flex gap-2 overflow-x-auto pb-1" data-noswipe>
                 {wods.map((w) => {

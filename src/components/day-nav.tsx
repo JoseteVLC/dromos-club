@@ -3,11 +3,16 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { addDays, dayHref, dayLabel, longDate } from "@/lib/dates";
+import { addDays, dayHref as wodHref, dayLabel, fullDayHref, longDate } from "@/lib/dates";
+
+/** «d»: pantalla de WODs (una parte); «dia»: día completo */
+type Base = "d" | "dia";
+const hrefOf = (base: Base) => (iso: string) => (base === "dia" ? fullDayHref(iso) : wodHref(iso));
 import { useI18n } from "@/lib/i18n/client";
 
 /** Barra de fecha: ‹ Hoy › + botón de calendario. */
-export function DayNav({ date, today, min, max }: { date: string; today: string; min?: string | null; max?: string | null }) {
+export function DayNav({ date, today, min, max, base = "d" }: { date: string; today: string; min?: string | null; max?: string | null; base?: Base }) {
+  const dayHref = hrefOf(base);
   const router = useRouter();
   const { t, locale } = useI18n();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -20,7 +25,7 @@ export function DayNav({ date, today, min, max }: { date: string; today: string;
   useEffect(() => {
     if (canPrev) router.prefetch(dayHref(prev));
     if (canNext) router.prefetch(dayHref(next));
-  }, [router, prev, next, canPrev, canNext]);
+  }, [router, prev, next, canPrev, canNext, dayHref]);
 
   const openPicker = () => {
     const el = inputRef.current;
@@ -97,7 +102,8 @@ function CalendarIcon() {
 }
 
 /** Deslizar a izquierda/derecha para cambiar de día. */
-export function SwipeDays({ date, min, max, children }: { date: string; min?: string | null; max?: string | null; children: React.ReactNode }) {
+export function SwipeDays({ date, min, max, base = "d", children }: { date: string; min?: string | null; max?: string | null; base?: Base; children: React.ReactNode }) {
+  const dayHref = hrefOf(base);
   const router = useRouter();
   const start = useRef<{ x: number; y: number } | null>(null);
 
