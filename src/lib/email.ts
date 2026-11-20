@@ -1,23 +1,35 @@
 import "server-only";
 
-/** ¿Está configurado el envío de emails? (RESEND_API_KEY y EMAIL_FROM en Vercel) */
-export const hasEmail = () => !!process.env.RESEND_API_KEY && !!process.env.EMAIL_FROM;
+/**
+ * Envío de emails, de dos formas (la que esté configurada en Vercel):
+ * · SMTP de tu correo (p. ej. una cuenta de SiteGround): SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS y EMAIL_FROM.
+ * · Resend: RESEND_API_KEY y EMAIL_FROM.
+ */
+const smtpReady = () => !!process.env.SMTP_HOST && !!process.env.SMTP_USER && !!process.env.SMTP_PASS;
+export const hasEmail = () => smtpReady() || (!!process.env.RESEND_API_KEY && !!process.env.EMAIL_FROM);
 
-/** Envía un email con Resend. Devuelve null si ha ido bien o el mensaje de error. */
+/** Envía un email. Devuelve null si ha ido bien o el mensaje de error. */
 export async function sendEmail(m: { to: string; subject: string; html: string; text: string; replyTo?: string | null }): Promise<string | null> {
-  if (!hasEmail()) return "Falta configurar el envío de emails (RESEND_API_KEY y EMAIL_FROM en Vercel).";
+  if (!hasEmail()) return "Falta configurar el envío de emails (SMTP o RESEND_API_KEY en Vercel).";
+  const from = process.env.EMAIL_FROM || process.env.SMTP_USER!;
   try {
+    if (smtpReady()) {
+      const { createTransport } = await import("nodemailer");
+      const port = Number(process.env.SMTP_PORT || 465);
+      const tx = createTransport({
+        host: process.env.SMTP_HOST,
+        port,
+        secure: port === 465,
+        auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+        connectionTimeout: 15000,
+      });
+      await tx.sendMail({ from, to: m.to, subject: m.subject, html: m.html, text: m.text, ...(m.replyTo ? { replyTo: m.replyTo } : {}) });
+      return null;
+    }
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from: process.env.EMAIL_FROM,
-        to: [m.to],
-        subject: m.subject,
-        html: m.html,
-        text: m.text,
-        ...(m.replyTo ? { reply_to: m.replyTo } : {}),
-      }),
+      body: JSON.stringify({ from, to: [m.to], subject: m.subject, html: m.html, text: m.text, ...(m.replyTo ? { reply_to: m.replyTo } : {}) }),
     });
     if (res.ok) return null;
     const j = (await res.json().catch(() => null)) as { message?: string } | null;

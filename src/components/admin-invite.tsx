@@ -35,7 +35,7 @@ export function ShareInvite({ name, email, link, token }: { name: string; email:
     start(async () => {
       if (token) setMail(await sendInviteEmail(token));
     });
-  const noConfig = mail?.error && /RESEND_API_KEY/.test(mail.vars?.msg ?? "");
+  const noConfig = mail?.error && /Falta configurar el envío/.test(mail.vars?.msg ?? "");
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap gap-2">
