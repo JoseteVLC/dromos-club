@@ -86,6 +86,14 @@ En el menú **Ranking** tienes cuatro pestañas. Puntos y Leaderboards se ven po
 | Leaderboards | Todos los WODs del periodo, con quién va primero y tu posición. Toca uno para entrar en su clasificación |
 | Medallas | Tus medallas: las conseguidas y lo que te falta para las demás (ver «Medallas») |
 
+## Si tu box está en modo competición
+
+Algunos boxes son equipos de atletas que compiten y tienen activado el **modo competición**. Si es tu caso:
+- No hay constancia ni rachas, medallas, puntos ni pestaña Ranking, y no te llegan recordatorios de racha ni el resumen semanal.
+- Cada WOD tiene una sola versión: no eliges Élite, RX ni Escalado. Hazlo como pone la plani y, si has tenido que escalar algo, cuéntalo en **«¿Has escalado algo?»** al meter el resultado.
+- Lo demás funciona igual: la plani (WODs y Día), tus resultados, el leaderboard de cada parte, tus marcas, el historial, la calculadora y los consejos.
+- Tu coach ve todo lo que haces (qué partes has hecho y cuáles no, tus marcas y tus notas) para ajustar tu planificación.
+
 ## Mis marcas
 
 En **Historial → 🏋️ Mis marcas** tienes el catálogo de benchmarks de CrossFit para apuntar tus mejores marcas, aunque no salgan en la plani: Girls, Héroes, clásicos, básicos (squat, deadlift, press…), halterofilia, gimnásticos y cardio.
