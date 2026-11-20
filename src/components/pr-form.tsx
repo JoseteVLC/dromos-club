@@ -4,7 +4,7 @@ import { twoDigits } from "@/lib/scoring";
 import { startTransition, useActionState, useRef, useState } from "react";
 import { saveBenchmark, savePersonalRecord } from "@/app/actions";
 import { BENCH_CATEGORIES, RM_CATEGORIES, RX_CATEGORIES, unitFor, type Benchmark, type PersonalRecord } from "@/lib/marcas";
-import { PR_SCORE_TYPES, SCORE_TYPES, type ScoreType } from "@/lib/types";
+import { PR_SCORE_TYPES, SCORE_TYPES } from "@/lib/types";
 import { FormMessage, Segmented, SubmitButton } from "./ui";
 import { DateInput } from "./date-input";
 import { useI18n } from "@/lib/i18n/client";
