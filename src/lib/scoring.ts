@@ -35,6 +35,10 @@ export function formatScore(wod: Pick<Wod, "score_type" | "score_label">, r: Res
       return `CAP + ${r.reps ?? 0} reps`;
     case "amrap":
       return `${r.rounds ?? 0} + ${r.reps ?? 0}`;
+    case "pace":
+      return r.time_seconds != null ? `${formatTime(r.time_seconds)} ${wod.score_label || "/km"}` : "–";
+    case "check":
+      return "✓";
     default: {
       const unit = wod.score_label || SCORE_TYPES[wod.score_type].unit || "";
       return `${fmtNum(Number(r.value ?? 0))} ${unit}`.trim();
@@ -59,6 +63,13 @@ export function compareScore(type: ScoreType, a: Result, b: Result): number {
       const dr = (b.rounds ?? 0) - (a.rounds ?? 0);
       return dr !== 0 ? dr : (b.reps ?? 0) - (a.reps ?? 0);
     }
+    case "pace": {
+      // Ritmo: menos segundos por km va delante; sin ritmo, al final
+      if (a.time_seconds == null || b.time_seconds == null) return (a.time_seconds == null ? 1 : 0) - (b.time_seconds == null ? 1 : 0);
+      return a.time_seconds - b.time_seconds;
+    }
+    case "check":
+      return 0;
     default:
       return Number(b.value ?? 0) - Number(a.value ?? 0);
   }

@@ -232,6 +232,17 @@ export async function saveResult(_: ActionState, fd: FormData): Promise<ActionSt
       }
       break;
     }
+    case "pace": {
+      const mins = int(fd, "pace_min") ?? 0;
+      const secs = int(fd, "pace_sec") ?? 0;
+      if (Number.isNaN(mins) || Number.isNaN(secs) || secs > 59) return { error: "Ritmo no válido: minutos y segundos (0–59)." };
+      const p = mins * 60 + secs;
+      if (p <= 0) return { error: "Mete tu ritmo medio (minutos y segundos por km)." };
+      row.time_seconds = p;
+      break;
+    }
+    case "check":
+      break;
     case "amrap": {
       const rounds = int(fd, "rounds");
       const reps = int(fd, "reps") ?? 0;

@@ -49,6 +49,8 @@ Baja hasta «Mete tu resultado», elige tu categoría, escribe tu marca y pulsa 
 | AMRAP | Rondas completas + reps sueltas | Más |
 | Carga | Kilos | Más |
 | Repeticiones · Calorías · Distancia · EMOM | El número total | Más |
+| Ritmo medio | Tu ritmo en minutos y segundos por km (p. ej. 4:45) | Menos |
+| Hecho | Nada: solo guardas para marcarlo como hecho (sin ranking; cuenta para la racha y suma 1 punto) | — |
 
 **WODs con dos scores.** Algunos WODs piden dos marcas, por ejemplo kilos del back squat y reps de sandbag clean. Verás dos casillas: la segunda es opcional y cada una tiene su propio ranking.
 

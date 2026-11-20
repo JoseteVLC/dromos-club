@@ -149,7 +149,44 @@ export function ResultForm({ wod, existing, defaultDivision }: { wod: Wod; exist
         </div>
       )}
 
-      {div !== "scaled" && !["for_time", "amrap"].includes(wod.score_type) && (
+      {div !== "scaled" && wod.score_type === "pace" && (
+        <div>
+          <span className="label">{t("Ritmo medio")} ({wod.score_label || "min/km"})</span>
+          <div className="flex items-center gap-2">
+            <input
+              name="pace_min"
+              aria-label={t("Minutos")}
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={2}
+              onInput={(e) => (e.currentTarget.value = twoDigits(e.currentTarget.value))}
+              className="input text-center text-2xl font-bold"
+              placeholder="min"
+              defaultValue={existing?.time_seconds ? Math.floor(existing.time_seconds / 60) : ""}
+            />
+            <span className="h-display text-3xl text-muted">:</span>
+            <input
+              name="pace_sec"
+              aria-label={t("Segundos")}
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={2}
+              onInput={(e) => (e.currentTarget.value = twoDigits(e.currentTarget.value, 59))}
+              className="input text-center text-2xl font-bold"
+              placeholder={t("seg")}
+              defaultValue={existing?.time_seconds ? String(existing.time_seconds % 60).padStart(2, "0") : ""}
+            />
+          </div>
+        </div>
+      )}
+
+      {div !== "scaled" && wod.score_type === "check" && (
+        <p className="rounded-lg border border-line bg-bg p-3 text-sm text-muted">{t("Aquí no hay marca: guarda para dejarlo como hecho. Cuenta para tu racha.")}</p>
+      )}
+
+      {div !== "scaled" && !["for_time", "amrap", "pace", "check"].includes(wod.score_type) && (
         <div>
           <label className="label" htmlFor="value">
             {wod.score2_type && wod.score_name ? wod.score_name : t(SCORE_TYPES[wod.score_type].label).replace(/\s*\(.*\)/, "")}

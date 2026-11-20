@@ -107,7 +107,7 @@ export async function Leaderboard({
       {(() => {
         // Tu posición y percentil (solo lo ves tú), dentro del filtro elegido
         const mine = ranked.find((r) => r.user_id === userId);
-        if (!mine) return null;
+        if (!mine || wod.score_type === "check") return null;
         const beat = ranked.filter((r) => r.rank > mine.rank).length;
         return (
           <PercentileCard
@@ -130,7 +130,7 @@ export async function Leaderboard({
             const me = r.user_id === userId;
             return (
               <li key={r.id} className={`flex items-center gap-3 px-4 py-3 ${me ? "bg-accent/10" : ""}`}>
-                <span className={`marker w-7 ${r.rank <= 3 ? "text-accent" : "text-muted"}`}>{String(r.rank).padStart(2, "0")}</span>
+                <span className={`marker w-7 ${r.rank <= 3 && wod.score_type !== "check" ? "text-accent" : "text-muted"}`}>{wod.score_type === "check" ? "✓" : String(r.rank).padStart(2, "0")}</span>
                 <Link href={`/atleta/${r.user_id}`} className="self-start pt-0.5">
                   <Avatar name={r.profiles?.full_name} url={r.profiles?.avatar_url} size={36} />
                 </Link>

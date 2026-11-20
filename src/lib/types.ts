@@ -5,7 +5,9 @@ export type ScoreType =
   | "reps"
   | "calories"
   | "distance"
-  | "emom";
+  | "emom"
+  | "pace"
+  | "check";
 
 export type Division = "elite" | "rx" | "scaled";
 export type Gender = "M" | "F";
@@ -92,7 +94,12 @@ export const SCORE_TYPES: Record<
   calories: { label: "Calorías", help: "Más calorías gana.", unit: "cal" },
   distance: { label: "Distancia (m)", help: "Más metros gana.", unit: "m" },
   emom: { label: "EMOM", help: "Reps o rondas totales completadas. Más es mejor.", unit: "reps" },
+  pace: { label: "Ritmo medio", help: "Ritmo medio en minutos por km (p. ej. carrera). Menos es mejor.", unit: "/km" },
+  check: { label: "Hecho", help: "Solo marcar que lo has hecho. Sin ranking: cuenta para la racha.", unit: "" },
 };
+
+/** Tipos que no sirven para las marcas personales (benchmarks) */
+export const PR_SCORE_TYPES = (Object.keys(SCORE_TYPES) as ScoreType[]).filter((s) => s !== "pace" && s !== "check");
 
 export const DIVISIONS: { value: Division; label: string }[] = [
   { value: "elite", label: "Elite" },

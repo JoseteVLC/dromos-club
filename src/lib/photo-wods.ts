@@ -19,7 +19,7 @@ const TOOL = {
             part: { type: "string", description: "Letra de la parte: A, B, C… En orden de aparición dentro de cada día." },
             title: { type: "string", description: "Título corto. Si es un benchmark conocido, su nombre exacto (Fran, Grace, Murph, Back Squat 1RM…)." },
             description: { type: "string", description: "Texto completo del WOD tal cual, con saltos de línea: estructura, reps, movimientos, pesos (♂/♀), time cap." },
-            score_type: { type: "string", enum: Object.keys(SCORE_TYPES), description: "for_time, amrap, load (kilos), reps, calories, distance o emom." },
+            score_type: { type: "string", enum: Object.keys(SCORE_TYPES), description: "for_time, amrap, load (kilos), reps, calories, distance, emom, pace (ritmo medio min/km) o check (solo marcar hecho)." },
             time_cap: { type: "string", description: "Solo en for_time: time cap en mm:ss si aparece. Si no, cadena vacía." },
             is_benchmark: { type: "boolean", description: "true si es un benchmark conocido (Girls, Heroes, 1RM de un básico…)." },
           },
@@ -43,7 +43,7 @@ Para cada parte:
 - part: A, B, C… en el orden en que aparecen ese día (respeta la letra si la pizarra la pone).
 - title: corto y claro. Benchmarks con su nombre exacto.
 - description: transcribe el WOD completo y fiel, con saltos de línea, sin inventar nada. Si algo no se lee, pon [ilegible].
-- score_type: elige según cómo se puntúa: For Time → for_time; AMRAP → amrap; buscar peso/RM → load; máximo de reps → reps; calorías → calories; metros → distance; EMOM con score → emom. «For quality» con pesos (yoke, sandbag, farmer, sled…) → load (el peso más alto que ha movido); si no hay peso, reps.
+- score_type: elige según cómo se puntúa: For Time → for_time; AMRAP → amrap; buscar peso/RM → load; máximo de reps → reps; calorías → calories; metros → distance; EMOM con score → emom; ritmo medio de carrera (min/km) → pace; trabajo sin marca que apuntar (técnica, movilidad) → check. «For quality» con pesos (yoke, sandbag, farmer, sled…) → load (el peso más alto que ha movido); si no hay peso, reps.
 - time_cap: mm:ss solo si aparece (p. ej. "TC 12'" → "12:00").
 
 Responde SIEMPRE llamando a la herramienta guardar_wods (aunque no encuentres nada: parts vacío y explícalo en notes).`;

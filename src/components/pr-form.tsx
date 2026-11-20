@@ -4,7 +4,7 @@ import { twoDigits } from "@/lib/scoring";
 import { startTransition, useActionState, useRef, useState } from "react";
 import { saveBenchmark, savePersonalRecord } from "@/app/actions";
 import { BENCH_CATEGORIES, RM_CATEGORIES, RX_CATEGORIES, unitFor, type Benchmark, type PersonalRecord } from "@/lib/marcas";
-import { SCORE_TYPES, type ScoreType } from "@/lib/types";
+import { PR_SCORE_TYPES, SCORE_TYPES, type ScoreType } from "@/lib/types";
 import { FormMessage, Segmented, SubmitButton } from "./ui";
 import { DateInput } from "./date-input";
 import { useI18n } from "@/lib/i18n/client";
@@ -170,7 +170,7 @@ export function BenchmarkForm({ benchmark, defaultCategory }: { benchmark?: Benc
         <div>
           <label className="label" htmlFor="b_type">{t("Tipo de resultado")}</label>
           <select id="b_type" name="score_type" className="input" defaultValue={benchmark?.score_type ?? "for_time"}>
-            {(Object.keys(SCORE_TYPES) as ScoreType[]).map((st) => (
+            {PR_SCORE_TYPES.map((st) => (
               <option key={st} value={st}>{t(SCORE_TYPES[st].label)}</option>
             ))}
           </select>

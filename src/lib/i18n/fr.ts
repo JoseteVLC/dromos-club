@@ -826,6 +826,14 @@ const d: Record<string, string> = {
   "Mover todo a la semana del lunes": "Tout déplacer à la semaine du lundi",
   "Mover": "Déplacer",
   "Cada parte mantiene su día de la semana. Los atletas no ven una semana hasta el domingo anterior, así que puedes dejar cargada la siguiente.": "Chaque partie garde son jour de la semaine. Les athlètes ne voient une semaine qu'à partir du dimanche précédent : tu peux charger la suivante à l'avance.",
+  "Ritmo medio": "Allure moyenne",
+  "Hecho": "Fait",
+  "Ritmo medio en minutos por km (p. ej. carrera). Menos es mejor.": "Allure moyenne en minutes par km (p. ex. course). Moins c'est mieux.",
+  "Solo marcar que lo has hecho. Sin ranking: cuenta para la racha.": "Il suffit de marquer comme fait. Pas de classement : ça compte pour ta série.",
+  "Aquí no hay marca: guarda para dejarlo como hecho. Cuenta para tu racha.": "Pas de score ici : enregistre pour le marquer comme fait. Ça compte pour ta série.",
+  "Ritmo no válido: minutos y segundos (0–59).": "Allure non valide : minutes et secondes (0–59).",
+  "Mete tu ritmo medio (minutos y segundos por km).": "Saisis ton allure moyenne (minutes et secondes par km).",
+  "Ritmo de {v}/km: más rápido que el récord mundial.": "Allure de {v}/km : plus rapide que le record du monde.",
 };
 
 export default d;

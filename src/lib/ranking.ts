@@ -24,7 +24,9 @@ export function computeStandings(wods: Wod[], results: Result[], gender: Gender 
   const acc = new Map<string, Omit<Standing, "rank">>();
   for (const w of wods) {
     const ranked = rankResults(w, byWod.get(w.id) ?? [], { gender });
-    const n = ranked.length;
+    // «Hecho»: no hay clasificación, solo 1 punto por participar
+    const check = w.score_type === "check";
+    const n = check ? 1 : ranked.length;
     for (const r of ranked) {
       const s = acc.get(r.user_id) ?? {
         user_id: r.user_id,
@@ -37,7 +39,7 @@ export function computeStandings(wods: Wod[], results: Result[], gender: Gender 
       };
       s.points += n - r.rank + 1;
       s.wods += 1;
-      if (r.rank <= 3) s.podiums += 1;
+      if (r.rank <= 3 && !check) s.podiums += 1;
       acc.set(r.user_id, s);
     }
     // Escalados: sin posición, pero 1 punto por participar

@@ -144,6 +144,7 @@ function isNoise(line: string): boolean {
 
 const SCORE_RULES: [RegExp, ScoreType][] = [
   [/\bamrap\b/i, "amrap"],
+  [/\b(?:avg|average|media|medio)\s+pace\b|\britmo\s+medio\b/i, "pace"],
   [/\bfor\s*time\b|\brft\b|\bpor\s+tiempo\b/i, "for_time"],
   [/\bemom\b|\be\d+mom\b|\bevery\s+\d+(?::\d{2})?\s*(?:min|')|\bcada\s+\d+\s*min/i, "emom"],
   [/\bfor\s+(?:load|weight)\b|\bfind\s+(?:a\s+)?heavy\b|\bbuild\s+to\b|\b\d\s*rm\b(?!\s*para)|\brep\s+max\b/i, "load"],

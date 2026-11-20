@@ -124,9 +124,9 @@ async function WodBoards({ period, refDate }: { period: Period; refDate: string 
                   .filter((w) => w.wod_date === d)
                   .map((w) => {
                     const res = byWod.get(w.id) ?? [];
-                    const top = rankResults(w, res)[0];
+                    const top = w.score_type === "check" ? undefined : rankResults(w, res)[0];
                     const mine = res.find((r) => r.user_id === user.id);
-                    const myPos = mine && mine.division !== "scaled" ? rankResults(w, res).find((r) => r.id === mine.id)?.rank : null;
+                    const myPos = mine && mine.division !== "scaled" && w.score_type !== "check" ? rankResults(w, res).find((r) => r.id === mine.id)?.rank : null;
                     return (
                       <li key={w.id}>
                         <Link href={dayHref(w.wod_date, { w: w.id }) + "#leaderboard"} className="flex items-center gap-3 px-4 py-3 hover:bg-line/40">

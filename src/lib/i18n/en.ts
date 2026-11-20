@@ -826,5 +826,13 @@ const d: Record<string, string> = {
   "Mover todo a la semana del lunes": "Move everything to the week starting Monday",
   "Mover": "Move",
   "Cada parte mantiene su día de la semana. Los atletas no ven una semana hasta el domingo anterior, así que puedes dejar cargada la siguiente.": "Each part keeps its weekday. Athletes don't see a week until the Sunday before, so you can load next week in advance.",
+  "Ritmo medio": "Average pace",
+  "Hecho": "Done",
+  "Ritmo medio en minutos por km (p. ej. carrera). Menos es mejor.": "Average pace in minutes per km (e.g. running). Lower is better.",
+  "Solo marcar que lo has hecho. Sin ranking: cuenta para la racha.": "Just mark it as done. No ranking: it counts for your streak.",
+  "Aquí no hay marca: guarda para dejarlo como hecho. Cuenta para tu racha.": "No score here: save to mark it as done. It counts for your streak.",
+  "Ritmo no válido: minutos y segundos (0–59).": "Invalid pace: minutes and seconds (0–59).",
+  "Mete tu ritmo medio (minutos y segundos por km).": "Enter your average pace (minutes and seconds per km).",
+  "Ritmo de {v}/km: más rápido que el récord mundial.": "Pace of {v}/km: faster than the world record.",
 };
 export default d;

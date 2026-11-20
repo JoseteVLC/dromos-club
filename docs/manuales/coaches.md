@@ -18,7 +18,7 @@ En **Coach** rellenas el formulario y pulsas **Crear WOD**. Úsalo para un WOD s
 | Parte | A, B, C… Cada parte con leaderboard es un WOD aparte |
 | Título | Corto y siempre igual para los benchmarks: «Fran», «Back Squat 1RM» |
 | WOD | El texto completo, pegado tal cual de la plani (Word, PDF, TrueCoach u otra app) |
-| Tipo de resultado | For Time, AMRAP, Carga, Repeticiones, Calorías, Distancia o EMOM. Decide cómo se ordena el ranking |
+| Tipo de resultado | For Time, AMRAP, Carga, Repeticiones, Calorías, Distancia, EMOM, Ritmo medio (min/km, menos es mejor) o Hecho (solo marcar que se ha hecho, sin ranking). Decide cómo se ordena el ranking |
 | Time cap | Solo en For Time (mm:ss). Quien no acaba mete CAP + reps |
 | Unidad | Opcional, si quieres otra etiqueta (p. ej. «rondas») |
 | Segundo score | Marca la casilla si el WOD tiene dos marcas: elige el tipo y nombra cada score («Back squat» y «Sandbag clean») |

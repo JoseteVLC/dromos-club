@@ -50,6 +50,12 @@ export function rules({ wod, r, gender, others }: Ctx): { hard?: Msg; soft?: Msg
       return { soft: m("{v} frente a una mediana de {med} en el box (mejor: {best}).", { v: formatTime(r.time_seconds), med: formatTime(Math.round(median(ts))), best: formatTime(Math.min(...ts)) }) };
     return null;
   }
+  if (t === "check") return null;
+  if (t === "pace") {
+    const s = r.time_seconds ?? 0;
+    if (s > 0 && s < 150) return { hard: m("Ritmo de {v}/km: más rápido que el récord mundial.", { v: formatTime(s) }) };
+    return null;
+  }
   if (t === "amrap") {
     const rounds = r.rounds ?? 0;
     const rec = BENCH_ROUNDS[title];
