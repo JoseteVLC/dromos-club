@@ -21,7 +21,7 @@ Al abrir la app ves el entreno de hoy. Si el día tiene varias partes (A, B, C�
 - **Tu semana:** la tira de días de arriba marca con ✓ los días en que ya metiste resultado.
 - **Ya hiciste este WOD:** si el WOD se repite (mismo nombre y mismo enunciado, o un benchmark como Fran), debajo te salen tus resultados anteriores con la fecha, hasta tres. Toca uno para ir a ese día.
 - **★ Benchmark:** los WODs con estrella son pruebas de referencia (Fran, Grace, 1RM…). Cuentan para tus PRs.
-- **Desde tu alta:** ves y participas en la plani a partir del día en que te diste de alta. Los días anteriores no aparecen.
+- **Desde la semana de tu alta:** ves y participas en la plani desde el lunes de la semana en que te diste de alta (si entras un jueves, ves lo que la gente ha hecho desde el lunes y puedes meter tus resultados). Las semanas anteriores no aparecen.
 - **🔥 Calentamiento · ⏱️ Timer · 💡 Peso y escalado · Discos:** debajo del WOD tienes estos botones en una misma fila (Discos solo en WODs con pesos); el que pulses se abre justo debajo (y se cierra con ✕ o volviéndolo a pulsar).
 - **🔥 Calentamiento:** unos 6–10 minutos específicos para ese WOD (técnica de los movimientos, series de aproximación con los pesos y una ronda suave para coger ritmo), para hacer después del calentamiento general. Es el mismo para todos y sale en tu idioma.
 - **💬 Dudas del WOD:** debajo del WOD hay una sección plegable para preguntar (pesos, escalado, estándares…). Te contesta el equipo o el resto del box; las respuestas de coach salen con la etiqueta **Coach** y la buena puede estar **📌 fijada** arriba. Puedes reaccionar a los comentarios como en los resultados, y te avisamos cuando alguien responde.
@@ -221,9 +221,9 @@ Con el sobre ✉️ de arriba (o Perfil → Mensajes con el equipo) hablas direc
 
 **¿Me equivoqué al meter el resultado?** Vuelve al WOD, corrígelo y guarda. También puedes borrarlo desde el leaderboard. Si es una marca de Mis marcas, usa ✏️ Editar en su historial.
 
-**¿Se me pasa un día?** Puedes meter el resultado de días anteriores navegando hasta esa fecha (desde tu alta). Cuenta para la racha si lo metes.
+**¿Se me pasa un día?** Puedes meter el resultado de días anteriores navegando hasta esa fecha (desde el lunes de la semana de tu alta). Cuenta para la racha si lo metes.
 
-**¿Puedo apuntar marcas de antes de darme de alta?** Sí: en Mis marcas puedes poner cualquier fecha. Lo que no puedes es participar en WODs de la plani anteriores a tu alta.
+**¿Puedo apuntar marcas de antes de darme de alta?** Sí: en Mis marcas puedes poner cualquier fecha. Lo que no puedes es participar en WODs de la plani de semanas anteriores a tu alta.
 
 **¿Quién ve mis datos?** Tus resultados, tu foto y lo que marques como público, solo los atletas y coaches de tu box con cuenta en la app. Tus datos privados, solo el equipo de tu box.
 

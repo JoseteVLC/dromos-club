@@ -93,12 +93,16 @@ export const requireUser = cache(async () => {
 });
 
 /**
- * Primer día de plani que puede ver y en el que puede participar un atleta: el día de su alta.
+ * Primer día de plani que puede ver y en el que puede participar un atleta: el lunes de la semana de su alta
+ * (así, si entra un jueves, ve lo que la gente ha hecho desde el lunes y entra en el juego).
  * Los coaches y admins lo ven todo (devuelve null).
  */
 export function memberSince(p: Profile | null | undefined): string | null {
   if (!p || isCoachProfile(p) || !p.created_at) return null;
-  return new Date(p.created_at).toLocaleDateString("sv-SE", { timeZone: "Europe/Madrid" });
+  const day = new Date(p.created_at).toLocaleDateString("sv-SE", { timeZone: "Europe/Madrid" });
+  const d = new Date(day + "T12:00:00Z");
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+  return d.toISOString().slice(0, 10);
 }
 
 export const isCoachProfile = (p: Profile | null | undefined) => !!p && (p.role === "coach" || !!p.is_admin);
