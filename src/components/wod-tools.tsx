@@ -57,19 +57,21 @@ export function WodTools({
     `btn-ghost inline-flex flex-1 items-center justify-center gap-1 px-2 py-2 text-xs leading-tight ${on ? "border-accent text-accent" : ""}`;
 
   const shown = panel === "warm" ? warm : panel === "tip" ? tip : null;
+  // Técnica, skills o calentamiento: el consejo son ideas de ejercicios y no hace falta otro calentamiento
+  const skill = wod.score_type === "check";
   const error = warm.error ?? tip.error;
 
   return (
     <div className="space-y-2">
       <div className="flex gap-2">
-        <button type="button" disabled={warm.pending} onClick={() => toggle("warm", warm)} className={btn(panel === "warm")}>
+        {!skill && <button type="button" disabled={warm.pending} onClick={() => toggle("warm", warm)} className={btn(panel === "warm")}>
           {warm.pending ? t("Preparando…") : <><Icon name="flame" size={15} /> {t("Calentamiento")}</>}
-        </button>
+        </button>}
         <button type="button" onClick={() => setTimer(true)} className={btn(false)}>
           <Icon name="timer" size={15} /> {t("Timer")}
         </button>
         <button type="button" disabled={tip.pending} onClick={() => toggle("tip", tip)} className={btn(panel === "tip")}>
-          {tip.pending ? t("Calculando…") : <><Icon name="tip" size={15} /> {t("Peso y escalado")}</>}
+          {tip.pending ? t("Calculando…") : <><Icon name="tip" size={15} /> {skill ? t("Ideas") : t("Peso y escalado")}</>}
         </button>
         {calc && (
           <button type="button" onClick={() => setPanel(panel === "calc" ? null : "calc")} className={`${btn(panel === "calc")} inline-flex items-center justify-center gap-1`}>
@@ -84,7 +86,7 @@ export function WodTools({
         <div className="card space-y-2 border-accent/40 p-4">
           <div className="flex items-center justify-between gap-2">
             <p className="flex items-center gap-2 text-sm font-semibold text-accent">
-              {panel === "warm" ? <><Icon name="flame" /> {t("Calentamiento para este WOD")}</> : <><Icon name="tip" /> {t("Peso y escalado para ti")}</>}
+              {panel === "warm" ? <><Icon name="flame" /> {t("Calentamiento para este WOD")}</> : <><Icon name="tip" /> {skill ? t("Ideas para este bloque") : t("Peso y escalado para ti")}</>}
             </p>
             <button type="button" onClick={() => setPanel(null)} className="text-xs text-muted" aria-label={t("Cerrar")}>✕</button>
           </div>
@@ -92,7 +94,9 @@ export function WodTools({
           <p className="text-[11px] text-muted">
             {panel === "warm"
               ? t("Después del calentamiento general. Ajusta los pesos a cómo te encuentres hoy.")
-              : t("Calculado con tus marcas. Si algo no te cuadra, pregunta a tu coach.")}
+              : skill
+                ? t("Elige las que encajen con tu nivel. Si tienes dudas, pregunta a tu coach.")
+                : t("Calculado con tus marcas. Si algo no te cuadra, pregunta a tu coach.")}
           </p>
         </div>
       )}

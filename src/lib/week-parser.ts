@@ -125,6 +125,9 @@ const WARMUP =
 
 const ACCESSORY = /^\s*(?:trabajo\s+accesorio|accesorios?|accessor(?:y|ies))\b/i;
 
+/** Bloques de técnica o habilidad: «Skills», «Técnica», «Práctica de…», «Running technique». */
+const SKILL = /\b(skills?|t[eé]cnica|technique|pr[aá]ctica|practice|drills?)\b/i;
+
 /** Líneas de ruido al pegar/imprimir desde TrueCoach. */
 function isNoise(line: string): boolean {
   const s = line.trim();
@@ -144,7 +147,6 @@ function isNoise(line: string): boolean {
 
 const SCORE_RULES: [RegExp, ScoreType][] = [
   [/\bamrap\b/i, "amrap"],
-  [/\b(?:avg|average|media|medio)\s+pace\b|\britmo\s+medio\b/i, "pace"],
   [/\bfor\s*time\b|\brft\b|\bpor\s+tiempo\b/i, "for_time"],
   [/\bemom\b|\be\d+mom\b|\bevery\s+\d+(?::\d{2})?\s*(?:min|')|\bcada\s+\d+\s*min/i, "emom"],
   [/\bfor\s+(?:load|weight)\b|\bfind\s+(?:a\s+)?heavy\b|\bbuild\s+to\b|\b\d\s*rm\b(?!\s*para)|\brep\s+max\b/i, "load"],
@@ -315,13 +317,10 @@ export function parseWeek(text: string, weekStart: string): ParsedWeek {
     const body = b.body.map((l) => l.replace(/\s+$/, ""));
     const description = body.join("\n").replace(/^\n+|\n+$/g, "").replace(/\n{3,}/g, "\n\n");
     const firstLine = body.find((l) => l.trim()) ?? "";
-    if (WARMUP.test(b.head) || WARMUP.test(firstLine)) {
-      skipped++;
-      return;
-    }
-    // Accesorios sin marca no llevan leaderboard. El trabajo «for quality» sí entra (p. ej. strongman con pesos):
-    // el atleta apunta su peso o sus reps y el coach puede quitarlo en la vista previa si no lo quiere
-    if (ACCESSORY.test(b.head) || (!b.head && ACCESSORY.test(firstLine))) {
+    // Calentamiento, movilidad, técnica, skills y accesorios también entran: si no hay marca que apuntar, como «Hecho»
+    const noMark =
+      WARMUP.test(b.head) || WARMUP.test(firstLine) || SKILL.test(b.head) || ACCESSORY.test(b.head) || (!b.head && ACCESSORY.test(firstLine));
+    if (!description.trim() && !b.head.trim()) {
       skipped++;
       return;
     }
@@ -337,6 +336,10 @@ export function parseWeek(text: string, weekStart: string): ParsedWeek {
     if (isQuality && (!score_type || score_type === "emom")) score_type = /\d\s*(kg|lb|#)|\bkilos?\b|\bpeso\b|\bheavy\b|\bpesad/i.test(description) ? "load" : "";
     // «EL RESULTADO ES: Ax1 + Bx2 + Cx3» dentro de un EMOM/EVERY: el resultado no es un EMOM, que elija el coach
     if (score_type === "emom" && /\b(?:el\s+)?resultado\s+es\b|\bscore\s+is\b/i.test(description)) score_type = "";
+    // Ritmo medio: solo si se pide el ritmo por km de forma explícita
+    if (!score_type && /\b(?:ritmo\s+medio|avg\s+pace|average\s+pace)\b/i.test(description) && /\/\s*km\b|\bpor\s+km\b/i.test(description)) score_type = "pace";
+    // Bloques sin marca (calentamiento, técnica…): solo «hecho», salvo que el texto pida apuntar algo
+    if (noMark && (!score_type || score_type === "emom" || WARMUP.test(b.head) || WARMUP.test(firstLine))) score_type = "check";
     parts.push({
       key: `${i}-${b.date}-${part}`,
       include: true,

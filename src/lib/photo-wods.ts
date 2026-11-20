@@ -34,9 +34,9 @@ const TOOL = {
 
 const PROMPT = (defaultDate: string) => `Eres el asistente de un box de CrossFit. Te paso foto(s) de la pizarra del box o de la planificación (puede ser letra a mano, una pantalla o un papel).
 
-Extrae SOLO las partes que tienen resultado para un leaderboard (metcons, levantamientos con marca, AMRAP, EMOM con score, benchmarks, strongman…).
-SÍ incluye el trabajo «for quality» (p. ej. strongman o fuerza con pesos): el atleta apuntará el peso que ha usado o sus reps.
-NO incluyas calentamiento, movilidad, activación, técnica sin carga, accesorios ni vuelta a la calma.
+Extrae TODAS las partes de la sesión, en orden y sin saltarte ninguna: calentamiento (warm-up), carrera o técnica de carrera, skills y técnica (p. ej. práctica de handstand, wall walk, piruetas, double unders), movilidad, fuerza, metcons, accesorios, strongman, trabajo «for quality» y vuelta a la calma.
+Cada bloque con su duración o formato propio es una parte distinta (p. ej. «10' running + technique skills» y «15' práctica de wall walk/pirueta» son dos partes).
+Las partes sin marca que apuntar (calentamiento, técnica, skills, movilidad, práctica, vuelta a la calma) van con score_type = check: el atleta solo marca que las ha hecho.
 
 Para cada parte:
 - date: si la foto indica el día (lunes, martes… o una fecha), conviértelo a fecha real tomando como referencia que la fecha por defecto es ${defaultDate}. Si no indica día, usa ${defaultDate}.

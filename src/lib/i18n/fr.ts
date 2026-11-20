@@ -834,6 +834,10 @@ const d: Record<string, string> = {
   "Ritmo no válido: minutos y segundos (0–59).": "Allure non valide : minutes et secondes (0–59).",
   "Mete tu ritmo medio (minutos y segundos por km).": "Saisis ton allure moyenne (minutes et secondes par km).",
   "Ritmo de {v}/km: más rápido que el récord mundial.": "Allure de {v}/km : plus rapide que le record du monde.",
+  "Vale el Word de la plani, el texto de TrueCoach o el del PDF, tal cual. Detecto días y partes (A, B, C…) y meto todo: calentamiento, técnica, skills y accesorios entran como «Hecho» (solo marcar), y en el resto pongo el tipo de score si el texto lo dice. Si trae fechas («Mon, Nov 9») uso esas; si no, cuento desde el lunes de arriba.": "Colle le Word de la programmation, le texte de TrueCoach ou celui du PDF, tel quel. Je détecte les jours et les parties (A, B, C…) et j'inclus tout : échauffement, technique, skills et accessoires entrent comme « Fait » (juste cocher), et pour le reste je mets le type de score si le texte l'indique. S'il y a des dates (« Mon, Nov 9 ») je les utilise ; sinon je compte depuis le lundi ci-dessus.",
+  "Ideas": "Idées",
+  "Ideas para este bloque": "Idées pour ce bloc",
+  "Elige las que encajen con tu nivel. Si tienes dudas, pregunta a tu coach.": "Choisis celles qui correspondent à ton niveau. En cas de doute, demande à ton coach.",
 };
 
 export default d;

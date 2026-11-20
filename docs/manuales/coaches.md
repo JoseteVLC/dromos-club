@@ -37,7 +37,7 @@ En **Coach → Importar WODs → 📷 Desde una foto** haces una foto a la pizar
 3. En unos segundos aparecen las partes en la **misma pantalla de revisión** que la importación de la semana: fecha, letra, título, texto y tipo de resultado. Si la app ve algo dudoso, sale un aviso amarillo.
 4. Corrige lo que haga falta y pulsa **«Crear N WODs»**.
 
-La app quita calentamientos, accesorios y vuelta a la calma, y pone el nombre exacto de los benchmarks. Con letra muy mala o reflejos puede equivocarse: revisa siempre antes de crear.
+La app mete todas las partes de la sesión, también el calentamiento, la carrera o técnica, los skills, la movilidad, los accesorios y la vuelta a la calma; las que no tienen marca entran como «Hecho» (el atleta solo marca que lo ha hecho, y con el botón **Ideas** la app le propone ejercicios y progresiones). Pone el nombre exacto de los benchmarks. Con letra muy mala o reflejos puede equivocarse: revisa siempre antes de crear.
 
 ## Importar la semana desde la plani
 
@@ -45,7 +45,7 @@ Es la forma rápida: subes la plani de la semana y la app crea todos los WODs de
 
 1. **Elige el lunes** de la semana, por si el texto no trae fechas. Si las trae («Mon, Nov 9»), usa esas.
 2. **Sube el Word** (.docx) de la plani, o pega el texto tal cual: vale el de TrueCoach u otra app, o el del PDF.
-3. **Pulsa Analizar.** La app separa días y partes (A, B, C…) y quita sola calentamientos, vuelta a la calma, accesorios y descansos. El trabajo «for quality» (strongman, fuerza con pesos…) sí lo mete, como Carga, para que los atletas apunten el peso que han movido; si no lo quieres, desmárcalo en la vista previa. Si el texto dice el tipo de score, lo pone.
+3. **Pulsa Analizar.** La app separa días y partes (A, B, C…) y mete todo: calentamiento, técnica, skills, accesorios y vuelta a la calma entran como «Hecho». El trabajo «for quality» (strongman, fuerza con pesos…) sí lo mete, como Carga, para que los atletas apunten el peso que han movido; si no lo quieres, desmárcalo en la vista previa. Si el texto dice el tipo de score, lo pone.
 4. **Revisa cada parte:** fecha, letra, título y tipo de resultado. Las que salen en **amarillo** no tienen tipo: elígelo. Desmarca lo que no quieras con leaderboard.
 5. **Pulsa «Crear N WODs».**
 

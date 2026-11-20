@@ -60,6 +60,9 @@ Con el WOD y sus marcas, dale en ${lang} un consejo práctico y corto (máximo 6
 - Una clave de estrategia (ritmo, cómo partir las series).
 Si no tienes la marca que necesitas, dilo en una frase y explica cómo elegir el peso en el calentamiento. No inventes marcas que no te he dado. Tutea.`;
 
+const SKILL_SYSTEM = (lang: string) => `Eres coach de CrossFit y hablas con un atleta sobre un bloque de técnica, skills, carrera o calentamiento (sin marca que apuntar).
+Dale en ${lang} ideas prácticas para ese bloque, adaptadas a su nivel (máximo 7 líneas): 3 o 4 ejercicios o progresiones concretas (de más fácil a más difícil), con series o tiempo, y el punto técnico clave en el que fijarse. Si el bloque es de carrera, propone drills de técnica de carrera. Escribe como lo diría su coach en persona: frases naturales, sin emojis, sin títulos, sin negritas; como mucho guiones simples. Tutea.`;
+
 /** Consejo de peso y escalado para un WOD (lo genera la IA una vez por WOD y atleta). */
 export async function makeTip(db: SupabaseClient, wod: Wod, userId: string, boxId: string, locale: string): Promise<string | null> {
   const a = await athleteContext(db, userId, boxId);
@@ -72,7 +75,8 @@ Sus mejores marcas:
 ${a.prs.length ? a.prs.join("\n") : "(no ha apuntado ninguna)"}
 Cargas recientes en WODs del box:
 ${a.loads.length ? a.loads.join("\n") : "(ninguna)"}`;
-  return askAi(`${SYSTEM(langName(locale))}\n\n${voice(locale)}`, prompt, 450);
+  const system = wod.score_type === "check" ? SKILL_SYSTEM(langName(locale)) : SYSTEM(langName(locale));
+  return askAi(`${system}\n\n${voice(locale)}`, prompt, 450);
 }
 
 /** Texto del consejo guardado si está en ese idioma (los antiguos, sin marca, cuentan como español). */
