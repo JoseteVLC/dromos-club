@@ -10,7 +10,8 @@ import { FormMessage, Segmented } from "./ui";
 import { useI18n } from "@/lib/i18n/client";
 import { Icon } from "@/components/icon";
 
-export function ResultForm({ wod, existing, defaultDivision }: { wod: Wod; existing: Result | null; defaultDivision?: Division }) {
+/** single: modo competición, una sola versión (sin Élite/RX/Escalado); si han escalado algo, lo cuentan en las notas. */
+export function ResultForm({ wod, existing, defaultDivision, single = false }: { wod: Wod; existing: Result | null; defaultDivision?: Division; single?: boolean }) {
   const [state, action, pending] = useActionState(saveResult, undefined);
   // Se envía a mano para que el formulario no se vacíe si hay que confirmar o corregir algo
   const last = useRef<FormData | null>(null);
@@ -23,7 +24,7 @@ export function ResultForm({ wod, existing, defaultDivision }: { wod: Wod; exist
   // Solo las categorías que tiene este WOD; si la tuya no está, la más cercana (RX ↔ Élite)
   const allowed = wodDivisions(wod);
   const pick = (d?: Division) => (d && allowed.includes(d) ? d : d === "rx" && allowed.includes("elite") ? "elite" : d === "elite" && allowed.includes("rx") ? "rx" : allowed[0]);
-  const [div, setDiv] = useState<Division>(pick(existing?.division ?? defaultDivision ?? "rx"));
+  const [div, setDiv] = useState<Division>(single ? (allowed.includes("rx") ? "rx" : (allowed.find((d) => d !== "scaled") ?? "rx")) : pick(existing?.division ?? defaultDivision ?? "rx"));
   const formRef = useRef<HTMLFormElement>(null);
   const [fromTimer, setFromTimer] = useState<string | null>(null);
 
@@ -68,7 +69,7 @@ export function ResultForm({ wod, existing, defaultDivision }: { wod: Wod; exist
       <input type="hidden" name="wod_id" value={wod.id} />
       <h2 className="h-display text-2xl">{existing ? t("Tu resultado") : t("Mete tu resultado")}</h2>
 
-      <div>
+      {single ? <input type="hidden" name="division" value={div} /> : <div>
         <span className="label">{t("Categoría")}</span>
         <Segmented<Division>
           small
@@ -78,7 +79,7 @@ export function ResultForm({ wod, existing, defaultDivision }: { wod: Wod; exist
           onChange={setDiv}
         />
         {div === "scaled" && <p className="mt-1 text-xs text-muted">{t("En escalado no hay ranking: cuenta lo que has hecho y el día cuenta para tu racha.")}</p>}
-      </div>
+      </div>}
 
       {div !== "scaled" && wod.score_type === "for_time" && (
         <>
@@ -221,7 +222,7 @@ export function ResultForm({ wod, existing, defaultDivision }: { wod: Wod; exist
       )}
 
       <div>
-        <label className="label" htmlFor="notes">{div === "scaled" ? t("¿Qué has hecho?") : t("Notas (opcional)")}</label>
+        <label className="label" htmlFor="notes">{div === "scaled" ? t("¿Qué has hecho?") : single ? t("¿Has escalado algo? (opcional)") : t("Notas (opcional)")}</label>
         {div === "scaled" ? (
           <textarea
             id="notes"
@@ -233,7 +234,7 @@ export function ResultForm({ wod, existing, defaultDivision }: { wod: Wod; exist
             defaultValue={existing?.notes ?? ""}
           />
         ) : (
-          <input id="notes" name="notes" className="input" placeholder={t("Escalados, peso usado…")} defaultValue={existing?.notes ?? ""} />
+          <input id="notes" name="notes" className="input" placeholder={single ? t("Qué has cambiado: peso, movimiento, reps… y cómo te has sentido") : t("Escalados, peso usado…")} defaultValue={existing?.notes ?? ""} />
         )}
       </div>
 

@@ -91,8 +91,8 @@ export async function Leaderboard({
             {t(g.label)}
           </Link>
         ))}
-        <span className="mx-1 w-px self-stretch bg-line" />
-        {[{ value: "all", label: t("Todas") }, ...RANKED_DIVISIONS.filter((d) => wodDivisions(wod).includes(d.value))].map((d) => (
+        {!competition && <span className="mx-1 w-px self-stretch bg-line" />}
+        {!competition && [{ value: "all", label: t("Todas") }, ...RANKED_DIVISIONS.filter((d) => wodDivisions(wod).includes(d.value))].map((d) => (
           <Link key={d.value} href={href(gender, d.value, score)} scroll={false} replace className={`chip ${division === d.value ? "chip-on" : ""}`}>
             {d.label}
           </Link>
@@ -143,7 +143,7 @@ export async function Leaderboard({
                     {me && <span className="ml-1 text-xs text-accent">{t("(tú)")}</span>}
                   </Link>
                   <div className="flex items-center gap-2 text-xs text-muted">
-                    <span className="rounded bg-line px-1.5 py-0.5 font-semibold uppercase">{r.division}</span>
+                    {!competition && <span className="rounded bg-line px-1.5 py-0.5 font-semibold uppercase">{r.division}</span>}
                     {r.profiles?.gender && <span>{r.profiles.gender === "M" ? "♂" : "♀"}</span>}
                     {!competition && !inTime(wod.wod_date, byId.get(r.id)?.created_at) && (
                       <span className="shrink-0 rounded border border-line px-1 py-0.5" title={t("Metido después del cierre: no cuenta para medallas")}>

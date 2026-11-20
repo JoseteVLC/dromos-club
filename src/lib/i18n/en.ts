@@ -896,5 +896,7 @@ const d: Record<string, string> = {
   "6 meses": "6 months",
   "1 año": "1 year",
   "Todo": "All",
+  "¿Has escalado algo? (opcional)": "Did you scale anything? (optional)",
+  "Qué has cambiado: peso, movimiento, reps… y cómo te has sentido": "What you changed: weight, movement, reps… and how you felt",
 };
 export default d;

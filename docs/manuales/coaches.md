@@ -123,6 +123,7 @@ En **Admin → Descargar datos de atletas (CSV)** tienes a todo el mundo en un a
 ## Modo competición (admins)
 
 Para un box de atletas que compiten. Se activa en **Admin → Ajustes del box → Modo competición**. Con él activado:
+- Hay una sola versión de cada WOD: los atletas no eligen Élite, RX ni Escalado. Si han tenido que escalar algo, lo cuentan en las notas («¿Has escalado algo?»), que el equipo ve en la ficha del atleta.
 - Los atletas no ven constancia ni rachas, medallas, puntos ni la pestaña Ranking, y no reciben recordatorios de racha ni el resumen semanal. En el leaderboard de cada WOD no salen los avisos de cierre ni de medallas.
 - Siguen teniendo la plani (WODs y Día), sus resultados, el leaderboard de cada parte, sus marcas, el historial, la calculadora y los consejos.
 - El equipo lo sigue todo desde el **Panel del box** y la **ficha completa** de cada atleta.

@@ -28,10 +28,12 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
   if (!isISODate(date)) notFound();
   const sp = await searchParams;
   const gender = (["M", "F"].includes(String(sp.g)) ? sp.g : "all") as Gender | "all";
-  const division = (["elite", "rx"].includes(String(sp.d)) ? sp.d : "all") as Division | "all";
+  const divisionParam = (["elite", "rx"].includes(String(sp.d)) ? sp.d : "all") as Division | "all";
   const score = (sp.s === "2" ? 2 : 1) as 1 | 2;
 
   const { supabase, user, profile, box } = await requireUser();
+  // Modo competición: una sola versión, sin filtro de categoría
+  const division = box.competition ? ("all" as const) : divisionParam;
   const isCoach = isCoachProfile(profile);
   // Atletas nuevos: no ven ni participan en la plani anterior a su alta
   const since = memberSince(profile);
@@ -284,7 +286,7 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
               locale={locale}
             />
 
-            <ResultForm key={selected!.id} wod={selected!} existing={mine} defaultDivision={profile?.division ?? undefined} />
+            <ResultForm key={selected!.id} wod={selected!} existing={mine} defaultDivision={profile?.division ?? undefined} single={box.competition} />
 
             <Leaderboard
               wod={selected!}

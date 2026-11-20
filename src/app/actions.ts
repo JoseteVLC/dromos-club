@@ -182,7 +182,7 @@ export async function updatePassword(_: ActionState, fd: FormData): Promise<Acti
 export async function saveResult(_: ActionState, fd: FormData): Promise<ActionState> {
   const { supabase, user, box } = await requireUser();
   const wodId = str(fd, "wod_id");
-  const division = str(fd, "division") as Division;
+  let division = str(fd, "division") as Division;
   if (!["elite", "rx", "scaled"].includes(division)) return { error: "Elige Elite, RX o Escalado." };
 
   const { data: wod } = await supabase
@@ -191,6 +191,11 @@ export async function saveResult(_: ActionState, fd: FormData): Promise<ActionSt
     .eq("id", wodId)
     .single<Pick<Wod, "score_type" | "time_cap_seconds" | "score2_type" | "wod_date" | "divisions" | "title" | "score_label">>();
   if (!wod) return { error: "WOD no encontrado." };
+  if (box.competition) {
+    // Modo competición: una sola versión (lo escalado va en las notas)
+    const ok = wodDivisions(wod).filter((d) => d !== "scaled");
+    division = ok.includes("rx") ? "rx" : (ok[0] ?? "rx");
+  }
   if (!wodDivisions(wod).includes(division)) return { error: "Este WOD no tiene esa categoría." };
   const since = memberSince((await requireUser()).profile);
   if (since && wod.wod_date < since) return { error: "Este WOD es anterior a tu alta: no puedes meter resultado." };
