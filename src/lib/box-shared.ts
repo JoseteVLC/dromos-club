@@ -7,7 +7,7 @@ export const RESERVED_SLUGS = new Set([
   "www", "app", "api", "admin", "auth", "login", "logout", "invitacion", "inactivo", "ayuda", "boxes", "box",
   "nuevo", "nuevo-box", "d", "r", "wod", "coach", "ranking", "historial", "marcas", "medallas", "mensajes", "perfil", "atleta", "avisos",
   "mail", "email", "static", "assets", "cdn", "status", "blog", "help", "soporte", "dromos", "dromosclub", "demo", "test", "dev", "staging",
-  "unirse", "cartel", "manual",
+  "unirse", "cartel", "manual", "dia",
 ]);
 
 export function isValidSlug(s: string): boolean {
