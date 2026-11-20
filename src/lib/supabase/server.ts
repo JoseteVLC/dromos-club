@@ -118,3 +118,15 @@ export async function requireAdmin() {
   if (!ctx.profile?.is_admin) redirect("/");
   return ctx;
 }
+
+/**
+ * Último día de plani que ve un atleta: el domingo de esta semana; y desde el domingo, también la semana siguiente.
+ * Así los coaches pueden dejar cargadas semanas futuras sin que se vean antes de tiempo. Coaches y admins: sin límite (null).
+ */
+export function planHorizon(p: Profile | null | undefined, today: string): string | null {
+  if (isCoachProfile(p)) return null;
+  const d = new Date(today + "T12:00:00Z");
+  const dow = (d.getUTCDay() + 6) % 7; // 0 = lunes … 6 = domingo
+  d.setUTCDate(d.getUTCDate() + (6 - dow) + (dow === 6 ? 7 : 0));
+  return d.toISOString().slice(0, 10);
+}

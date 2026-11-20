@@ -823,6 +823,9 @@ const d: Record<string, string> = {
   "Editar este benchmark (coaches)": "Modifier ce benchmark (coachs)",
   "Añadir un benchmark al catálogo (coaches)": "Ajouter un benchmark au catalogue (coachs)",
   "Foto de la pizarra, Word de la plani o texto copiado": "Photo du tableau, fichier Word du plan ou texte collé",
+  "Mover todo a la semana del lunes": "Tout déplacer à la semaine du lundi",
+  "Mover": "Déplacer",
+  "Cada parte mantiene su día de la semana. Los atletas no ven una semana hasta el domingo anterior, así que puedes dejar cargada la siguiente.": "Chaque partie garde son jour de la semaine. Les athlètes ne voient une semaine qu'à partir du dimanche précédent : tu peux charger la suivante à l'avance.",
 };
 
 export default d;

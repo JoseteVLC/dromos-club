@@ -7,7 +7,7 @@ import { staffIds } from "@/lib/push";
 import { moveWod } from "@/app/actions";
 import { tipFor } from "@/lib/ai-tips";
 import { notFound, redirect } from "next/navigation";
-import { isCoachProfile, memberSince, requireUser } from "@/lib/supabase/server";
+import { isCoachProfile, memberSince, planHorizon, requireUser } from "@/lib/supabase/server";
 import { addDays, dayHref, isISODate, todayISO } from "@/lib/dates";
 import { mondayOf } from "@/lib/week-parser";
 import { myStreak } from "@/lib/streak-data";
@@ -36,6 +36,8 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
   // Atletas nuevos: no ven ni participan en la plani anterior a su alta
   const since = memberSince(profile);
   if (since && date < since) redirect(dayHref(since));
+  const horizon = planHorizon(profile, todayISO());
+  if (horizon && date > horizon) redirect(dayHref(horizon));
   const { t, locale } = await getI18n();
   const today = todayISO();
 
@@ -178,9 +180,9 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
   const nextPart = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").find((l) => !usedParts.has(l)) ?? "Z";
 
   return (
-    <SwipeDays date={date} min={since}>
+    <SwipeDays date={date} min={since} max={horizon}>
       <div className="space-y-5">
-        <DayNav date={date} today={today} min={since} />
+        <DayNav date={date} today={today} min={since} max={horizon} />
 
         <StreakCard
           days={streak.stats.days}

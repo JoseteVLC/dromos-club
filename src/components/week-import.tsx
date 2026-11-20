@@ -95,6 +95,27 @@ export function WeekImport({ defaultMonday, today }: { defaultMonday: string; to
     }
   };
 
+  // Mover todo lo leído a la semana que elijas (p. ej. cargar ya la semana que viene), manteniendo el día de cada parte
+  const [moveTo, setMoveTo] = useState(defaultMonday);
+  const mondayOf = (iso: string) => {
+    const d = new Date(iso + "T12:00:00Z");
+    d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+    return d;
+  };
+  const moveAll = () => {
+    if (!parts?.length || !moveTo) return;
+    const first = parts.map((p) => p.wod_date).sort()[0];
+    const shift = Math.round((mondayOf(moveTo).getTime() - mondayOf(first).getTime()) / 864e5);
+    if (!shift) return;
+    setParts(
+      parts.map((p) => {
+        const d = new Date(p.wod_date + "T12:00:00Z");
+        d.setUTCDate(d.getUTCDate() + shift);
+        return { ...p, wod_date: d.toISOString().slice(0, 10) };
+      }),
+    );
+  };
+
   const update = (key: string, patch: Partial<ParsedPart>) =>
     setParts((ps) => ps!.map((p) => (p.key === key ? { ...p, ...patch } : p)));
 
@@ -165,6 +186,20 @@ export function WeekImport({ defaultMonday, today }: { defaultMonday: string; to
             </p>
           )}
           {parts.length === 0 && <p className="card p-4 text-muted">{t("No he encontrado nada. Revisa el texto.")}</p>}
+          {parts.length > 0 && (
+            <div className="card flex flex-wrap items-end gap-2 p-3">
+              <label className="min-w-0 flex-1">
+                <span className="label">{t("Mover todo a la semana del lunes")}</span>
+                <DateInput value={moveTo} onChange={setMoveTo} />
+              </label>
+              <button type="button" className="btn-ghost text-sm" onClick={moveAll}>
+                {t("Mover")}
+              </button>
+              <p className="w-full text-xs text-muted">
+                {t("Cada parte mantiene su día de la semana. Los atletas no ven una semana hasta el domingo anterior, así que puedes dejar cargada la siguiente.")}
+              </p>
+            </div>
+          )}
 
           {parts.map((p) => (
             <div key={p.key} className={`card space-y-3 p-3 ${p.include ? "" : "opacity-40"}`}>

@@ -30,6 +30,8 @@ En **Coach** rellenas el formulario y pulsas **Crear WOD**. Úsalo para un WOD s
 
 En **Coach → Importar WODs → 📷 Desde una foto** haces una foto a la pizarra del box, a la plani en papel o una captura de pantalla, y la app te prepara los WODs.
 
+**Cargar semanas por adelantado.** Los atletas solo ven la plani hasta el domingo de la semana en curso; la semana siguiente aparece el domingo. Puedes importar y dejar publicada la semana que viene (o varias) sin que nadie la vea antes de tiempo; los coaches sí la ven. Al importar, en la revisión tienes **«Mover todo a la semana del lunes»**: elige el lunes y pulsa **Mover**, y cada parte se coloca en ese mismo día de esa semana (útil si el texto o la foto traen otras fechas).
+
 1. **Fecha:** pon el día al que corresponde si la foto no lo indica (por defecto, hoy). Si la foto trae los días de la semana, los usa.
 2. **Pulsa «Hacer foto o elegir imagen».** Puedes elegir hasta 4 fotos a la vez (por ejemplo, la semana en varias páginas).
 3. En unos segundos aparecen las partes en la **misma pantalla de revisión** que la importación de la semana: fecha, letra, título, texto y tipo de resultado. Si la app ve algo dudoso, sale un aviso amarillo.

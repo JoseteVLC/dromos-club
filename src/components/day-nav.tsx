@@ -7,19 +7,20 @@ import { addDays, dayHref, dayLabel, longDate } from "@/lib/dates";
 import { useI18n } from "@/lib/i18n/client";
 
 /** Barra de fecha: ‹ Hoy › + botón de calendario. */
-export function DayNav({ date, today, min }: { date: string; today: string; min?: string | null }) {
+export function DayNav({ date, today, min, max }: { date: string; today: string; min?: string | null; max?: string | null }) {
   const router = useRouter();
   const { t, locale } = useI18n();
   const inputRef = useRef<HTMLInputElement>(null);
   const prev = addDays(date, -1);
   const next = addDays(date, 1);
   const canPrev = !min || prev >= min;
+  const canNext = !max || next <= max;
 
   // Precarga los días contiguos para que el cambio sea instantáneo
   useEffect(() => {
     if (canPrev) router.prefetch(dayHref(prev));
-    router.prefetch(dayHref(next));
-  }, [router, prev, next, canPrev]);
+    if (canNext) router.prefetch(dayHref(next));
+  }, [router, prev, next, canPrev, canNext]);
 
   const openPicker = () => {
     const el = inputRef.current;
@@ -57,15 +58,22 @@ export function DayNav({ date, today, min }: { date: string; today: string; min?
             type="date"
             value={date}
             min={min ?? undefined}
+            max={max ?? undefined}
             onChange={(e) => e.target.value && router.push(dayHref(e.target.value))}
             className="pointer-events-none absolute inset-0 opacity-0"
             tabIndex={-1}
             aria-hidden
           />
         </button>
-        <Link href={dayHref(next)} className="btn-ghost h-11 w-11 text-xl" aria-label={t("Día siguiente")}>
-          ›
-        </Link>
+        {canNext ? (
+          <Link href={dayHref(next)} className="btn-ghost h-11 w-11 text-xl" aria-label={t("Día siguiente")}>
+            ›
+          </Link>
+        ) : (
+          <span className="btn-ghost h-11 w-11 text-xl opacity-20" aria-hidden>
+            ›
+          </span>
+        )}
       </div>
       <div className="flex items-center justify-between px-1 text-xs text-muted">
         <span>{longDate(date, locale).replace(/^./, (c) => c.toUpperCase())}</span>
@@ -89,7 +97,7 @@ function CalendarIcon() {
 }
 
 /** Deslizar a izquierda/derecha para cambiar de día. */
-export function SwipeDays({ date, min, children }: { date: string; min?: string | null; children: React.ReactNode }) {
+export function SwipeDays({ date, min, max, children }: { date: string; min?: string | null; max?: string | null; children: React.ReactNode }) {
   const router = useRouter();
   const start = useRef<{ x: number; y: number } | null>(null);
 
@@ -110,7 +118,7 @@ export function SwipeDays({ date, min, children }: { date: string; min?: string 
         start.current = null;
         if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.8) {
           const to = addDays(date, dx < 0 ? 1 : -1);
-          if (!min || to >= min) router.push(dayHref(to));
+          if ((!min || to >= min) && (!max || to <= max)) router.push(dayHref(to));
         }
       }}
       className="min-h-[60vh]"
