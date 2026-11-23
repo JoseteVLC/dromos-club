@@ -107,8 +107,10 @@ export function rankResults(
       (division === "all" || r.division === division),
   );
 
+  // Pesos: marca absoluta (todos juntos por kilos). El resto: Élite por delante de RX
+  const absolute = wod.score_type === "load";
   const cmp = (a: Result, b: Result) =>
-    DIVISION_ORDER[a.division] - DIVISION_ORDER[b.division] || compareScore(wod.score_type, a, b);
+    (absolute ? 0 : DIVISION_ORDER[a.division] - DIVISION_ORDER[b.division]) || compareScore(wod.score_type, a, b);
 
   const sorted = [...filtered].sort(cmp);
   const ranked: RankedResult[] = [];

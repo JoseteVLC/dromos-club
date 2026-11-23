@@ -315,7 +315,7 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
               comments={commentCounts}
               competition={box.competition}
               gender={gender}
-              division={division}
+              division={shown!.score_type === "load" ? "all" : division}
               score={selected!.score2_type ? score : 1}
               href={(g, d, s) =>
                 dayHref(date, {
