@@ -898,5 +898,7 @@ const d: Record<string, string> = {
   "Todo": "Wszystko",
   "¿Has escalado algo? (opcional)": "Czy coś skalowałeś? (opcjonalnie)",
   "Qué has cambiado: peso, movimiento, reps… y cómo te has sentido": "Co zmieniłeś: ciężar, ruch, powtórzenia… i jak się czułeś",
+  "Sumar una ronda": "Dodaj rundę",
+  "Toca la pantalla o + para sumar una ronda": "Dotknij ekranu lub +, aby dodać rundę",
 };
 export default d;

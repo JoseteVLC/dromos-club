@@ -186,6 +186,15 @@ export function WodTimer({
   const [elapsed, setElapsed] = useState(0);
   const [stoppedAt, setStoppedAt] = useState<number | null>(null); // For Time: cuando pulsa «Terminar»
   const [taps, setTaps] = useState(0);
+  /** Suma o resta una ronda (con una vibración corta en el móvil, si se puede). */
+  const addRound = (d: number) => {
+    setTaps((n) => Math.max(0, n + d));
+    try {
+      navigator.vibrate?.(25);
+    } catch {
+      /* sin vibración */
+    }
+  };
   const base = useRef(0); // ms acumulados antes de la última pausa
   const since = useRef(0); // instante en que se reanudó
   const lastBeep = useRef(-1);
@@ -363,7 +372,9 @@ export function WodTimer({
       ) : (
         <div
           className="flex flex-1 select-none flex-col items-center justify-center gap-4 p-4 text-center"
-          onClick={() => (cfg.mode !== "intervals" && running && elapsed >= PREP ? setTaps((n) => n + 1) : undefined)}
+          // En el móvil, «pointerdown» responde al instante y no se pierde ningún toque rápido (el click espera al doble toque)
+          style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent", WebkitUserSelect: "none" }}
+          onPointerDown={() => (cfg.mode !== "intervals" && running && elapsed >= PREP ? addRound(1) : undefined)}
         >
           <p className={`h-display text-2xl uppercase ${tone}`}>{view.label}</p>
           <p className={`h-display tabular-nums leading-none ${tone}`} style={{ fontSize: cfg.mode !== "intervals" && elapsed >= PREP ? "min(26vw, 28vh)" : "min(32vw, 40vh)" }}>{view.big}</p>
@@ -372,27 +383,36 @@ export function WodTimer({
             <div className="h-full bg-accent transition-[width]" style={{ width: `${Math.min(100, view.progress * 100)}%` }} />
           </div>
           {cfg.mode !== "intervals" && elapsed >= PREP && (
-            <div className="mt-2 flex items-center gap-5">
-              <div className="flex flex-col items-center">
+            <div className="mt-2 flex items-center gap-4">
+              <button
+                type="button"
+                onPointerDown={(e) => {
+                  e.stopPropagation();
+                  addRound(-1);
+                }}
+                className={`btn-ghost h-16 w-16 shrink-0 text-3xl ${taps === 0 ? "opacity-30" : ""}`}
+                aria-label={t("Quitar una ronda")}
+              >
+                −
+              </button>
+              <div className="flex min-w-[6rem] flex-col items-center">
                 <span className="text-sm font-semibold uppercase tracking-widest text-muted">{t("Rondas")}</span>
                 <span className="h-display tabular-nums leading-none text-fg" style={{ fontSize: "min(22vw, 24vh)" }}>{taps}</span>
               </div>
-              {taps > 0 && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setTaps((n) => Math.max(0, n - 1));
-                  }}
-                  className="btn-ghost h-14 w-14 text-2xl"
-                  aria-label={t("Quitar una ronda")}
-                >
-                  −1
-                </button>
-              )}
+              <button
+                type="button"
+                onPointerDown={(e) => {
+                  e.stopPropagation();
+                  addRound(1);
+                }}
+                className="btn h-16 w-16 shrink-0 text-3xl"
+                aria-label={t("Sumar una ronda")}
+              >
+                +
+              </button>
             </div>
           )}
-          {cfg.mode !== "intervals" && elapsed >= PREP && <p className="text-sm text-muted">{t("Toca la pantalla para sumar una ronda")}</p>}
+          {cfg.mode !== "intervals" && elapsed >= PREP && <p className="text-sm text-muted">{t("Toca la pantalla o + para sumar una ronda")}</p>}
         </div>
       )}
 
