@@ -44,7 +44,8 @@ export default async function HistorialPage({ searchParams }: PageProps<"/histor
   const benchByName = new Map((benchData ?? []).map((b) => [norm(b.name), b]));
   const marcas = (marcaData ?? []).filter((m) => benchById.has(m.benchmark_id));
   // Un WOD cuenta como benchmark si el coach lo marcó o si se llama igual que uno del catálogo (Fran, Murph…)
-  const isBench = (w: Wod) => w.is_benchmark || benchByName.has(norm(w.title));
+  // Los WODs de carga no: cada levantamiento ya sale como su propia marca (Back squat 1RM, Bench press 1RM…)
+  const isBench = (w: Wod) => w.score_type !== "load" && (w.is_benchmark || benchByName.has(norm(w.title)));
 
   // Historial: resultados de WODs + marcas personales, juntos por fecha
   type Item = { kind: "wod"; date: string; r: MyResult } | { kind: "marca"; date: string; m: PersonalRecord; b: Benchmark };
