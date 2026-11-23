@@ -11,7 +11,7 @@ import { useI18n } from "@/lib/i18n/client";
 import { Icon } from "@/components/icon";
 
 /** single: modo competición, una sola versión (sin Élite/RX/Escalado); si han escalado algo, lo cuentan en las notas. */
-export function ResultForm({ wod, existing, defaultDivision, single = false }: { wod: Wod; existing: Result | null; defaultDivision?: Division; single?: boolean }) {
+export function ResultForm({ wod, existing, defaultDivision, single = false, prNote }: { wod: Wod; existing: Result | null; defaultDivision?: Division; single?: boolean; prNote?: string }) {
   const [state, action, pending] = useActionState(saveResult, undefined);
   // Se envía a mano para que el formulario no se vacíe si hay que confirmar o corregir algo
   const last = useRef<FormData | null>(null);
@@ -202,6 +202,10 @@ export function ResultForm({ wod, existing, defaultDivision, single = false }: {
             placeholder="0"
           />
         </div>
+      )}
+
+      {div !== "scaled" && prNote && (
+        <p className="text-xs text-muted">📈 {t("Se guarda también en Mis marcas: {m}", { m: prNote })}</p>
       )}
 
       {div !== "scaled" && wod.score2_type && (

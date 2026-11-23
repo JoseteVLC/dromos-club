@@ -22,7 +22,7 @@ En **Coach** rellenas el formulario y pulsas **Crear WOD**. Úsalo para un WOD s
 | Time cap | Solo en For Time (mm:ss). Quien no acaba mete CAP + reps |
 | Unidad | Opcional, si quieres otra etiqueta (p. ej. «rondas») |
 | Segundo score | Marca la casilla si el WOD tiene dos marcas: elige el tipo y nombra cada score («Back squat» y «Sandbag clean») |
-| ★ Benchmark | Márcalo si debe contar para los PRs. Si el título es igual que un benchmark del catálogo («Fran», «Murph»…), cuenta como benchmark aunque no lo marques |
+| ★ Benchmark | Márcalo si debe contar para los PRs. Si el título es igual que un benchmark del catálogo («Fran», «Murph»…), cuenta como benchmark aunque no lo marques. En los WODs de fuerza no hace falta: si piden un RM de un levantamiento (1RM back squat, 3RM deadlift…), cada carga va sola a Mis marcas de cada atleta; con dos cargas, una por levantamiento y con dos leaderboards |
 | Categorías | Élite, RX y Escalado vienen marcadas. Si ese día Élite y RX son iguales, desmarca una: todos compiten en el mismo ranking y nadie pasa por delante solo por elegir «Élite». Al importar la plani, si el texto solo habla de Élite (o solo de RX), la otra se quita sola |
 | Publicado | Si lo desmarcas, los atletas no lo ven hasta que lo publiques |
 

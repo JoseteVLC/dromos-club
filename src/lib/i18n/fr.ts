@@ -900,6 +900,7 @@ const d: Record<string, string> = {
   "Qué has cambiado: peso, movimiento, reps… y cómo te has sentido": "Ce que tu as changé : charge, mouvement, reps… et comment tu t'es senti",
   "Sumar una ronda": "Ajouter un round",
   "Toca la pantalla o + para sumar una ronda": "Touche l'écran ou + pour ajouter un round",
+  "Se guarda también en Mis marcas: {m}": "Enregistré aussi dans Mes records : {m}",
 };
 
 export default d;

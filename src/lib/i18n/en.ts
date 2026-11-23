@@ -900,5 +900,6 @@ const d: Record<string, string> = {
   "Qué has cambiado: peso, movimiento, reps… y cómo te has sentido": "What you changed: weight, movement, reps… and how you felt",
   "Sumar una ronda": "Add a round",
   "Toca la pantalla o + para sumar una ronda": "Tap the screen or + to add a round",
+  "Se guarda también en Mis marcas: {m}": "Also saved to My records: {m}",
 };
 export default d;

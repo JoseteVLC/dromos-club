@@ -100,6 +100,7 @@ En **Historial → 🏋️ Mis marcas** tienes el catálogo de benchmarks de Cro
 
 - **Despliega una categoría** o usa el buscador, y entra en el ejercicio.
 - **Apunta tu marca:** fecha, RX o Escalado (en WODs) o el RM (1RM, 3RM, 5RM… en levantamientos) y tu resultado. Antes de guardar un tiempo verás «Se guardará como 5:09» para comprobar que está bien.
+- **Desde los WODs de fuerza:** si la plani pide un RM de un levantamiento (por ejemplo «1 rep back squat» y «1 rep bench press»), al meter tu resultado cada carga se guarda sola en Mis marcas como su ejercicio y RM. Si el WOD tiene dos cargas, el leaderboard tiene dos pestañas, una por levantamiento. Si cambias o borras el resultado, la marca cambia o se borra con él.
 - **Corrige o borra:** en «Tu historial», debajo de cada marca, tienes ✏️ Editar y la papelera.
 - **Tu PR y tu percentil:** ves tu mejor marca, en qué porcentaje de la comunidad estás («Top 15 %», con la campana de Gauss a partir de 10 atletas) y el ranking de la comunidad por chicos y chicas.
 - **Tu progreso:** con dos marcas o más (en RX y el mismo RM), una gráfica enseña cómo has evolucionado. Los puntos rellenos son tus PR y la línea naranja, tu mejor marca en cada momento. En tiempos, subir en la gráfica es bajar el tiempo.

@@ -19,6 +19,7 @@ import { DayNav, SwipeDays } from "@/components/day-nav";
 import { ResultForm } from "@/components/result-form";
 import { Leaderboard } from "@/components/leaderboard";
 import type { ReactionSummary } from "@/components/reactions";
+import { wodLifts, type WodLift } from "@/lib/wod-lifts";
 import { getI18n } from "@/lib/i18n/server";
 import type { T } from "@/lib/i18n/core";
 import { Icon } from "@/components/icon";
@@ -181,6 +182,23 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
   const usedParts = new Set(wods.map((w) => w.part));
   const nextPart = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").find((l) => !usedParts.has(l)) ?? "Z";
 
+  // WOD de fuerza: cada carga con su levantamiento (Back squat · 1RM, Bench press · 1RM). Da nombre a los dos leaderboards
+  // y se guarda solo en Mis marcas al apuntar el resultado
+  const liftBenches =
+    selected?.score_type === "load"
+      ? ((await supabase.from("benchmarks").select("id, name, category").in("category", ["lifts", "olympic"])).data ?? [])
+      : [];
+  const wodLiftList = selected ? wodLifts(selected, liftBenches) : [null, null];
+  const liftLabel = (l: WodLift | null) => (l ? `${l.name}${l.rm ? ` · ${l.rm}RM` : ""}` : null);
+  const shown = selected
+    ? {
+        ...selected,
+        score_name: selected.score_name || (selected.score2_type ? liftLabel(wodLiftList[0]) : null),
+        score2_name: selected.score2_name || liftLabel(wodLiftList[1]),
+      }
+    : null;
+  const prNote = wodLiftList.filter((l) => l?.rm).map((l) => liftLabel(l)).join(" · ");
+
   return (
     <SwipeDays date={date} min={since} max={horizon}>
       <div className="space-y-5">
@@ -250,7 +268,7 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
               </div>
             )}
 
-            <WodHeader wod={selected!} isCoach={isCoach} t={t} />
+            <WodHeader wod={shown!} isCoach={isCoach} t={t} />
 
             {repeats.length > 0 && (
               <div className="card space-y-1 border-accent/40 p-4">
@@ -286,10 +304,10 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
               locale={locale}
             />
 
-            <ResultForm key={selected!.id} wod={selected!} existing={mine} defaultDivision={profile?.division ?? undefined} single={box.competition} />
+            <ResultForm key={selected!.id} wod={shown!} prNote={prNote} existing={mine} defaultDivision={profile?.division ?? undefined} single={box.competition} />
 
             <Leaderboard
-              wod={selected!}
+              wod={shown!}
               results={results}
               userId={user.id}
               isCoach={isCoach}
@@ -332,6 +350,7 @@ function WodHeader({ wod, isCoach, t }: { wod: Wod; isCoach: boolean; t: T }) {
         <span className="text-accent">
           {t(SCORE_TYPES[wod.score_type].label)}
           {wod.score2_type ? ` + ${t(SCORE_TYPES[wod.score2_type].label)}` : ""}
+          {wod.score_name && wod.score2_name ? ` · ${wod.score_name} + ${wod.score2_name}` : ""}
         </span>
         {wod.time_cap_seconds ? <span>· Cap {formatTime(wod.time_cap_seconds)}</span> : null}
         {wod.is_benchmark && <span>· ★ Benchmark</span>}

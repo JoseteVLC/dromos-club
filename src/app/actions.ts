@@ -1,5 +1,6 @@
 "use server";
 
+import { wodLifts } from "@/lib/wod-lifts";
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { syncMedals } from "@/lib/achievements";
@@ -189,7 +190,7 @@ export async function saveResult(_: ActionState, fd: FormData): Promise<ActionSt
     .from("wods")
     .select("*")
     .eq("id", wodId)
-    .single<Pick<Wod, "score_type" | "time_cap_seconds" | "score2_type" | "wod_date" | "divisions" | "title" | "score_label">>();
+    .single<Pick<Wod, "id" | "description" | "score_type" | "time_cap_seconds" | "score2_type" | "wod_date" | "divisions" | "title" | "score_label">>();
   if (!wod) return { error: "WOD no encontrado." };
   if (box.competition) {
     // Modo competición: una sola versión (lo escalado va en las notas)
@@ -285,6 +286,7 @@ export async function saveResult(_: ActionState, fd: FormData): Promise<ActionSt
 
   const { error } = await supabase.from("results").upsert(row, { onConflict: "wod_id,user_id" });
   if (error) return { error: error.message };
+  await syncLiftRecords(supabase, user.id, wod, row as { division: string; value?: number | null; value2?: number | null }).catch((e) => console.error(e));
   revalidatePath("/", "layout");
   checkMedalsLater(supabase, user.id, box);
   // Si confirma algo imposible sin discusión (p. ej. por encima del récord mundial), queda para que lo mire el coach
@@ -333,9 +335,51 @@ export async function toggleDone(fd: FormData) {
   if (back.startsWith("/")) redirect(back);
 }
 
+/**
+ * WOD de fuerza («1 rep back squat / 1 rep bench press»): cada carga va a Mis marcas como su levantamiento y RM,
+ * una marca por score. Si cambias el resultado se actualiza; si lo quitas o es escalado, se borra.
+ */
+async function syncLiftRecords(
+  supabase: Awaited<ReturnType<typeof requireUser>>["supabase"],
+  userId: string,
+  wod: Pick<Wod, "id" | "title" | "description" | "score_type" | "score2_type" | "wod_date">,
+  row: { division: string; value?: number | null; value2?: number | null } | null,
+) {
+  if (wod.score_type !== "load") return;
+  const { data: benches } = await supabase.from("benchmarks").select("id, name, category").in("category", ["lifts", "olympic"]);
+  const lifts = wodLifts(wod, benches ?? []);
+  for (const [i, lift] of lifts.entries()) {
+    const slot = i + 1;
+    const value = row ? (slot === 1 ? row.value : row.value2) : null;
+    if (!lift?.rm || value == null || !row || row.division === "scaled") {
+      await supabase.from("personal_records").delete().eq("user_id", userId).eq("wod_id", wod.id).eq("score_slot", slot);
+      continue;
+    }
+    await supabase.from("personal_records").upsert(
+      {
+        user_id: userId,
+        benchmark_id: lift.id,
+        performed_on: wod.wod_date,
+        division: "rx",
+        rm: lift.rm,
+        finished: true,
+        value,
+        notes: `${wod.title}`.slice(0, 500),
+        wod_id: wod.id,
+        score_slot: slot,
+      },
+      { onConflict: "user_id,wod_id,score_slot" },
+    );
+  }
+  revalidatePath("/marcas", "layout");
+}
+
 export async function deleteResult(fd: FormData) {
-  const { supabase } = await requireUser();
+  const { supabase, user } = await requireUser();
+  const { data: res } = await supabase.from("results").select("wod_id").eq("id", str(fd, "id")).maybeSingle<{ wod_id: string }>();
   await supabase.from("results").delete().eq("id", str(fd, "id"));
+  // Las marcas que salieron de ese resultado se van con él
+  if (res) await supabase.from("personal_records").delete().eq("user_id", user.id).eq("wod_id", res.wod_id).not("score_slot", "is", null);
   revalidatePath("/", "layout");
   const back = str(fd, "back");
   if (back.startsWith("/")) redirect(back);
