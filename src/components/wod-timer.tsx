@@ -100,7 +100,7 @@ function play(k: Sound) {
   } catch {}
 }
 
-type View = { big: string; label: string; sub: string; tone: "prep" | "work" | "rest" | "done"; progress: number; finished: boolean };
+type View = { big: string; label: string; sub: string; tone: "prep" | "work" | "rest" | "done"; progress: number; finished: boolean; round?: { r: number; n: number; within: number } };
 
 function viewAt(cfg: Cfg, elapsed: number, t: (s: string, v?: Record<string, string | number>) => string): View {
   if (elapsed < PREP) return { big: String(Math.ceil(PREP - elapsed)), label: t("Prepárate"), sub: "", tone: "prep", progress: elapsed / PREP, finished: false };
@@ -122,10 +122,11 @@ function viewAt(cfg: Cfg, elapsed: number, t: (s: string, v?: Record<string, str
   return {
     big: mmss(working ? cfg.work - within : len - within),
     label: working ? (cfg.rest ? t("Trabajo") : "GO") : t("Descanso"),
-    sub: t("Ronda {r} de {n}", { r: round, n: cfg.rounds }),
+    sub: "",
     tone: working ? "work" : "rest",
     progress: s / total,
     finished: false,
+    round: { r: round, n: cfg.rounds, within: within / len },
   };
 }
 
@@ -376,12 +377,36 @@ export function WodTimer({
           style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent", WebkitUserSelect: "none" }}
           onPointerDown={() => (cfg.mode !== "intervals" && running && elapsed >= PREP ? addRound(1) : undefined)}
         >
+          {view.round && (
+            // EMOM / intervalos: la ronda, bien grande arriba («3/10»)
+            <div className="flex flex-col items-center leading-none">
+              <span className="text-sm font-semibold uppercase tracking-widest text-muted">{t("Ronda")}</span>
+              <span className="h-display tabular-nums text-fg" style={{ fontSize: "min(20vw, 18vh)" }}>
+                {view.round.r}
+                <span className="text-muted">/{view.round.n}</span>
+              </span>
+            </div>
+          )}
           <p className={`h-display text-2xl uppercase ${tone}`}>{view.label}</p>
-          <p className={`h-display tabular-nums leading-none ${tone}`} style={{ fontSize: cfg.mode !== "intervals" && elapsed >= PREP ? "min(26vw, 28vh)" : "min(32vw, 40vh)" }}>{view.big}</p>
+          <p className={`h-display tabular-nums leading-none ${tone}`} style={{ fontSize: view.round ? "min(26vw, 26vh)" : cfg.mode !== "intervals" && elapsed >= PREP ? "min(26vw, 28vh)" : "min(32vw, 40vh)" }}>{view.big}</p>
           {view.sub && <p className="text-lg text-muted">{view.sub}</p>}
-          <div className="h-1.5 w-full max-w-md overflow-hidden rounded-full bg-line">
-            <div className="h-full bg-accent transition-[width]" style={{ width: `${Math.min(100, view.progress * 100)}%` }} />
-          </div>
+          {view.round && view.round.n <= 40 ? (
+            // Una barra por ronda: hechas en color, la actual llenándose, las que faltan en gris
+            <div className="flex w-full max-w-xl gap-1">
+              {Array.from({ length: view.round.n }, (_, i) => (
+                <div key={i} className="h-4 flex-1 overflow-hidden rounded-full bg-line">
+                  <div
+                    className={`h-full ${i + 1 === view.round!.r ? (view.tone === "rest" ? "bg-sky-400" : "bg-accent") : "bg-accent"}`}
+                    style={{ width: i + 1 < view.round!.r ? "100%" : i + 1 === view.round!.r ? `${view.round!.within * 100}%` : "0%" }}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="h-4 w-full max-w-xl overflow-hidden rounded-full bg-line">
+              <div className="h-full bg-accent transition-[width]" style={{ width: `${Math.min(100, view.progress * 100)}%` }} />
+            </div>
+          )}
           {cfg.mode !== "intervals" && elapsed >= PREP && (
             <div className="mt-2 flex items-center gap-4">
               <button

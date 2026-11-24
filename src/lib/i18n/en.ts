@@ -901,5 +901,6 @@ const d: Record<string, string> = {
   "Sumar una ronda": "Add a round",
   "Toca la pantalla o + para sumar una ronda": "Tap the screen or + to add a round",
   "Se guarda también en Mis marcas: {m}": "Also saved to My records: {m}",
+  "Ronda": "Round",
 };
 export default d;
