@@ -5,6 +5,24 @@ export type WodLift = { id: string; name: string; rm: number | null };
 
 const norm = (x: string) => x.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
+const escapeRe = (x: string) => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/** Otros nombres con los que sale cada levantamiento en la plani (inglés y español). Clave: nombre del catálogo en minúsculas. */
+const ALIASES: Record<string, string[]> = {
+  "strict press": ["shoulder press", "overhead press", "military press", "press militar", "press estricto", "press de hombro", "ohp"],
+  "back squat": ["sentadilla trasera"],
+  "front squat": ["sentadilla frontal"],
+  "overhead squat": ["sentadilla overhead", "ohs"],
+  "bench press": ["press banca", "press de banca"],
+  deadlift: ["peso muerto"],
+  "sumo deadlift": ["peso muerto sumo"],
+  "clean & jerk": ["c&j", "cargada y envion"],
+  snatch: ["arrancada"],
+  "power clean": ["cargada de potencia"],
+  "power snatch": ["arrancada de potencia"],
+  "split jerk": ["envion en tijera"],
+};
+
 /**
  * En un WOD de fuerza («1 rep back squat / 1 rep bench press», «Find 3RM deadlift») busca los levantamientos del
  * catálogo en el orden en que salen: el primero va con el score 1 y el segundo con el score 2.
@@ -25,10 +43,16 @@ export function wodLifts(
       [...lifts]
         .sort((a, b) => b.name.length - a.name.length)
         .forEach((b) => {
-          const n = norm(b.name).replace(/&/g, "(?:&|and|y)").replace(/\s+/g, "[\\s-]*");
-          const m = new RegExp(`\\b${n}\\b`).exec(line);
+          // El nombre del catálogo o cualquiera de sus otros nombres («shoulder press» = Strict press…)
+          let m: RegExpExecArray | null = null;
+          for (const name of [norm(b.name), ...(ALIASES[norm(b.name)] ?? [])]) {
+            const n = escapeRe(name).replace(/&/g, "(?:&|and|y)").replace(/\s+/g, "[\\s-]*");
+            m = new RegExp(`(?:^|[^a-z0-9])(${n})(?![a-z0-9])`).exec(line);
+            if (m) break;
+          }
           if (!m) return;
-          const [s, e] = [m.index, m.index + m[0].length];
+          const start = m.index + m[0].length - m[1].length;
+          const [s, e] = [start, start + m[1].length];
           if (taken.some(([a, z]) => s < z && e > a)) return;
           taken.push([s, e]);
           if (!found.some((f) => f.b.id === b.id)) found.push({ at: li * 10000 + s, line: li, b });
@@ -45,7 +69,9 @@ export function wodLifts(
     if (!f) return null;
     // Reps del propio renglón («1 reps BACK SQUAT», «Back squat 3RM»); si no, las del WOD («Find 1RM»)
     const own = /\b(\d{1,2})\s*(?:-?\s*rm\b|reps?\b|rep\b)/.exec(f.text)?.[1];
-    const rm = Number(own ?? globalRm ?? NaN);
+    // «5x3 push press» es trabajo por series, no un máximo
+    const sets = !own && /\b\d+\s*x\s*\d+/.test(f.text);
+    const rm = sets ? NaN : Number(own ?? globalRm ?? NaN);
     return { id: f.b.id, name: f.b.name, rm: Number.isFinite(rm) && rm >= 1 && rm <= 20 ? rm : null };
   };
   return [toLift(found[0]), wod.score2_type === "load" ? toLift(found[1]) : null];
