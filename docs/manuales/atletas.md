@@ -192,6 +192,8 @@ Se desbloquean solas al guardar tus resultados y tus marcas, y una vez ganadas *
 
 **Retos del mes.** Además de las 20 permanentes, cada mes o en eventos como el Open habrá retos especiales que solo se pueden ganar en ese periodo. Quedarán en tu perfil como recuerdo.
 
+**Medallas que se repiten.** Semana de fuego, Mes perfecto, Imparable, Rompe-récords, Podio y Campeón se pueden ganar más veces. Arriba a la derecha sale cuántas llevas (×4) y la medalla evoluciona: a las 3 veces le sale un aro (nivel 2), a las 5 brilla (nivel 3) y a las 10 lleva corona (nivel 4). Al subir de nivel te llega un aviso.
+
 **Cómo cuentan.** Un entreno es un día de plani con resultado metido. Hay dos rachas. La principal son los **días seguidos**: días de plani seguidos con resultado (los días sin WOD no la rompen y hoy no cuenta como fallo hasta que acaba). Debajo están las **semanas de 5 días**: semanas seguidas entrenando al menos 5 días, los que quieras de lunes a domingo, con una barra de cómo vas esta semana; si una semana tiene menos días de plani, basta con hacerlos todos. Un PR es cada vez que mejoras tu mejor marca en un benchmark (en RX). El podio y la victoria se calculan dentro de tu categoría (Elite o RX) y tu sexo.
 
 **Cuándo se ganan Podio, Campeón y Dinastía.** Cada WOD tiene **2 días de margen** para meter el resultado: el del lunes se puede meter hasta el miércoles a las 23:59. Hasta entonces la clasificación es provisional (lo verás encima del ranking). Al cerrar, la app reparte las medallas con la clasificación final y te avisa si has ganado alguna. Si alguien mete su resultado después del cierre, sale en el ranking con la etiqueta «fuera de plazo», pero no gana ni quita medallas.

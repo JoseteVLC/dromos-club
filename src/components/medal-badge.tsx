@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { MedalDef } from "@/lib/medals";
+import { medalLevel, type MedalDef } from "@/lib/medals";
 import { Icon } from "@/components/icon";
 
 /**
@@ -294,11 +294,40 @@ const ART: Record<string, Art> = {
   },
 };
 
-export function MedalBadge({ medal, unlocked, size = 76 }: { medal: MedalDef; unlocked: boolean; size?: number }) {
+/**
+ * times: veces conseguida (medallas que se repiten). Desde 2 sale «×N» arriba a la derecha y la medalla evoluciona:
+ * nivel 2 (×3) aro, nivel 3 (×5) aro y brillo, nivel 4 (×10) aro, brillo que late y corona.
+ */
+export function MedalBadge({ medal, unlocked, size = 76, times = 0 }: { medal: MedalDef; unlocked: boolean; size?: number; times?: number }) {
   const a = ART[medal.code] ?? ART.first;
   const id = `m-${medal.code}`;
+  const level = unlocked ? medalLevel(times) : 0;
   return (
     <div className="relative mx-auto" style={{ width: size, height: size }}>
+      {level >= 2 && (
+        <div
+          aria-hidden
+          className={`pointer-events-none absolute rounded-full ${level >= 4 ? "animate-pulse" : ""}`}
+          style={{
+            inset: -size * 0.06,
+            border: `${Math.max(2, size * 0.035)}px solid ${a.c1}`,
+            boxShadow: level >= 3 ? `0 0 ${size * 0.18}px ${a.c1}aa, inset 0 0 ${size * 0.08}px ${a.c2}88` : undefined,
+          }}
+        />
+      )}
+      {level >= 4 && (
+        <svg aria-hidden viewBox="0 0 24 16" width={size * 0.34} className="absolute left-1/2 z-10 -translate-x-1/2" style={{ top: -size * 0.2 }}>
+          <path d="M2 14 L4 4 L8.5 9 L12 2 L15.5 9 L20 4 L22 14 Z" fill={a.c2} stroke={a.c1} strokeWidth={1.4} strokeLinejoin="round" />
+        </svg>
+      )}
+      {unlocked && times > 1 && (
+        <span
+          className="absolute z-10 rounded-full px-1.5 font-display font-bold tabular-nums leading-tight text-black shadow"
+          style={{ top: -size * 0.04, right: -size * 0.06, background: a.c2, fontSize: Math.max(11, size * 0.15), border: `2px solid ${a.c1}` }}
+        >
+          ×{times}
+        </span>
+      )}
       <svg
         viewBox="0 0 100 100"
         width={size}

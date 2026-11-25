@@ -7,7 +7,7 @@ import { compareScore, rankResults } from "./scoring";
 import type { Division, Gender, Result, ScoreType, Wod } from "./types";
 import { adminDb, hasAdminKey } from "./supabase/admin";
 import { sendPush } from "./push";
-import { MEDAL_BY_CODE } from "./medals";
+import { MEDAL_BY_CODE, medalLevel } from "./medals";
 import { closeDay, inTime, isClosed } from "./closing";
 import { addDays } from "./dates";
 
@@ -48,7 +48,8 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
   ]);
 
   const got = new Map<string, MedalProgress>();
-  const set = (code: string, progress: number, unlockedOn: string | null) => got.set(code, { code, progress, unlockedOn });
+  const set = (code: string, progress: number, unlockedOn: string | null, times?: number) =>
+    got.set(code, { code, progress, unlockedOn, times: times ?? (unlockedOn ? 1 : 0) });
 
   // --- Entrenos y rachas (días de plani con resultado) ---
   const doneSorted = [...done].sort();
@@ -63,9 +64,14 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
   let best = 0;
   let at6: string | null = null;
   let at30: string | null = null;
+  // Veces: cada bloque de 6 (o 30) días seguidos cuenta una vez; 12 seguidos = 2 semanas de fuego
+  let times6 = 0;
+  let times30 = 0;
   for (const d of [...days].sort()) {
     if (done.has(d)) {
       run++;
+      if (run % 6 === 0) times6++;
+      if (run % 30 === 0) times30++;
       best = Math.max(best, run);
       if (run === 6 && !at6) at6 = d;
       if (run === 30 && !at30) at30 = d;
@@ -74,8 +80,8 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
     }
   }
   // El progreso que se enseña es la racha de ahora (la que puedes seguir alargando), no la mejor que tuviste
-  set("week6", at6 ? best : run, at6);
-  set("streak30", at30 ? best : run, at30);
+  set("week6", at6 ? best : run, at6, times6);
+  set("streak30", at30 ? best : run, at30, times30);
 
   // Mes perfecto: 25 días distintos entrenados dentro de un mismo mes (varias partes el mismo día cuentan como un día)
   const perMonth = new Map<string, number>();
@@ -85,7 +91,7 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
     perMonth.set(d.slice(0, 7), n);
     if (n === 25 && !month25) month25 = d;
   }
-  set("month25", month25 ? 25 : (perMonth.get(today.slice(0, 7)) ?? 0), month25);
+  set("month25", month25 ? 25 : (perMonth.get(today.slice(0, 7)) ?? 0), month25, [...perMonth.values()].filter((n) => n >= 25).length);
 
   // --- PRs, Girls y Heroes (Mis marcas + WODs benchmark) ---
   const benchById = new Map((benchData ?? []).map((b) => [b.id, b]));
@@ -144,7 +150,7 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
       if (prCount === 25) pr25 = e.date;
     }
   }
-  set("pr1", Math.min(prCount, 1), pr1);
+  set("pr1", Math.min(prCount, 1), pr1, prCount);
   set("pr10", prCount, pr10);
   set("girls5", girls.size, girls5);
   set("hero5", heroes.size, hero5);
@@ -186,6 +192,7 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
   let podium: string | null = null;
   let winner: string | null = null;
   let wins = 0;
+  let podiums = 0;
   let winner5: string | null = null;
   for (const mine of eligible) {
     if (!gender) break;
@@ -198,18 +205,21 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
     const ranked = rankResults({ score_type: mine.wods.score_type, score_label: mine.wods.score_label, score2_type: null, score2_label: null }, rows, { gender, division: mine.division });
     const pos = ranked.find((r) => r.user_id === userId)?.rank;
     const on = closeDay(date); // la medalla se gana al cerrar el WOD
-    if (pos && pos <= 3 && !podium) podium = on;
+    if (pos && pos <= 3) {
+      podiums++;
+      if (!podium) podium = on;
+    }
     if (pos === 1) {
       wins++;
       if (!winner) winner = on;
       if (wins === 5) winner5 = on;
     }
   }
-  set("podium", podium ? 1 : 0, podium);
-  set("winner", winner ? 1 : 0, winner);
+  set("podium", podium ? 1 : 0, podium, podiums);
+  set("winner", winner ? 1 : 0, winner, wins);
   set("winner5", wins, winner5);
 
-  return MEDALS.map((m) => got.get(m.code) ?? { code: m.code, progress: 0, unlockedOn: null });
+  return MEDALS.map((m) => got.get(m.code) ?? { code: m.code, progress: 0, unlockedOn: null, times: 0 });
 }
 
 /**
@@ -221,13 +231,13 @@ export async function syncMedals(supabase: SupabaseClient, userId: string, box: 
   const { data: bx } = await supabase.from("boxes").select("competition").eq("id", box.id).maybeSingle<{ competition: boolean }>();
   if (bx?.competition) return { progress: [] as MedalProgress[], owned: new Map<string, string>() };
   const progress = await computeMedals(supabase, userId, box.id);
-  const { data: have } = await supabase.from("user_achievements").select("code, unlocked_on").eq("user_id", userId).eq("box_id", box.id);
+  const { data: have } = await supabase.from("user_achievements").select("code, unlocked_on, times").eq("user_id", userId).eq("box_id", box.id);
   const owned = new Map((have ?? []).map((h) => [h.code as string, h.unlocked_on as string]));
   const fresh = progress.filter((p) => p.unlockedOn && !owned.has(p.code));
   if (fresh.length && hasAdminKey()) {
     await adminDb()
       .from("user_achievements")
-      .upsert(fresh.map((p) => ({ box_id: box.id, user_id: userId, code: p.code, unlocked_on: p.unlockedOn })), { onConflict: "box_id,user_id,code", ignoreDuplicates: true });
+      .upsert(fresh.map((p) => ({ box_id: box.id, user_id: userId, code: p.code, unlocked_on: p.unlockedOn, times: Math.max(1, p.times) })), { onConflict: "box_id,user_id,code", ignoreDuplicates: true });
     for (const p of fresh) owned.set(p.code, p.unlockedOn!);
     // Push solo por medallas recién ganadas (de los últimos 3 días), no por las de antes de existir el sistema
     const recent = fresh.filter((p) => p.unlockedOn! >= new Date(Date.now() - 3 * 864e5).toISOString().slice(0, 10));
@@ -242,6 +252,27 @@ export async function syncMedals(supabase: SupabaseClient, userId: string, box: 
       });
     }
   }
+  // Medallas que se repiten: guardamos las veces y avisamos al subir de nivel (×3, ×5, ×10)
+  const timesHave = new Map((have ?? []).map((h) => [h.code as string, Number((h as { times?: number }).times ?? 1)]));
+  if (hasAdminKey()) {
+    const ups = progress.filter((p) => MEDAL_BY_CODE.get(p.code)?.repeat && timesHave.has(p.code) && p.times > (timesHave.get(p.code) ?? 1));
+    for (const p of ups) {
+      const before = timesHave.get(p.code) ?? 1;
+      await adminDb().from("user_achievements").update({ times: p.times }).eq("user_id", userId).eq("box_id", box.id).eq("code", p.code);
+      if (medalLevel(p.times) > medalLevel(before)) {
+        const m = MEDAL_BY_CODE.get(p.code);
+        await sendPush([userId], "medals", {
+          title: `🏅 ¡${m?.name} nivel ${medalLevel(p.times)}!`,
+          body: `Ya la llevas ${p.times} veces.`,
+          url: "/medallas",
+          tag: "medal",
+        box: box.slug,
+        });
+      }
+    }
+  }
+  // Lo guardado manda si es más (las medallas no se pierden aunque se borre un resultado)
+  for (const p of progress) if (timesHave.has(p.code)) p.times = Math.max(p.times, timesHave.get(p.code) ?? 1);
   return { progress, owned };
 }
 

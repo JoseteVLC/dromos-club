@@ -3,7 +3,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/supabase/server";
 import { getI18n } from "@/lib/i18n/server";
 import { syncMedals } from "@/lib/achievements";
-import { MEDALS, MEDAL_GROUPS } from "@/lib/medals";
+import { MEDALS, MEDAL_GROUPS, medalLevel, nextLevelAt } from "@/lib/medals";
 import { MedalBadge } from "@/components/medal-badge";
 import { RankingTabs } from "@/components/ranking-tabs";
 
@@ -49,11 +49,23 @@ export default async function MedallasPage({ searchParams }: PageProps<"/medalla
               const pct = Math.min(100, Math.round(((p?.progress ?? 0) / m.target) * 100));
               return (
                 <li key={m.code} className="card space-y-2 p-3 text-center">
-                  <MedalBadge medal={m} unlocked={!!date} size={92} />
+                  <MedalBadge medal={m} unlocked={!!date} size={92} times={p?.times ?? 0} />
                   <div className={`font-semibold leading-tight ${date ? "" : "text-muted"}`}>{t(m.name)}</div>
                   <p className="text-xs text-muted">{t(m.desc)}</p>
-                  {date ? (
-                    <div className="text-xs font-semibold text-accent">✓ {fmt(date)}</div>
+                  {date && m.repeat && (p?.times ?? 0) > 1 ? (
+                    <div className="space-y-0.5 text-xs">
+                      <div className="font-semibold text-accent">
+                        {t("Nivel {l}", { l: medalLevel(p!.times) })} · {t("{n} veces", { n: p!.times })}
+                      </div>
+                      {nextLevelAt(p!.times) && (
+                        <div className="text-[11px] text-muted">{t("Nivel {l} a las {n}", { l: medalLevel(p!.times) + 1, n: nextLevelAt(p!.times)! })}</div>
+                      )}
+                    </div>
+                  ) : date ? (
+                    <div className="space-y-0.5 text-xs">
+                      <div className="font-semibold text-accent">✓ {fmt(date)}</div>
+                      {m.repeat && <div className="text-[11px] text-muted">{t("Se puede volver a ganar")}</div>}
+                    </div>
                   ) : m.target > 1 ? (
                     <div className="space-y-1">
                       <div className="h-1.5 overflow-hidden rounded-full bg-line">
