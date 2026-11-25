@@ -23,7 +23,7 @@ export const MEDAL_GROUPS: { value: MedalGroup; label: string }[] = [
 export const MEDALS: MedalDef[] = [
   { code: "first", name: "Primer paso", desc: "Mete tu primer entreno", target: 1, group: "constancia" },
   { code: "week6", name: "Semana de fuego", desc: "6 días de plani seguidos: una semana completa", target: 6, group: "constancia" },
-  { code: "month25", name: "Mes perfecto", desc: "25 WODs registrados en un mismo mes", target: 25, group: "constancia" },
+  { code: "month25", name: "Mes perfecto", desc: "25 días entrenados en un mismo mes", target: 25, group: "constancia" },
   { code: "streak30", name: "Imparable", desc: "30 días de plani seguidos sin fallar", target: 30, group: "constancia", reward: true },
 
   { code: "total25", name: "En marcha", desc: "25 entrenos registrados", target: 25, group: "volumen" },

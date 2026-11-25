@@ -469,7 +469,7 @@ const d: Record<string, string> = {
   "Alma del box": "Heart of the box",
   "Anima a la comunidad: 25 comentarios o reacciones": "Cheer on the community: 25 comments or reactions",
   "6 días de plani seguidos: una semana completa": "6 programming days in a row: a full week",
-  "25 WODs registrados en un mismo mes": "25 WODs logged in one month",
+  "25 días entrenados en un mismo mes": "25 days trained in one month",
   "Snatch de 100 kg o más": "Snatch 100 kg or more",
   "Completa 5 Hero WODs distintos": "Complete 5 different Hero WODs",
   "Este WOD es anterior a tu alta: no puedes meter resultado.": "This WOD is from before you joined: you can't log a result.",

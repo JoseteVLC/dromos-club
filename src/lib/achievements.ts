@@ -73,20 +73,19 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
       run = 0;
     }
   }
-  set("week6", best, at6);
-  set("streak30", best, at30);
+  // El progreso que se enseña es la racha de ahora (la que puedes seguir alargando), no la mejor que tuviste
+  set("week6", at6 ? best : run, at6);
+  set("streak30", at30 ? best : run, at30);
 
-  // Mes perfecto: WODs registrados (un día puede tener varias partes)
+  // Mes perfecto: 25 días distintos entrenados dentro de un mismo mes (varias partes el mismo día cuentan como un día)
   const perMonth = new Map<string, number>();
   let month25: string | null = null;
-  let bestMonth = 0;
-  for (const d of myRes.map((r) => r.wods.wod_date).sort()) {
+  for (const d of doneSorted) {
     const n = (perMonth.get(d.slice(0, 7)) ?? 0) + 1;
     perMonth.set(d.slice(0, 7), n);
-    bestMonth = Math.max(bestMonth, n);
     if (n === 25 && !month25) month25 = d;
   }
-  set("month25", bestMonth, month25);
+  set("month25", month25 ? 25 : (perMonth.get(today.slice(0, 7)) ?? 0), month25);
 
   // --- PRs, Girls y Heroes (Mis marcas + WODs benchmark) ---
   const benchById = new Map((benchData ?? []).map((b) => [b.id, b]));

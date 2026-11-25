@@ -469,7 +469,7 @@ const d: Record<string, string> = {
   "Alma del box": "Cœur du box",
   "Anima a la comunidad: 25 comentarios o reacciones": "Encourager la communauté : 25 commentaires ou réactions",
   "6 días de plani seguidos: una semana completa": "6 jours de programmation d'affilée : une semaine complète",
-  "25 WODs registrados en un mismo mes": "25 WOD enregistrés en un mois",
+  "25 días entrenados en un mismo mes": "25 jours d'entraînement dans un même mois",
   "Snatch de 100 kg o más": "Snatch à 100 kg ou plus",
   "Completa 5 Hero WODs distintos": "Terminer 5 WOD Hero différents",
   "Este WOD es anterior a tu alta: no puedes meter resultado.": "Ce WOD date d'avant ton inscription : tu ne peux pas enregistrer de résultat.",

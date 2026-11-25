@@ -164,7 +164,7 @@ Se desbloquean solas al guardar tus resultados y tus marcas, y una vez ganadas *
 | **Constancia** | |
 | Primer paso | Mete tu primer entreno |
 | Semana de fuego | 6 días de plani seguidos: una semana completa |
-| Mes perfecto | 25 WODs registrados en un mismo mes |
+| Mes perfecto | 25 días entrenados en un mismo mes |
 | Imparable 🎁 | 30 días de plani seguidos sin fallar |
 | **Entrenos** | |
 | En marcha | 25 entrenos registrados |
