@@ -280,7 +280,9 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
                         <span className="text-muted">{new Date(r.date + "T12:00:00Z").toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })}</span>
                         <span className="font-semibold tabular-nums">
                           {r.score}
-                          <span className="ml-1 text-xs font-normal text-muted">{t(DIVISIONS.find((d) => d.value === r.division)?.label ?? r.division)}</span>
+                          {selected!.score_type !== "load" && (
+                            <span className="ml-1 text-xs font-normal text-muted">{t(DIVISIONS.find((d) => d.value === r.division)?.label ?? r.division)}</span>
+                          )}
                         </span>
                       </Link>
                     </li>

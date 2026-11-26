@@ -241,8 +241,15 @@ export default async function HistorialPage({ searchParams }: PageProps<"/histor
                               {isBench(r.wods) && " ★"}
                             </div>
                             <div className="text-xs text-muted">
-                              <span className="uppercase">{t(divLabel(r.division))}</span>
-                              {r.division !== "scaled" && ` · ${t(SCORE_TYPES[r.wods.score_type].label)}`}
+                              {/* Pesos: marca absoluta, sin categoría */}
+                              {r.wods.score_type === "load" && r.division !== "scaled" ? (
+                                t(SCORE_TYPES[r.wods.score_type].label)
+                              ) : (
+                                <>
+                                  <span className="uppercase">{t(divLabel(r.division))}</span>
+                                  {r.division !== "scaled" && ` · ${t(SCORE_TYPES[r.wods.score_type].label)}`}
+                                </>
+                              )}
                               {s2 && ` · ${s2}`}
                             </div>
                           </div>

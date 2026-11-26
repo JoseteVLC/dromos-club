@@ -199,10 +199,10 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
     const date = mine.wods.wod_date;
     const rows = (byWod.get(mine.wod_id) ?? [])
       // Los que el detector ve imposibles no cuentan hasta que un coach los da por buenos
-      .filter((r) => r.division === mine.division && r.profiles?.gender === gender && inTime(date, r.created_at) && (!r.flag || r.flag_reviewed))
+      .filter((r) => (mine.wods.score_type === "load" || r.division === mine.division) && r.profiles?.gender === gender && inTime(date, r.created_at) && (!r.flag || r.flag_reviewed))
       .map((r) => ({ ...r, profiles: { full_name: "", gender } }) as unknown as Result);
     if (rows.length < 3 || mine.wods.score_type === "check") continue;
-    const ranked = rankResults({ score_type: mine.wods.score_type, score_label: mine.wods.score_label, score2_type: null, score2_label: null }, rows, { gender, division: mine.division });
+    const ranked = rankResults({ score_type: mine.wods.score_type, score_label: mine.wods.score_label, score2_type: null, score2_label: null }, rows, { gender, division: mine.wods.score_type === "load" ? "all" : mine.division }); // pesos: podio absoluto
     const pos = ranked.find((r) => r.user_id === userId)?.rank;
     const on = closeDay(date); // la medalla se gana al cerrar el WOD
     if (pos && pos <= 3) {
