@@ -135,8 +135,18 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
 
               <div className="space-y-2 p-3 pt-2">
                 <Link href={`/r/${r.id}`} className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  <span className="h-display text-3xl tabular-nums text-accent">{r.division === "scaled" ? t("Escalado") : formatScore(w, r)}</span>
-                  {w.score_type !== "load" && r.division !== "scaled" && <span className="rounded bg-line px-1.5 py-0.5 text-xs font-semibold uppercase">{r.division}</span>}
+                  {r.division === "scaled" ? (
+                    // Escalado: sin marcar como «peor», solo que lo ha hecho a su medida
+                    <>
+                      <span className="h-display text-3xl">✓ {t("Hecho")}</span>
+                      <span className="rounded border border-line px-1.5 py-0.5 text-xs text-muted">{t("Adaptado")}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="h-display text-3xl tabular-nums text-accent">{formatScore(w, r)}</span>
+                      {w.score_type !== "load" && <span className="rounded bg-line px-1.5 py-0.5 text-xs font-semibold uppercase">{r.division}</span>}
+                    </>
+                  )}
                   {r.effort != null && <span className="text-xs text-muted">{t("Esfuerzo {n}/10", { n: r.effort })}</span>}
                 </Link>
                 {r.notes && <p className="text-sm text-muted">{r.notes}</p>}

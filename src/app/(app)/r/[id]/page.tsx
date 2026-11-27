@@ -76,12 +76,20 @@ export default async function ResultPage({ params }: PageProps<"/r/[id]">) {
             <div className="min-w-0">
             <div className="h-title truncate text-3xl">{name}</div>
             <div className="mt-1 flex items-center gap-2 text-xs text-muted">
-              {wod.score_type !== "load" && <span className="rounded bg-line px-1.5 py-0.5 font-semibold uppercase">{result.division}</span>}
+              {result.division === "scaled" ? (
+                <span className="rounded border border-line px-1.5 py-0.5">{t("Adaptado")}</span>
+              ) : (
+                wod.score_type !== "load" && <span className="rounded bg-line px-1.5 py-0.5 font-semibold uppercase">{result.division}</span>
+              )}
               {result.profiles?.gender && <span>{result.profiles.gender === "M" ? "♂" : "♀"}</span>}
             </div>
             </div>
           </Link>
-          <div className="h-display text-4xl tabular-nums text-accent">{formatScore(wod, result)}</div>
+          {result.division === "scaled" ? (
+            <div className="h-display text-3xl">✓ {t("Hecho")}</div>
+          ) : (
+            <div className="h-display text-4xl tabular-nums text-accent">{formatScore(wod, result)}</div>
+          )}
         </div>
         {result.effort != null && <p className="text-xs text-muted">{t("Esfuerzo {n}/10", { n: result.effort })}</p>}
         {result.notes && <p className="text-sm text-muted">{result.notes}</p>}

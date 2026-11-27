@@ -932,6 +932,7 @@ const d: Record<string, string> = {
   "Esfuerzo percibido": "Effort perçu",
   "Ver foto": "Voir la photo",
   "No se ha podido preparar la imagen. Inténtalo otra vez.": "Impossible de préparer l'image. Réessaie.",
+  "Adaptado": "Adapté",
 };
 
 export default d;
