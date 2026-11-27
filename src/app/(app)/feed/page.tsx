@@ -34,6 +34,7 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
   const followIds = (follows ?? []).map((f) => f.followee_id as string);
 
   let rows: Row[] = [];
+  let fetched: Row[] = [];
   if (!following || followIds.length) {
     let q = supabase
       .from("results")
@@ -44,17 +45,20 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
           "reactions(user_id, emoji), result_comments(count)",
       )
       .eq("box_id", box.id)
-      .neq("wods.score_type", "check")
       .order("created_at", { ascending: false })
-      .limit(PAGE + 1);
+      .limit(PAGE * 3);
     const since = memberSince(profile);
     if (since) q = q.gte("wods.wod_date", since);
     if (before) q = q.lt("created_at", before);
     if (following) q = q.in("user_id", followIds);
     const { data } = await q.returns<Row[]>();
-    rows = data ?? [];
+    // Las partes de «Hecho» (calentamiento, técnica…) solo salen si llevan foto
+    fetched = data ?? [];
+    rows = fetched.filter((r) => r.wods.score_type !== "check" || r.photo_path);
   }
-  const more = rows.length > PAGE;
+  // Hay más si sobran filas o si la consulta vino llena; «Ver más» sigue desde la última mostrada (o la última leída)
+  const more = rows.length > PAGE || fetched.length === PAGE * 3;
+  const cursor = rows.length > PAGE ? rows[PAGE - 1].created_at : fetched.at(-1)?.created_at;
   rows = rows.slice(0, PAGE);
 
   // En modo competición no hay gamificación: sin Leyendas
@@ -135,11 +139,11 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
 
               <div className="space-y-2 p-3 pt-2">
                 <Link href={`/r/${r.id}`} className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  {r.division === "scaled" ? (
+                  {r.division === "scaled" || w.score_type === "check" ? (
                     // Escalado: sin marcar como «peor», solo que lo ha hecho a su medida
                     <>
                       <span className="h-display text-3xl">✓ {t("Hecho")}</span>
-                      <span className="rounded border border-line px-1.5 py-0.5 text-xs text-muted">{t("Adaptado")}</span>
+                      {r.division === "scaled" && <span className="rounded border border-line px-1.5 py-0.5 text-xs text-muted">{t("Adaptado")}</span>}
                     </>
                   ) : (
                     <>
@@ -167,9 +171,9 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
         })}
       </ul>
 
-      {more && rows.length > 0 && (
+      {more && cursor && (
         <Link
-          href={`/feed?${new URLSearchParams({ ...(following ? { ver: "siguiendo" } : {}), antes: rows[rows.length - 1].created_at ?? "" })}`}
+          href={`/feed?${new URLSearchParams({ ...(following ? { ver: "siguiendo" } : {}), antes: cursor })}`}
           className="btn-ghost block w-full py-2.5 text-center"
         >
           {t("Ver más")}
