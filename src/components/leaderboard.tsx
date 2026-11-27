@@ -125,6 +125,17 @@ export async function Leaderboard({
         );
       })()}
 
+      {isCoach && (() => {
+        // Esfuerzo percibido del WOD: solo lo ve el equipo, para ajustar la carga
+        const eff = results.map((x) => x.effort).filter((x): x is number => x != null);
+        if (!eff.length) return null;
+        const avg = eff.reduce((a, b) => a + b, 0) / eff.length;
+        return (
+          <p className="text-xs text-muted">
+            {t("Esfuerzo medio {v}/10 · {n} atletas", { v: avg.toLocaleString(locale, { maximumFractionDigits: 1 }), n: eff.length })}
+          </p>
+        );
+      })()}
       {ranked.length === 0 ? (
         <p className="card p-6 text-center text-muted">{t("Aún no hay resultados con estos filtros.")}</p>
       ) : (
@@ -154,6 +165,14 @@ export async function Leaderboard({
                       <Link href="/coach" className="shrink-0 rounded border border-alert/60 px-1 py-0.5 text-alert" title={byId.get(r.id)?.flag ?? ""}>
                         <Icon name="alert" size={13} /> {t("revisar")}
                       </Link>
+                    )}
+                    {isCoach && byId.get(r.id)?.effort != null && (
+                      <span className="shrink-0 rounded border border-line px-1 py-0.5 tabular-nums" title={t("Esfuerzo percibido")}>
+                        E{byId.get(r.id)?.effort}
+                      </span>
+                    )}
+                    {byId.get(r.id)?.photo_path && (
+                      <Link href={`/r/${r.id}`} className="shrink-0" aria-label={t("Ver foto")}>📷</Link>
                     )}
                     {other(r.id) && <span className="shrink-0 font-semibold text-fg/80">{other(r.id)}</span>}
                     {r.notes && <span className="truncate">{r.notes}</span>}

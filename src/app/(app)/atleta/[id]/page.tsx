@@ -9,6 +9,8 @@ import { RM_CATEGORIES, bestPR, formatPR, type Benchmark, type PersonalRecord } 
 import { Avatar } from "@/components/avatar";
 import { MedalBadge } from "@/components/medal-badge";
 import { Icon } from "@/components/icon";
+import { getKudos, getLegends } from "@/lib/feed";
+import { toggleFollow } from "@/app/actions";
 
 type Pub = { id: string; full_name: string; avatar_url: string | null; bio: string | null; instagram: string | null; gender: string | null; division: string | null; box: string | null; age: number | null };
 
@@ -27,6 +29,13 @@ export default async function AtletaPage({ params }: { params: Promise<{ id: str
     myTrainingDays(supabase, id, box.id),
   ]);
   if (!pub) notFound();
+  // Reconocimiento y Leyendas (no en modo competición, que va sin gamificación)
+  const [kudos, legends, { data: follow }] = await Promise.all([
+    box.competition ? Promise.resolve({} as Record<string, number>) : getKudos(supabase, id),
+    box.competition ? Promise.resolve([]) : getLegends(supabase),
+    supabase.from("follows").select("followee_id").eq("follower_id", user.id).eq("followee_id", id).maybeSingle(),
+  ]);
+  const myLegends = legends.filter((l) => l.user_id === id);
 
   const stats = computeStreak(training.days, training.done, training.today);
   const owned = new Map((medals ?? []).map((m) => [m.code as string, m.unlocked_on as string]));
@@ -66,6 +75,31 @@ export default async function AtletaPage({ params }: { params: Promise<{ id: str
           </div>
         </div>
         {pub.bio && <p className="max-w-sm text-[15px]">{pub.bio}</p>}
+        {myLegends.length > 0 && (
+          <div className="flex flex-wrap justify-center gap-2">
+            {myLegends.map((l) => (
+              <span key={l.kind + l.label} className="rounded-full border border-accent/60 bg-accent/10 px-3 py-1 text-sm font-semibold">
+                👑 {l.kind === "box" ? t("Leyenda del box") : t("Leyenda de {w}", { w: l.label })}
+              </span>
+            ))}
+          </div>
+        )}
+        {!box.competition && (
+          <div className="flex gap-3 text-sm" aria-label={t("Reacciones recibidas")}>
+            {["👊", "🔥"].map((e) => (
+              <span key={e} className="rounded-full border border-line px-3 py-1 tabular-nums">
+                {e} {kudos[e] ?? 0}
+              </span>
+            ))}
+          </div>
+        )}
+        {!me && (
+          <form action={toggleFollow}>
+            <input type="hidden" name="user_id" value={id} />
+            <input type="hidden" name="on" value={follow ? "0" : "1"} />
+            <button className={follow ? "chip" : "btn px-5 py-2"}>{follow ? t("Siguiendo ✓") : t("Seguir")}</button>
+          </form>
+        )}
         {me && (
           <Link href="/perfil" className="text-xs text-muted underline">
             {t("Editar mi perfil")}

@@ -80,6 +80,10 @@ export type Result = {
   /** Motivo si el detector lo ve imposible (solo lo usan los coaches) */
   flag?: string | null;
   flag_reviewed?: boolean;
+  /** Foto opcional del resultado (bucket privado result-photos; se ve con enlace firmado) */
+  photo_path?: string | null;
+  /** Esfuerzo percibido del 1 al 10 (opcional) */
+  effort?: number | null;
   profiles?: Pick<Profile, "full_name" | "gender"> & { avatar_url?: string | null } | null;
 };
 

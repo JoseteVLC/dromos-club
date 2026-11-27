@@ -213,7 +213,20 @@ export async function saveResult(_: ActionState, fd: FormData): Promise<ActionSt
     value2: undefined as number | undefined,
     notes: str(fd, "notes") || null,
     updated_at: new Date().toISOString(),
+    effort: null as number | null,
+    photo_path: undefined as string | null | undefined,
   };
+  // Esfuerzo percibido (1–10), opcional
+  const effort = int(fd, "effort");
+  row.effort = effort != null && effort >= 1 && effort <= 10 ? effort : null;
+  // Foto opcional: llega ya reducida desde el móvil
+  const photo = fd.get("photo");
+  const newPhoto = photo instanceof File && photo.size > 0 ? photo : null;
+  if (newPhoto) {
+    if (newPhoto.size > 4 * 1024 * 1024) return { error: "La foto es demasiado grande." };
+    if (!["image/jpeg", "image/png", "image/webp"].includes(newPhoto.type)) return { error: "Formato no válido (JPG, PNG o WebP)." };
+    if (!hasAdminKey()) return { error: "No se pudo subir la foto." };
+  }
 
   // Escalado: el resultado es lo que cuentas en las notas (sin score ni ranking)
   if (division === "scaled") {
@@ -284,8 +297,23 @@ export async function saveResult(_: ActionState, fd: FormData): Promise<ActionSt
   const check = hasAdminKey() ? await checkCandidate(adminDb(), wodId, user.id, { ...row, id: "" } as unknown as Result, i18n.t, i18n.locale).catch(() => null) : null;
   if (check && str(fd, "confirm") !== "1") return { confirm: check.reason };
 
+  // Foto: se sube ahora (después de confirmar) y se borra la anterior si se cambia o se quita
+  const { data: prev } = await supabase.from("results").select("photo_path").eq("wod_id", wodId).eq("user_id", user.id).maybeSingle<{ photo_path: string | null }>();
+  if (newPhoto) {
+    const ext = newPhoto.type === "image/png" ? "png" : newPhoto.type === "image/webp" ? "webp" : "jpg";
+    const path = `${user.id}/${box.id}-${wodId}-${Date.now()}.${ext}`;
+    const { error: upErr } = await adminDb().storage.from("result-photos").upload(path, newPhoto, { contentType: newPhoto.type, cacheControl: "31536000" });
+    if (upErr) return { error: "No se pudo subir la foto." };
+    row.photo_path = path;
+  } else if (str(fd, "remove_photo") === "1") {
+    row.photo_path = null;
+  }
+  if (row.photo_path === undefined) delete (row as { photo_path?: unknown }).photo_path;
+
   const { error } = await supabase.from("results").upsert(row, { onConflict: "wod_id,user_id" });
   if (error) return { error: error.message };
+  if (prev?.photo_path && row.photo_path !== undefined && prev.photo_path !== row.photo_path && hasAdminKey())
+    after(() => adminDb().storage.from("result-photos").remove([prev.photo_path!]).then(() => undefined));
   await syncLiftRecords(supabase, user.id, wod, row as { division: string; value?: number | null; value2?: number | null }).catch((e) => console.error(e));
   revalidatePath("/", "layout");
   checkMedalsLater(supabase, user.id, box);
@@ -374,10 +402,22 @@ async function syncLiftRecords(
   revalidatePath("/marcas", "layout");
 }
 
+/** Seguir (o dejar de seguir) a un compañero del box: sale en «Siguiendo» del feed. */
+export async function toggleFollow(fd: FormData) {
+  const { supabase, user } = await requireUser();
+  const id = str(fd, "user_id");
+  if (!/^[0-9a-f-]{36}$/i.test(id) || id === user.id) return;
+  if (str(fd, "on") === "1") await supabase.from("follows").insert({ follower_id: user.id, followee_id: id });
+  else await supabase.from("follows").delete().eq("follower_id", user.id).eq("followee_id", id);
+  revalidatePath(`/atleta/${id}`);
+  revalidatePath("/feed");
+}
+
 export async function deleteResult(fd: FormData) {
   const { supabase, user } = await requireUser();
-  const { data: res } = await supabase.from("results").select("wod_id").eq("id", str(fd, "id")).maybeSingle<{ wod_id: string }>();
-  await supabase.from("results").delete().eq("id", str(fd, "id"));
+  const { data: res } = await supabase.from("results").select("wod_id, photo_path").eq("id", str(fd, "id")).maybeSingle<{ wod_id: string; photo_path: string | null }>();
+  const { data: gone } = await supabase.from("results").delete().eq("id", str(fd, "id")).select("id");
+  if (gone?.length && res?.photo_path && hasAdminKey()) await adminDb().storage.from("result-photos").remove([res.photo_path]).catch(() => null);
   // Las marcas que salieron de ese resultado se van con él
   if (res) await supabase.from("personal_records").delete().eq("user_id", user.id).eq("wod_id", res.wod_id).not("score_slot", "is", null);
   revalidatePath("/", "layout");

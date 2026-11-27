@@ -12,6 +12,7 @@ import { Reactions, type ReactionSummary } from "@/components/reactions";
 import { ReactableBubble } from "@/components/comment-reactions";
 import type { CommentReaction } from "@/lib/comment-reactions";
 import type { Result, Wod } from "@/lib/types";
+import { signResultPhotos } from "@/lib/feed";
 
 type Comment = { id: string; user_id: string; body: string; created_at: string; profiles: { full_name: string; avatar_url: string | null } | null };
 
@@ -58,6 +59,7 @@ export default async function ResultPage({ params }: PageProps<"/r/[id]">) {
     if (x.user_id === user.id) e.mine = true;
   }
   const canModerate = isCoachProfile(profile);
+  const photo = (await signResultPhotos([result])).get(result.id);
   const name = result.profiles?.full_name || t("Sin nombre");
 
   return (
@@ -81,7 +83,12 @@ export default async function ResultPage({ params }: PageProps<"/r/[id]">) {
           </Link>
           <div className="h-display text-4xl tabular-nums text-accent">{formatScore(wod, result)}</div>
         </div>
+        {result.effort != null && <p className="text-xs text-muted">{t("Esfuerzo {n}/10", { n: result.effort })}</p>}
         {result.notes && <p className="text-sm text-muted">{result.notes}</p>}
+        {photo && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={photo} alt={t("Foto de {name}", { name })} className="max-h-[75vh] w-full rounded-xl object-cover" />
+        )}
         <div className="flex items-center justify-between">
           <Reactions resultId={result.id} initial={reactions} own={mine} />
           {(mine || canModerate) && (

@@ -29,6 +29,46 @@ export function ResultForm({ wod, existing, defaultDivision, single: singleProp 
   const [div, setDiv] = useState<Division>(single ? (allowed.includes("rx") ? "rx" : (allowed.find((d) => d !== "scaled") ?? "rx")) : pick(existing?.division ?? defaultDivision ?? "rx"));
   const formRef = useRef<HTMLFormElement>(null);
   const [fromTimer, setFromTimer] = useState<string | null>(null);
+  // Esfuerzo percibido (opcional) y foto para el feed (opcional, se reduce en el móvil antes de subir)
+  const [effort, setEffort] = useState<number | null>(existing?.effort ?? null);
+  const [photo, setPhoto] = useState<{ file: File; src: string } | null>(null);
+  const [keepPhoto, setKeepPhoto] = useState(!!existing?.photo_path);
+  const [shrinking, setShrinking] = useState(false);
+  const picker = useRef<HTMLInputElement>(null);
+  useEffect(() => () => {
+    if (photo) URL.revokeObjectURL(photo.src);
+  }, [photo]);
+  const withExtras = (fd: FormData) => {
+    fd.delete("photo_pick");
+    if (photo) fd.set("photo", photo.file);
+    if (!photo && !keepPhoto && existing?.photo_path) fd.set("remove_photo", "1");
+    return fd;
+  };
+  async function pickPhoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    e.target.value = "";
+    if (!f) return;
+    setShrinking(true);
+    try {
+      const small = await shrinkPhoto(f);
+      setPhoto({ file: small, src: URL.createObjectURL(small) });
+    } catch {
+      alert(t("No se ha podido preparar la imagen. Inténtalo otra vez."));
+    } finally {
+      setShrinking(false);
+    }
+  }
+
+  // Guardado: la foto nueva ya está subida (no se vuelve a subir si se guarda otra vez)
+  useEffect(() => {
+    if (!state?.ok || !last.current) return;
+    const sent = last.current;
+    if (sent.get("photo")) {
+      setPhoto(null);
+      setKeepPhoto(true);
+    } else if (sent.get("remove_photo")) setKeepPhoto(false);
+  }, [state]);
+
 
   // «Usar en mi resultado» del timer: rellena el tiempo (o las rondas); el atleta lo revisa y guarda
   useEffect(() => {
@@ -64,7 +104,7 @@ export function ResultForm({ wod, existing, defaultDivision, single: singleProp 
       ref={formRef}
       onSubmit={(e) => {
         e.preventDefault();
-        send(new FormData(e.currentTarget));
+        send(withExtras(new FormData(e.currentTarget)));
       }}
       className="card space-y-4 p-4"
     >
@@ -244,6 +284,55 @@ export function ResultForm({ wod, existing, defaultDivision, single: singleProp 
         )}
       </div>
 
+      {wod.score_type !== "check" && (
+        <div>
+          <span className="label">{t("Esfuerzo percibido (opcional)")}</span>
+          <input type="hidden" name="effort" value={effort ?? ""} />
+          <div className="grid grid-cols-10 gap-1" role="radiogroup" aria-label={t("Esfuerzo percibido (opcional)")}>
+            {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+              <button
+                key={n}
+                type="button"
+                role="radio"
+                aria-checked={effort === n}
+                onClick={() => setEffort(effort === n ? null : n)}
+                className={`h-9 rounded-md border text-sm font-bold tabular-nums ${
+                  effort === n ? "border-accent bg-accent text-accent-fg" : effort != null && n < effort ? "border-accent/40 bg-accent/15" : "border-line text-muted"
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+          <p className="mt-1 text-xs text-muted">{t("1 = muy suave · 10 = al límite. Lo ve tu coach para ajustar la carga.")}</p>
+        </div>
+      )}
+
+      <div>
+        <span className="label">{t("Foto (opcional)")}</span>
+        <input ref={picker} name="photo_pick" type="file" accept="image/*" className="hidden" onChange={pickPhoto} />
+        {photo ? (
+          <div className="flex items-center gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={photo.src} alt="" className="h-20 w-20 rounded-lg object-cover" />
+            <div className="flex flex-col items-start gap-1 text-sm">
+              <button type="button" onClick={() => picker.current?.click()} className="text-accent underline">{t("Cambiar foto")}</button>
+              <button type="button" onClick={() => setPhoto(null)} className="text-muted underline">{t("Quitar")}</button>
+            </div>
+          </div>
+        ) : keepPhoto ? (
+          <div className="flex items-center gap-3 text-sm">
+            <span className="text-muted">📷 {t("Tienes una foto en este resultado.")}</span>
+            <button type="button" onClick={() => picker.current?.click()} className="text-accent underline">{t("Cambiar")}</button>
+            <button type="button" onClick={() => setKeepPhoto(false)} className="text-muted underline">{t("Quitar")}</button>
+          </div>
+        ) : (
+          <button type="button" onClick={() => picker.current?.click()} disabled={shrinking} className="btn-ghost inline-flex w-full items-center justify-center gap-2 py-2.5 disabled:opacity-60">
+            <Icon name="camera" size={16} /> {shrinking ? t("Preparando…") : t("Añadir una foto para el feed")}
+          </button>
+        )}
+      </div>
+
       {fromTimer && !state && (
         <p className="rounded-lg border border-accent/40 bg-accent/10 px-3 py-2 text-sm">
           <Icon name="timer" size={15} /> {t("Del timer: {v}. Revísalo (puedes cambiarlo) y guarda.", { v: fromTimer })}
@@ -273,4 +362,26 @@ export function ResultForm({ wod, existing, defaultDivision, single: singleProp 
       <button disabled={pending} className="btn w-full">{pending ? t("Guardando…") : existing ? t("Actualizar") : t("Guardar resultado")}</button>
     </form>
   );
+}
+
+/** Reduce la foto a 1440 px por el lado largo (JPEG): sube rápido y pesa poco */
+async function shrinkPhoto(f: File): Promise<File> {
+  const src = URL.createObjectURL(f);
+  try {
+    const img = await new Promise<HTMLImageElement>((ok, ko) => {
+      const i = new Image();
+      i.onload = () => ok(i);
+      i.onerror = () => ko(new Error("img"));
+      i.src = src;
+    });
+    const k = Math.min(1, 1440 / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement("canvas");
+    c.width = Math.round(img.naturalWidth * k);
+    c.height = Math.round(img.naturalHeight * k);
+    c.getContext("2d")!.drawImage(img, 0, 0, c.width, c.height);
+    const b = await new Promise<Blob>((ok, ko) => c.toBlob((x) => (x ? ok(x) : ko(new Error("blob"))), "image/jpeg", 0.82));
+    return new File([b], "foto.jpg", { type: "image/jpeg" });
+  } finally {
+    URL.revokeObjectURL(src);
+  }
 }
