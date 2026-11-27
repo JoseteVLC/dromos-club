@@ -7,11 +7,12 @@ import { Avatar } from "@/components/avatar";
 import { Icon } from "@/components/icon";
 import { Reactions, type ReactionSummary } from "@/components/reactions";
 import { getLegends, legendsByUser, signResultPhotos } from "@/lib/feed";
+import { localizeWods } from "@/lib/wod-i18n";
 import type { Result, Wod } from "@/lib/types";
 
 type Row = Result & {
   updated_at: string;
-  wods: Pick<Wod, "id" | "title" | "part" | "wod_date" | "score_type" | "score_label" | "score2_type" | "score2_label" | "score2_name" | "score_name">;
+  wods: Pick<Wod, "id" | "title" | "description" | "part" | "wod_date" | "score_type" | "score_label" | "score2_type" | "score2_label" | "score2_name" | "score_name">;
   reactions: { user_id: string; emoji: string }[];
   result_comments: { count: number }[];
 };
@@ -26,7 +27,7 @@ const PAGE = 20;
 export default async function FeedPage({ searchParams }: { searchParams: Promise<{ ver?: string; antes?: string }> }) {
   const sp = await searchParams;
   const { supabase, user, profile, box } = await requireUser();
-  const { t, locale } = await getI18n();
+  const { t, locale, lang } = await getI18n();
   const following = sp.ver === "siguiendo";
   const before = sp.antes && !Number.isNaN(Date.parse(sp.antes)) ? sp.antes : null;
 
@@ -41,7 +42,7 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
       .select(
         "id, wod_id, user_id, division, finished, time_seconds, rounds, reps, value, value2, notes, created_at, updated_at, photo_path, effort, " +
           "profiles!results_user_id_fkey(full_name, gender, avatar_url), " +
-          "wods!inner(id, title, part, wod_date, score_type, score_label, score2_type, score2_label, score2_name, score_name), " +
+          "wods!inner(id, title, description, part, wod_date, score_type, score_label, score2_type, score2_label, score2_name, score_name, i18n), " +
           "reactions(user_id, emoji), result_comments(count)",
       )
       .eq("box_id", box.id)
@@ -60,6 +61,9 @@ export default async function FeedPage({ searchParams }: { searchParams: Promise
   const more = rows.length > PAGE || fetched.length === PAGE * 3;
   const cursor = rows.length > PAGE ? rows[PAGE - 1].created_at : fetched.at(-1)?.created_at;
   rows = rows.slice(0, PAGE);
+  // Títulos de los WODs en el idioma del atleta
+  const shownWods = new Map(localizeWods(rows.map((r) => r.wods as Wod), lang).map((w) => [w.id, w]));
+  rows = rows.map((r) => ({ ...r, wods: { ...r.wods, title: shownWods.get(r.wods.id)?.title ?? r.wods.title } }));
 
   // En modo competición no hay gamificación: sin Leyendas
   const [photos, legends] = await Promise.all([signResultPhotos(rows), box.competition ? Promise.resolve([]) : getLegends(supabase)]);

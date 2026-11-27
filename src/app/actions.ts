@@ -15,6 +15,7 @@ import { BOX_COOKIE, boxUrl, isValidSlug } from "@/lib/box-shared";
 import { redirect } from "next/navigation";
 import { createClient, isCoachProfile, memberSince, requireAdmin, requireCoach, requireUser } from "@/lib/supabase/server";
 import { adminDb, hasAdminKey } from "@/lib/supabase/admin";
+import { translateWods } from "@/lib/wod-i18n";
 import { siteUrl } from "@/lib/site";
 import { inviteEmail, sendEmail } from "@/lib/email";
 import { randomBytes } from "node:crypto";
@@ -511,6 +512,7 @@ export async function createWod(_: ActionState, fd: FormData): Promise<ActionSta
     .select("id")
     .single();
   if (error) return { error: error.message };
+  after(() => translateWods([created.id as string]));
   revalidatePath("/", "layout");
   redirect(dayHref(data.wod_date, { w: created.id }));
 }
@@ -536,6 +538,7 @@ export async function updateWod(_: ActionState, fd: FormData): Promise<ActionSta
   const data = before?.score2_type && !newScore2 ? { ...rest, score_name: null, score2_type: null, score2_name: null, score2_label: null } : rest;
   const { error } = await supabase.from("wods").update(data).eq("id", id);
   if (error) return { error: error.message };
+  after(() => translateWods([id]));
   // Si se quita Élite o RX, los resultados que ya estaban ahí pasan a la que queda (un solo ranking)
   const kept = w.divisions;
   for (const [gone, to] of [["rx", "elite"], ["elite", "rx"]] as const)
@@ -654,8 +657,10 @@ export async function createWodsBulk(_: ActionState, fd: FormData): Promise<Acti
     used.set(r.wod_date, taken.add(r.part));
   }
 
-  const { error } = await supabase.from("wods").insert(rows);
+  const { data: inserted, error } = await supabase.from("wods").insert(rows).select("id");
   if (error) return { error: error.message };
+  const insertedIds: string[] = (inserted ?? []).map((x: { id: string }) => x.id);
+  after(() => translateWods(insertedIds));
   revalidatePath("/", "layout");
   redirect(dayHref(rows[0].wod_date));
 }

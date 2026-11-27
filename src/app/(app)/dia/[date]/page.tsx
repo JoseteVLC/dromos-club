@@ -11,6 +11,7 @@ import { SCORE_TYPES, type Result, type Wod } from "@/lib/types";
 import { DayNav, SwipeDays } from "@/components/day-nav";
 import { toggleDone } from "@/app/actions";
 import { getI18n } from "@/lib/i18n/server";
+import { localizeWods } from "@/lib/wod-i18n";
 import { DeleteDays } from "@/components/delete-days";
 
 /** Día completo: todas las partes del día en orden, con su enunciado. Al pulsar una entras a apuntar el resultado. */
@@ -23,7 +24,7 @@ export default async function FullDayPage({ params }: PageProps<"/dia/[date]">) 
   if (since && date < since) redirect(fullDayHref(since));
   const horizon = planHorizon(profile, todayISO());
   if (horizon && date > horizon) redirect(fullDayHref(horizon));
-  const { t } = await getI18n();
+  const { t, lang } = await getI18n();
   const today = todayISO();
   const monday = mondayOf(date);
 
@@ -32,7 +33,7 @@ export default async function FullDayPage({ params }: PageProps<"/dia/[date]">) 
     supabase.from("wods").select("wod_date").eq("published", true).gte("wod_date", monday).lte("wod_date", addDays(monday, 6)),
     supabase.from("wods").select("*").eq("wod_date", date).order("part").order("created_at").returns<Wod[]>(),
   ]);
-  const wods = wodsData ?? [];
+  const wods = localizeWods(wodsData ?? [], lang);
   const { data: mine } = wods.length
     ? await supabase.from("results").select("*").eq("user_id", user.id).in("wod_id", wods.map((w) => w.id)).returns<Result[]>()
     : { data: [] as Result[] };

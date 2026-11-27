@@ -21,6 +21,7 @@ import { Leaderboard } from "@/components/leaderboard";
 import type { ReactionSummary } from "@/components/reactions";
 import { wodLifts, type WodLift } from "@/lib/wod-lifts";
 import { getI18n } from "@/lib/i18n/server";
+import { localizeWods } from "@/lib/wod-i18n";
 import type { T } from "@/lib/i18n/core";
 import { Icon } from "@/components/icon";
 
@@ -41,7 +42,7 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
   if (since && date < since) redirect(dayHref(since));
   const horizon = planHorizon(profile, todayISO());
   if (horizon && date > horizon) redirect(dayHref(horizon));
-  const { t, locale } = await getI18n();
+  const { t, locale, lang } = await getI18n();
   const today = todayISO();
 
   const streakP = myStreak(supabase, user.id);
@@ -59,15 +60,18 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
     .order("part")
     .order("created_at")
     .returns<Wod[]>();
-  const wods = wodsData ?? [];
+  // La plani en el idioma del atleta (si aún no está traducida, en español y se traduce para la próxima)
+  const rawWods = wodsData ?? [];
+  const wods = localizeWods(rawWods, lang);
   const selected = wods.find((w) => w.id === sp.w) ?? wods[0] ?? null;
+  const rawSelected = selected ? rawWods.find((w) => w.id === selected.id)! : null;
   // Todo lo del WOD elegido se pide a la vez (antes iba en cadena y la página tardaba más)
   type Row = Result & { reactions?: { user_id: string; emoji: string }[]; result_comments?: { count: number }[] };
   // ¿Ya hiciste este WOD? Mismo título y tipo de score, y además mismo enunciado (o es un benchmark con nombre, como Fran)
   type Prev = { id: string; wod_date: string; description: string; score_type: Wod["score_type"]; score_label: string | null };
   const repeatP = (async () => {
-    if (!selected) return [] as { date: string; wodId: string; score: string; division: string }[];
-    const title = selected.title.replace(/[%_\\]/g, "").trim();
+    if (!selected || !rawSelected) return [] as { date: string; wodId: string; score: string; division: string }[];
+    const title = rawSelected.title.replace(/[%_\\]/g, "").trim();
     const [{ data: prev }, { data: bench }] = await Promise.all([
       supabase
         .from("wods")
@@ -82,7 +86,7 @@ export default async function DayPage({ params, searchParams }: PageProps<"/d/[d
       supabase.from("benchmarks").select("id").ilike("name", title).limit(1),
     ]);
     const norm = (x: string) => x.toLowerCase().replace(/\s+/g, " ").trim();
-    const same = (prev ?? []).filter((w) => (bench ?? []).length > 0 || norm(w.description) === norm(selected.description));
+    const same = (prev ?? []).filter((w) => (bench ?? []).length > 0 || norm(w.description) === norm(rawSelected.description));
     if (!same.length) return [];
     const { data: res } = await supabase
       .from("results")
