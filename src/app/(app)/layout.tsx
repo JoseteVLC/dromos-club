@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { isCoachProfile, requireUser } from "@/lib/supabase/server";
 import { BottomNav } from "@/components/bottom-nav";
+import { AppScroller } from "@/components/app-scroller";
 import { getI18n } from "@/lib/i18n/server";
 import { getNotices } from "@/lib/notifications";
 import { NoticeBanner } from "@/components/notice-banner";
@@ -33,6 +34,10 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   const msgLatest = (unreadMsgs?.[0]?.created_at as string | undefined) ?? null;
 
   return (
+    // Pantalla fija: solo se mueve el contenido de arriba y el menú va debajo, fuera del scroll.
+    // Así en iPhone el menú no se queda a media pantalla al hacer scroll (pasaba con el menú «fixed»).
+    <div className={`fixed inset-x-0 bottom-0 flex flex-col ${process.env.VERCEL_ENV === "preview" ? "top-5" : "top-0"}`}>
+      <AppScroller>
     <div className="mx-auto flex min-h-full max-w-2xl flex-col">
       <header className="flex items-center justify-between gap-3 px-4 pt-4">
         <Link href="/" className="flex min-w-0 items-center gap-2.5" aria-label={`${box.name} · ${BRAND.name}`}>
@@ -74,7 +79,9 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
         hasComments={fresh.some((n) => n.kind === "comment")}
         medals={fresh.filter((n) => n.kind === "medal").length}
       />
-      <main className="flex-1 px-4 pb-28 pt-4">{children}</main>
+      <main className="flex-1 px-4 pb-6 pt-4">{children}</main>
+    </div>
+      </AppScroller>
       <BottomNav isCoach={isCoach} competition={box.competition} />
     </div>
   );

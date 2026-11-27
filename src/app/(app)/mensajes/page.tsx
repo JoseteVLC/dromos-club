@@ -46,7 +46,7 @@ export default async function MensajesPage({ searchParams }: { searchParams: Pro
         ) : (
           <MessageList items={items} me={user.id} locale={locale} t={t} staffView={false} />
         )}
-        <div className="sticky bottom-24 rounded-xl border border-line bg-bg/95 p-2 backdrop-blur">
+        <div className="sticky bottom-3 rounded-xl border border-line bg-bg/95 p-2 backdrop-blur">
           <MessageForm />
         </div>
       </div>

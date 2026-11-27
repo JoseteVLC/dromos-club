@@ -267,7 +267,7 @@ export function WeekImport({ defaultMonday, today }: { defaultMonday: string; to
           ))}
 
           {parts.length > 0 && (
-            <div className="sticky bottom-20 space-y-2 rounded-xl bg-bg/90 py-2 backdrop-blur">
+            <div className="sticky bottom-3 space-y-2 rounded-xl bg-bg/90 py-2 backdrop-blur">
               <FormMessage state={state} />
               {missingType > 0 && (
                 <p className="rounded-lg border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-200">

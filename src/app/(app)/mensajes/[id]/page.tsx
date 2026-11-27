@@ -47,7 +47,7 @@ export default async function HiloPage({ params, searchParams }: { params: Promi
       ) : (
         <MessageList items={items} me={user.id} locale={locale} t={t} staffView />
       )}
-      <div className="sticky bottom-24 rounded-xl border border-line bg-bg/95 p-2 backdrop-blur">
+      <div className="sticky bottom-3 rounded-xl border border-line bg-bg/95 p-2 backdrop-blur">
         <MessageForm thread={id} />
       </div>
     </div>

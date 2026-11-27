@@ -22,11 +22,8 @@ export function BottomNav({ isCoach, competition = false }: { isCoach: boolean; 
   ];
 
   return (
-    // Fondo sólido y capa propia: en iPhone el desenfoque (backdrop-blur) hacía que el menú se quedara a media pantalla al hacer scroll
-    <nav
-      className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-bg pb-[env(safe-area-inset-bottom)]"
-      style={{ transform: "translate3d(0,0,0)", WebkitBackfaceVisibility: "hidden", willChange: "transform" }}
-    >
+    // Va debajo del contenido (no flota): la pantalla de la app es fija y solo hace scroll el contenido
+    <nav className="z-20 shrink-0 border-t border-line bg-bg pb-[env(safe-area-inset-bottom)]">
       <div className="mx-auto flex max-w-2xl">
         {items.map((it) => (
           <Link
