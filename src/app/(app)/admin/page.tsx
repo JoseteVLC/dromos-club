@@ -64,11 +64,12 @@ export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
     .from("user_achievements")
     .select("user_id, code, unlocked_on, created_at, delivered_at")
     .eq("box_id", box.id)
-    .in("code", REWARD_CODES)
+    .in("code", [...REWARD_CODES, "streak30"])
     .order("created_at", { ascending: false })
     .limit(100)
     .returns<Award[]>();
-  const awards = awardsData ?? [];
+  // Imparable llevó premio hasta el 28/11/2026: solo cuentan los que la ganaron antes
+  const awards = (awardsData ?? []).filter((a) => a.code !== "streak30" || a.created_at < "2026-11-28");
   const { data: shipData } = awards.length
     ? await db
         .from("profiles")

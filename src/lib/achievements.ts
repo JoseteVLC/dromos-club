@@ -41,12 +41,14 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
     supabase.from("profiles").select("gender").eq("id", userId).maybeSingle<{ gender: Gender | null }>(),
   ]);
   const [{ data: myComments }, { data: myReactions }, { data: myCommentReactions }] = await Promise.all([
-    supabase.from("result_comments").select("created_at").eq("user_id", userId).eq("box_id", boxId).order("created_at").limit(25),
-    supabase.from("reactions").select("created_at").eq("user_id", userId).eq("box_id", boxId).order("created_at").limit(25),
+    supabase.from("result_comments").select("created_at").eq("user_id", userId).eq("box_id", boxId).order("created_at").limit(50),
+    supabase.from("reactions").select("created_at").eq("user_id", userId).eq("box_id", boxId).order("created_at").limit(50),
     // Si la migración 011 aún no está, da error y cuenta como vacío
-    supabase.from("comment_reactions").select("created_at").eq("user_id", userId).eq("box_id", boxId).order("created_at").limit(25),
+    supabase.from("comment_reactions").select("created_at").eq("user_id", userId).eq("box_id", boxId).order("created_at").limit(50),
   ]);
 
+  // Objetivo de cada medalla (sale del catálogo, así no hay que tocar números en dos sitios)
+  const T = (code: string) => MEDAL_BY_CODE.get(code)!.target;
   const got = new Map<string, MedalProgress>();
   const set = (code: string, progress: number, unlockedOn: string | null, times?: number) =>
     got.set(code, { code, progress, unlockedOn, times: times ?? (unlockedOn ? 1 : 0) });
@@ -55,33 +57,64 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
   const doneSorted = [...done].sort();
   const nth = (n: number) => doneSorted[n - 1] ?? null;
   set("first", Math.min(doneSorted.length, 1), nth(1));
-  set("total25", doneSorted.length, nth(25));
-  set("total100", doneSorted.length, nth(100));
-  set("total250", doneSorted.length, nth(250));
-  set("total500", doneSorted.length, nth(500));
+  for (const c of ["total25", "total100", "total250", "total500", "total1000"]) set(c, doneSorted.length, nth(T(c)));
 
   let run = 0;
   let best = 0;
   let at6: string | null = null;
-  let at30: string | null = null;
-  // Veces: cada bloque de 6 (o 30) días seguidos cuenta una vez; 12 seguidos = 2 semanas de fuego
+  let atLong: string | null = null;
+  const LONG = T("streak30");
+  // Veces: cada bloque de 6 (o de los días de Imparable) seguidos cuenta una vez; 12 seguidos = 2 semanas de fuego
   let times6 = 0;
-  let times30 = 0;
+  let timesLong = 0;
   for (const d of [...days].sort()) {
     if (done.has(d)) {
       run++;
       if (run % 6 === 0) times6++;
-      if (run % 30 === 0) times30++;
+      if (run % LONG === 0) timesLong++;
       best = Math.max(best, run);
       if (run === 6 && !at6) at6 = d;
-      if (run === 30 && !at30) at30 = d;
+      if (run === LONG && !atLong) atLong = d;
     } else if (d < today) {
       run = 0;
     }
   }
   // El progreso que se enseña es la racha de ahora (la que puedes seguir alargando), no la mejor que tuviste
   set("week6", at6 ? best : run, at6, times6);
-  set("streak30", at30 ? best : run, at30, times30);
+  set("streak30", atLong ? best : run, atLong, timesLong);
+
+  // Medio año de hierro: semanas seguidas (lunes a domingo) entrenando al menos 5 días,
+  // o todos los días de plani si esa semana hay menos. Las semanas sin plani no rompen y la de ahora no cuenta como fallo.
+  {
+    const monday = (d: string) => {
+      const x = new Date(d + "T12:00:00Z");
+      x.setUTCDate(x.getUTCDate() - ((x.getUTCDay() + 6) % 7));
+      return x.toISOString().slice(0, 10);
+    };
+    const weeks = new Map<string, { plan: number; done: number; last: string }>();
+    for (const d of [...days].sort()) {
+      const k = monday(d);
+      const w = weeks.get(k) ?? { plan: 0, done: 0, last: d };
+      w.plan++;
+      if (done.has(d)) w.done++;
+      w.last = d;
+      weeks.set(k, w);
+    }
+    const thisWeek = monday(today);
+    const GOAL = T("weeks26");
+    let wr = 0;
+    let wBest = 0;
+    let at26: string | null = null;
+    for (const [k, w] of [...weeks.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+      if (w.done >= Math.min(5, w.plan)) {
+        wr++;
+        wBest = Math.max(wBest, wr);
+        if (wr === GOAL && !at26) at26 = w.last;
+      } else if (k < thisWeek) wr = 0;
+    }
+    set("weeks26", at26 ? wBest : wr, at26);
+  }
+
 
   // Mes perfecto: 25 días distintos entrenados dentro de un mismo mes (varias partes el mismo día cuentan como un día)
   const perMonth = new Map<string, number>();
@@ -120,6 +153,7 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
   let hero5: string | null = null;
   let murph: string | null = null;
   let pr25: string | null = null;
+  let pr100: string | null = null;
   let club100: string | null = null;
   const clubKg = me?.gender === "F" ? 80 : 100;
   const benches = new Set<string>();
@@ -127,18 +161,18 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
   for (const e of evs) {
     if (!benches.has(e.bench)) {
       benches.add(e.bench);
-      if (benches.size === 10 && !bench10) bench10 = e.date;
+      if (benches.size === T("bench10") && !bench10) bench10 = e.date;
     }
     if (e.bench === "murph" && !murph) murph = e.date;
     // Club de los 100: snatch (cualquier variante salvo el snatch balance) de 100 kg en chicos u 80 kg en chicas
     if (/snatch/.test(e.bench) && !/balance/.test(e.bench) && e.type === "load" && Number(e.res.value ?? 0) >= clubKg && !club100) club100 = e.date;
     if (e.cat === "girls" && !girls.has(e.bench)) {
       girls.add(e.bench);
-      if (girls.size === 5 && !girls5) girls5 = e.date;
+      if (girls.size === T("girls5") && !girls5) girls5 = e.date;
     }
     if (e.cat === "heroes" && !heroes.has(e.bench)) {
       heroes.add(e.bench);
-      if (heroes.size === 5 && !hero5) hero5 = e.date;
+      if (heroes.size === T("hero5") && !hero5) hero5 = e.date;
     }
     if (!e.rx) continue;
     const prev = bestByKey.get(e.key);
@@ -147,8 +181,9 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
       bestByKey.set(e.key, e);
       prCount++;
       if (prCount === 1) pr1 = e.date;
-      if (prCount === 10) pr10 = e.date;
-      if (prCount === 25) pr25 = e.date;
+      if (prCount === T("pr10")) pr10 = e.date;
+      if (prCount === T("pr25")) pr25 = e.date;
+      if (prCount === T("pr100")) pr100 = e.date;
     }
   }
   set("pr1", Math.min(prCount, 1), pr1, prCount);
@@ -156,13 +191,14 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
   set("girls5", girls.size, girls5);
   set("hero5", heroes.size, hero5);
   set("pr25", prCount, pr25);
+  set("pr100", prCount, pr100);
   set("murph", murph ? 1 : 0, murph);
   set("club100", club100 ? 1 : 0, club100);
   set("bench10", benches.size, bench10);
 
   // --- Comunidad: comentarios y reacciones dados ---
   const social = [...(myComments ?? []), ...(myReactions ?? []), ...(myCommentReactions ?? [])].map((x) => String(x.created_at)).sort();
-  set("social25", social.length, social[49]?.slice(0, 10) ?? null);
+  set("social25", social.length, social[T("social25") - 1]?.slice(0, 10) ?? null);
 
   // --- Podio y victorias (en tu división y género, con al menos 3 atletas) ---
   // Solo WODs ya cerrados (2 días de margen) y solo con los resultados metidos antes del cierre:
@@ -213,7 +249,7 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
     if (pos === 1) {
       wins++;
       if (!winner) winner = on;
-      if (wins === 5) winner5 = on;
+      if (wins === T("winner5")) winner5 = on;
     }
   }
   set("podium", podium ? 1 : 0, podium, podiums);

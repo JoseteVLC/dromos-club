@@ -92,7 +92,12 @@ const ART: Record<string, Art> = {
   streak30: {
     shape: "shield", c1: "#c4b5fd", c2: "#6d28d9", field: "#1e0b45",
     icon: <polygon points="55,22 37,50 48,50 43,72 64,42 52,42 59,22" fill={INK} />,
-    ribbon: "30 DÍAS",
+    ribbon: "60 DÍAS",
+  },
+  weeks26: {
+    shape: "shield", c1: "#93c5fd", c2: "#1d4ed8", field: "#071a45",
+    icon: <polygon points="55,22 37,50 48,50 43,72 64,42 52,42 59,22" fill={INK} />,
+    ribbon: "26 SEM",
   },
 
   // ---------- Entrenos ----------
@@ -105,7 +110,7 @@ const ART: Record<string, Art> = {
         <rect x={44} y={51} width={12} height={4} rx={2} fill="#15803d" />
       </g>
     ),
-    ribbon: "25",
+    ribbon: "50",
   },
   total100: {
     shape: "shield", c1: "#fca5a5", c2: "#991b1b", field: "#2f0707",
@@ -139,6 +144,16 @@ const ART: Record<string, Art> = {
     ),
     ribbon: "500",
   },
+  total1000: {
+    shape: "pentagon", c1: "#fef08a", c2: "#a16207", field: "#2a1a02",
+    icon: (
+      <g>
+        <path d="M50 49 C44 38 30 38 30 49 C30 60 44 60 50 49 C56 38 70 38 70 49 C70 60 56 60 50 49Z" {...S} strokeWidth={4.5} />
+        <path d="M50 22 C54 28 55 31 54 34 C53 37 51 38 50 38 C48 38 46 36 46 34 C46 31 48 30 49 27Z" fill={INK} />
+      </g>
+    ),
+    ribbon: "1000",
+  },
 
   // ---------- Récords ----------
   pr1: {
@@ -162,7 +177,7 @@ const ART: Record<string, Art> = {
         <path d="M33 42 L67 42 M41 30 L46 42 L50 68 L54 42 L59 30" fill="none" stroke="#0e7490" strokeWidth={2} strokeLinejoin="round" />
       </g>
     ),
-    ribbon: "10 PRs",
+    ribbon: "25 PRs",
   },
   pr25: {
     shape: "octagon", c1: "#fdba74", c2: "#c2410c", field: "#3a1203",
@@ -174,7 +189,19 @@ const ART: Record<string, Art> = {
         <path d="M46 60 L50 72 L54 60 Z" fill="#fdba74" />
       </g>
     ),
-    ribbon: "25 PRs",
+    ribbon: "50 PRs",
+  },
+  pr100: {
+    shape: "octagon", c1: "#f9a8d4", c2: "#be185d", field: "#3a0620",
+    icon: (
+      <g transform="rotate(35 50 50)">
+        <path d="M50 22 C58 30 60 42 58 56 L42 56 C40 42 42 30 50 22Z" fill={INK} />
+        <circle cx={50} cy={40} r={4.5} fill="#be185d" />
+        <path d="M42 48 L35 60 L42 58 Z M58 48 L65 60 L58 58 Z" fill={INK} />
+        <path d="M46 60 L50 72 L54 60 Z" fill="#f9a8d4" />
+      </g>
+    ),
+    ribbon: "100 PRs",
   },
   club100: {
     shape: "seal", c1: "#d4d4d8", c2: "#3f3f46", field: "#111113",
@@ -187,7 +214,7 @@ const ART: Record<string, Art> = {
         <rect x={56} y={40} width={5} height={20} rx={2} fill={INK} />
       </g>
     ),
-    ribbon: "SNATCH 100",
+    ribbon: "SNATCH",
   },
 
   // ---------- Benchmarks ----------
@@ -211,7 +238,7 @@ const ART: Record<string, Art> = {
         <path d="M36 58 L50 64 L64 58 M36 65 L50 71 L64 65" {...S} />
       </g>
     ),
-    ribbon: "5 HEROES",
+    ribbon: "10 HEROES",
   },
   murph: {
     shape: "hex", c1: "#a8a29e", c2: "#1c1917", field: "#0c0a09",
@@ -234,7 +261,7 @@ const ART: Record<string, Art> = {
         <circle cx={50} cy={50} r={2.5} fill="#0f766e" />
       </g>
     ),
-    ribbon: "10",
+    ribbon: "25",
   },
 
   // ---------- Competición ----------
@@ -290,7 +317,7 @@ const ART: Record<string, Art> = {
         <path d="M24 30 L28 33 M76 30 L72 33 M50 20 L50 25" {...S} strokeWidth={2.6} />
       </g>
     ),
-    ribbon: "25",
+    ribbon: "50",
   },
 };
 

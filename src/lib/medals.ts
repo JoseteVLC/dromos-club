@@ -26,26 +26,29 @@ export const MEDALS: MedalDef[] = [
   { code: "first", name: "Primer paso", desc: "Mete tu primer entreno", target: 1, group: "constancia" },
   { code: "week6", name: "Semana de fuego", desc: "6 días de plani seguidos: una semana completa", target: 6, group: "constancia", repeat: true },
   { code: "month25", name: "Mes perfecto", desc: "25 días entrenados en un mismo mes", target: 25, group: "constancia", repeat: true },
-  { code: "streak30", name: "Imparable", desc: "30 días de plani seguidos sin fallar", target: 30, group: "constancia", reward: true, repeat: true },
+  { code: "streak30", name: "Imparable", desc: "60 días de plani seguidos sin fallar", target: 60, group: "constancia", repeat: true },
+  { code: "weeks26", name: "Medio año de hierro", desc: "26 semanas seguidas entrenando al menos 5 días", target: 26, group: "constancia" },
 
-  { code: "total25", name: "En marcha", desc: "25 entrenos registrados", target: 25, group: "volumen" },
+  { code: "total25", name: "En marcha", desc: "50 entrenos registrados", target: 50, group: "volumen" },
   { code: "total100", name: "Centurión", desc: "100 entrenos registrados", target: 100, group: "volumen", reward: true },
-  { code: "total250", name: "Leyenda", desc: "250 entrenos registrados", target: 250, group: "volumen", reward: true },
+  { code: "total250", name: "Titán", desc: "250 entrenos registrados", target: 250, group: "volumen", reward: true },
   { code: "total500", name: "Inmortal", desc: "500 entrenos registrados", target: 500, group: "volumen", reward: true },
+  { code: "total1000", name: "Club de los 1000", desc: "1000 entrenos registrados", target: 1000, group: "volumen" },
 
   { code: "pr1", name: "Rompe-récords", desc: "Consigue tu primer PR", target: 1, group: "prs", repeat: true },
-  { code: "pr10", name: "Coleccionista", desc: "Bate 10 PRs", target: 10, group: "prs" },
-  { code: "pr25", name: "Cohete", desc: "Bate 25 PRs", target: 25, group: "prs" },
+  { code: "pr10", name: "Coleccionista", desc: "Bate 25 PRs", target: 25, group: "prs" },
+  { code: "pr25", name: "Cohete", desc: "Bate 50 PRs", target: 50, group: "prs" },
+  { code: "pr100", name: "Máquina de PRs", desc: "Bate 100 PRs", target: 100, group: "prs" },
   { code: "club100", name: "Club de los 100", desc: "Snatch de 100 kg (chicos) u 80 kg (chicas)", target: 1, group: "prs" },
 
-  { code: "girls5", name: "Las chicas", desc: "Completa 5 Girls distintas", target: 5, group: "benchmarks" },
-  { code: "hero5", name: "Héroe", desc: "Completa 5 Hero WODs distintos", target: 5, group: "benchmarks" },
+  { code: "girls5", name: "Las chicas", desc: "Completa 10 Girls distintas", target: 10, group: "benchmarks" },
+  { code: "hero5", name: "Héroe", desc: "Completa 10 Hero WODs distintos", target: 10, group: "benchmarks" },
   { code: "murph", name: "Murph", desc: "Completa Murph", target: 1, group: "benchmarks" },
-  { code: "bench10", name: "Explorador", desc: "Completa 10 benchmarks distintos", target: 10, group: "benchmarks" },
+  { code: "bench10", name: "Explorador", desc: "Completa 25 benchmarks distintos", target: 25, group: "benchmarks" },
 
   { code: "podium", name: "Podio", desc: "Top 3 en un WOD de tu categoría (mín. 3 atletas)", target: 1, group: "competicion", repeat: true },
   { code: "winner", name: "Campeón", desc: "Gana un WOD de tu categoría (mín. 3 atletas)", target: 1, group: "competicion", repeat: true },
-  { code: "winner5", name: "Dinastía", desc: "Gana 5 WODs de tu categoría", target: 5, group: "competicion" },
+  { code: "winner5", name: "Dinastía", desc: "Gana 10 WODs de tu categoría", target: 10, group: "competicion" },
 
   { code: "social25", name: "Alma del box", desc: "Anima a la comunidad: 50 comentarios o reacciones", target: 50, group: "comunidad" },
 ];
