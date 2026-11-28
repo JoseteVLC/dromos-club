@@ -345,7 +345,7 @@ export default async function RankingPage({ searchParams }: PageProps<"/ranking"
       )}
 
       <p className="text-xs leading-relaxed text-muted">
-        {t("En cada WOD sumas 1 punto por participar y 1 más por cada atleta que queda por detrás de ti (Elite > RX). Si lo haces escalado sumas 1 punto. Cuantos más WODs hagas, más sumas.")}
+        {t("En cada WOD: 1 punto por participar, +1 si quedas en la mitad de arriba, +1 en el top 25 %, +1 en el top 10 % y +3, +2 o +1 si haces podio (Elite > RX; máximo 7). Escalado suma 1 punto y las partes de «Hecho», 1 punto al día. Cuantos más WODs hagas, más sumas.")}
       </p>
     </div>
   );

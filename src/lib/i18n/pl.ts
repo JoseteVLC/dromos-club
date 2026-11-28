@@ -282,7 +282,7 @@ const d: Record<string, string> = {
   "📲 Instala la app": "📲 Zainstaluj aplikację",
   "Email o contraseña incorrectos.": "Nieprawidłowy e-mail lub hasło.",
   "Elige Elite, RX o Escalado.": "Wybierz Elite, RX lub Skalowany.",
-  "En cada WOD sumas 1 punto por participar y 1 más por cada atleta que queda por detrás de ti (Elite > RX). Si lo haces escalado sumas 1 punto. Cuantos más WODs hagas, más sumas.": "W każdym WOD-zie dostajesz 1 punkt za udział i 1 więcej za każdego zawodnika za tobą (Elite > RX). Wersja skalowana daje 1 punkt. Im więcej WOD-ów, tym więcej punktów.",
+  "En cada WOD: 1 punto por participar, +1 si quedas en la mitad de arriba, +1 en el top 25 %, +1 en el top 10 % y +3, +2 o +1 si haces podio (Elite > RX; máximo 7). Escalado suma 1 punto y las partes de «Hecho», 1 punto al día. Cuantos más WODs hagas, más sumas.": "W każdym WODzie: 1 punkt za udział, +1 w górnej połowie, +1 w top 25%, +1 w top 10% i +3, +2 lub +1 za podium (Elite > RX; maks. 7). Skalowane daje 1 punkt, a części „Zrobione” 1 punkt dziennie. Im więcej WODów, tym więcej punktów.",
   "Escalado": "Skalowany",
   "Para WODs con dos marcas (p. ej. kg del back squat y reps de sandbag clean). Cada score tiene su ranking.": "Dla WOD-ów z dwoma wynikami (np. kg w back squacie i powtórzenia sandbag clean). Każdy wynik ma własny ranking.",
   "Nombre del score 1": "Nazwa wyniku 1",
