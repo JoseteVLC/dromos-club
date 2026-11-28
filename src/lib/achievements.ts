@@ -121,6 +121,7 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
   let murph: string | null = null;
   let pr25: string | null = null;
   let club100: string | null = null;
+  const clubKg = me?.gender === "F" ? 80 : 100;
   const benches = new Set<string>();
   let bench10: string | null = null;
   for (const e of evs) {
@@ -129,8 +130,8 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
       if (benches.size === 10 && !bench10) bench10 = e.date;
     }
     if (e.bench === "murph" && !murph) murph = e.date;
-    // Club de los 100: snatch (cualquier variante salvo el snatch balance) de 100 kg o más
-    if (/snatch/.test(e.bench) && !/balance/.test(e.bench) && e.type === "load" && Number(e.res.value ?? 0) >= 100 && !club100) club100 = e.date;
+    // Club de los 100: snatch (cualquier variante salvo el snatch balance) de 100 kg en chicos u 80 kg en chicas
+    if (/snatch/.test(e.bench) && !/balance/.test(e.bench) && e.type === "load" && Number(e.res.value ?? 0) >= clubKg && !club100) club100 = e.date;
     if (e.cat === "girls" && !girls.has(e.bench)) {
       girls.add(e.bench);
       if (girls.size === 5 && !girls5) girls5 = e.date;
@@ -161,7 +162,7 @@ export async function computeMedals(supabase: SupabaseClient, userId: string, bo
 
   // --- Comunidad: comentarios y reacciones dados ---
   const social = [...(myComments ?? []), ...(myReactions ?? []), ...(myCommentReactions ?? [])].map((x) => String(x.created_at)).sort();
-  set("social25", social.length, social[24]?.slice(0, 10) ?? null);
+  set("social25", social.length, social[49]?.slice(0, 10) ?? null);
 
   // --- Podio y victorias (en tu división y género, con al menos 3 atletas) ---
   // Solo WODs ya cerrados (2 días de margen) y solo con los resultados metidos antes del cierre:

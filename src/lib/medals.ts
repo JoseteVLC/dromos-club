@@ -36,7 +36,7 @@ export const MEDALS: MedalDef[] = [
   { code: "pr1", name: "Rompe-récords", desc: "Consigue tu primer PR", target: 1, group: "prs", repeat: true },
   { code: "pr10", name: "Coleccionista", desc: "Bate 10 PRs", target: 10, group: "prs" },
   { code: "pr25", name: "Cohete", desc: "Bate 25 PRs", target: 25, group: "prs" },
-  { code: "club100", name: "Club de los 100", desc: "Snatch de 100 kg o más", target: 1, group: "prs" },
+  { code: "club100", name: "Club de los 100", desc: "Snatch de 100 kg (chicos) u 80 kg (chicas)", target: 1, group: "prs" },
 
   { code: "girls5", name: "Las chicas", desc: "Completa 5 Girls distintas", target: 5, group: "benchmarks" },
   { code: "hero5", name: "Héroe", desc: "Completa 5 Hero WODs distintos", target: 5, group: "benchmarks" },
@@ -47,7 +47,7 @@ export const MEDALS: MedalDef[] = [
   { code: "winner", name: "Campeón", desc: "Gana un WOD de tu categoría (mín. 3 atletas)", target: 1, group: "competicion", repeat: true },
   { code: "winner5", name: "Dinastía", desc: "Gana 5 WODs de tu categoría", target: 5, group: "competicion" },
 
-  { code: "social25", name: "Alma del box", desc: "Anima a la comunidad: 25 comentarios o reacciones", target: 25, group: "comunidad" },
+  { code: "social25", name: "Alma del box", desc: "Anima a la comunidad: 50 comentarios o reacciones", target: 50, group: "comunidad" },
 ];
 
 export const MEDAL_BY_CODE = new Map(MEDALS.map((m) => [m.code, m]));
